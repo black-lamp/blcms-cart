@@ -12,7 +12,7 @@ class m160923_135625_add_orders_table extends Migration
             'last_name' => $this->string(255)->notNull(),
             'email' => $this->string(255)->notNull(),
             'phone' => $this->string(255)->notNull(),
-            'address' => $this->integer(11)->notNull(),
+            'address' => $this->string(),
             'status' => $this->smallInteger(1)->defaultValue(0),
         ]);
 
@@ -22,8 +22,8 @@ class m160923_135625_add_orders_table extends Migration
             'count' => $this->integer(11)->defaultValue(1),
         ]);
 
-        $this->addForeignKey('order_product_product_id_product_id', 'shop_order_product', 'product_id', 'shop_product', 'id');
-        $this->addForeignKey('order_product_order_id_order_id', 'shop_order_product', 'order_id', 'shop_order', 'id');
+        $this->addForeignKey('order_product_product_id_product_id', 'shop_order_product', 'product_id', 'shop_product', 'id', 'cascade', 'cascade');
+        $this->addForeignKey('order_product_order_id_order_id', 'shop_order_product', 'order_id', 'shop_order', 'id', 'cascade', 'cascade');
     }
 
     public function down()
@@ -32,6 +32,6 @@ class m160923_135625_add_orders_table extends Migration
         $this->dropForeignKey('order_product_product_id_product_id', 'shop_order_product');
 
         $this->dropTable('shop_order_product');
-        $this->dropTable('shop_orders');
+        $this->dropTable('shop_order');
     }
 }
