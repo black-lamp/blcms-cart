@@ -1,0 +1,22 @@
+{
+  "name": "black-lamp/blcms-cart",
+  "description": "Cart component for Blcms-shop module",
+  "keywords": ["yii2", "cart", "shop", "blcms"],
+  "type": "yii2-extension",
+  "authors": [
+    {
+      "name": "Albert Gainutdinov",
+      "email": "xalbert.einsteinx@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.4.0",
+    "yiisoft/yii2": ">=2.0.4",
+    "black-lamp/blcms-shop": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "bl\\cms\\cart\\": ""
+    }
+  }
+}
