@@ -10,6 +10,7 @@ use yii\db\ActiveRecord;
  * @author Albert Gainutdinov <xalbert.einsteinx@gmail.com>
  *
  * @property integer $id
+ * @property integer $user_id
  * @property string $first_name
  * @property string $last_name
  * @property string $email
@@ -36,8 +37,8 @@ class Order extends ActiveRecord
     public function rules()
     {
         return [
-            [['first_name', 'last_name', 'email', 'phone'], 'required'],
-            [['status'], 'integer'],
+            [['first_name', 'last_name', 'email', 'phone', 'user_id'], 'required'],
+            [['status', 'user_id'], 'integer'],
             [['first_name', 'last_name', 'email', 'phone', 'address'], 'string', 'max' => 255],
         ];
     }
