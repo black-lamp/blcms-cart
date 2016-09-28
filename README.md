@@ -44,7 +44,7 @@ php yii migrate --migrationPath=@vendor/black-lamp/blcms-cart/migrations
     ],
 'components' => [
             'mailer' => [
-    //            'useFileTransport' => true,
+                'useFileTransport' => true,
                 'class' => 'yii\swiftmailer\Mailer',
                 'transport' => [
                     'class' => 'Swift_SmtpTransport',
