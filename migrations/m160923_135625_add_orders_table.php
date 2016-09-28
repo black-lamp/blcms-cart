@@ -12,7 +12,7 @@ class m160923_135625_add_orders_table extends Migration
             'first_name' => $this->string(255),
             'last_name' => $this->string(255),
             'email' => $this->string(255),
-            'phone' => $this->string(255),
+            'phone' => $this->integer(255),
             'address' => $this->string(),
             'status' => $this->string()->notNull()->defaultValue(0),
         ]);
