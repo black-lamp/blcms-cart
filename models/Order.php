@@ -40,7 +40,7 @@ class Order extends ActiveRecord
     public function rules()
     {
         return [
-            [['user_id', 'status'], 'required'],
+            [['status'], 'required'],
             [['user_id', 'phone', 'status'], 'integer'],
             [['first_name', 'last_name', 'email', 'address'], 'string', 'max' => 255],
             [['email'], 'email'],
