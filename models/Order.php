@@ -1,6 +1,7 @@
 <?php
 namespace bl\cms\cart\models;
 
+use dektrium\user\models\User;
 use Yii;
 use yii\db\ActiveRecord;
 
@@ -18,7 +19,9 @@ use yii\db\ActiveRecord;
  * @property string $address
  * @property integer $status
  *
- * @property OrderProduct[] $orderProducts
+ * @property User $user
+ * @property OrderStatus $orderStatus
+ * @property OrderProduct[] $OrderProducts
  */
 
 class Order extends ActiveRecord
@@ -38,9 +41,11 @@ class Order extends ActiveRecord
     {
         return [
             [['user_id', 'status'], 'required'],
-            [['phone'], 'integer'],
+            [['user_id', 'phone', 'status'], 'integer'],
+            [['first_name', 'last_name', 'email', 'address'], 'string', 'max' => 255],
             [['email'], 'email'],
-            [['status', 'first_name', 'last_name', 'address'], 'string', 'max' => 255],
+            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
+            [['status'], 'exist', 'skipOnError' => true, 'targetClass' => OrderStatus::className(), 'targetAttribute' => ['status' => 'id']],
         ];
     }
 
@@ -58,6 +63,22 @@ class Order extends ActiveRecord
             'address' => Yii::t('shop', 'Address'),
             'status' => Yii::t('shop', 'Status'),
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(User::className(), ['id' => 'user_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOrderStatus()
+    {
+        return $this->hasOne(OrderStatus::className(), ['id' => 'status']);
     }
 
     /**

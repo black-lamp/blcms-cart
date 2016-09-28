@@ -11,6 +11,7 @@ use yii\db\ActiveRecord;
  *
  * @author Albert Gainutdinov <xalbert.einsteinx@gmail.com>
  *
+ * @property integer $id
  * @property integer $product_id
  * @property integer $order_id
  * @property integer $count
@@ -34,7 +35,7 @@ class OrderProduct extends ActiveRecord
     public function rules()
     {
         return [
-            [['count'], 'required'],
+            [['product_id', 'order_id', 'count'], 'required'],
             [['product_id', 'order_id', 'count'], 'integer'],
             [['order_id'], 'exist', 'skipOnError' => true, 'targetClass' => Order::className(), 'targetAttribute' => ['order_id' => 'id']],
             [['product_id'], 'exist', 'skipOnError' => true, 'targetClass' => Product::className(), 'targetAttribute' => ['product_id' => 'id']],
