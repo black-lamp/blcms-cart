@@ -1,5 +1,5 @@
 <?php
-namespace bl\cms\cart;
+namespace bl\cms\cart\models;
 
 use Yii;
 use yii\db\ActiveRecord;
@@ -37,9 +37,10 @@ class Order extends ActiveRecord
     public function rules()
     {
         return [
-            [['first_name', 'last_name', 'email', 'phone', 'user_id'], 'required'],
-            [['status', 'user_id'], 'integer'],
-            [['first_name', 'last_name', 'email', 'phone', 'address'], 'string', 'max' => 255],
+            [['user_id', 'status'], 'required'],
+            [['phone'], 'integer'],
+            [['email'], 'email'],
+            [['status', 'first_name', 'last_name', 'address'], 'string', 'max' => 255],
         ];
     }
 

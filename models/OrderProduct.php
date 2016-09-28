@@ -1,9 +1,10 @@
 <?php
 
-namespace bl\cms\cart;
+namespace bl\cms\cart\models;
 
 use bl\cms\shop\common\entities\Product;
 use Yii;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "shop_order_product".
@@ -17,7 +18,7 @@ use Yii;
  * @property Order $order
  * @property Product $product
  */
-class OrderProduct extends \yii\db\ActiveRecord
+class OrderProduct extends ActiveRecord
 {
     /**
      * @inheritdoc
@@ -33,7 +34,7 @@ class OrderProduct extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['product_id', 'order_id'], 'required'],
+            [['count'], 'required'],
             [['product_id', 'order_id', 'count'], 'integer'],
             [['order_id'], 'exist', 'skipOnError' => true, 'targetClass' => Order::className(), 'targetAttribute' => ['order_id' => 'id']],
             [['product_id'], 'exist', 'skipOnError' => true, 'targetClass' => Product::className(), 'targetAttribute' => ['product_id' => 'id']],

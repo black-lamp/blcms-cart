@@ -8,16 +8,17 @@ class m160923_135625_add_orders_table extends Migration
     {
         $this->createTable('shop_order', [
             'id' => $this->primaryKey(),
-            'user_id' => $this->integer(),
-            'first_name' => $this->string(255)->notNull(),
-            'last_name' => $this->string(255)->notNull(),
-            'email' => $this->string(255)->notNull(),
-            'phone' => $this->string(255)->notNull(),
+            'user_id' => $this->integer()->notNull(),
+            'first_name' => $this->string(255),
+            'last_name' => $this->string(255),
+            'email' => $this->string(255),
+            'phone' => $this->string(255),
             'address' => $this->string(),
-            'status' => $this->smallInteger(1)->defaultValue(0),
+            'status' => $this->string()->notNull()->defaultValue(0),
         ]);
 
         $this->createTable('shop_order_product', [
+            'id' => $this->primaryKey(),
             'product_id' => $this->integer(11)->notNull(),
             'order_id' => $this->integer(11)->notNull(),
             'count' => $this->integer(11)->defaultValue(1),

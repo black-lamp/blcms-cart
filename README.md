@@ -36,14 +36,26 @@ php yii migrate --migrationPath=@vendor/black-lamp/blcms-cart/migrations
             'class' => 'bl\cms\shop\frontend\Module',
             'cartConfig' => [
                 'emailNotifications' => true,
-                'sendTo' => [
-                    'guts.vadim@gmail.com',
-                    'xalbert.einsteinx@gmail.com'
-                ],
+                sender => '',
+                'sendTo' => [],
                 'saveToDataBase' => true
             ]
         ]
-    ]
+    ],
+'components' => [
+            'mailer' => [
+    //            'useFileTransport' => true,
+                'class' => 'yii\swiftmailer\Mailer',
+                'transport' => [
+                    'class' => 'Swift_SmtpTransport',
+                    'username' => '',
+                    'password' => '',
+                    'host' => 'smtp.gmail.com',
+                    'port' => '587',
+                    'encryption' => 'tls',
+                ],
+            ],
+]
 ```
 
 
