@@ -3,6 +3,7 @@
 namespace bl\cms\cart\models;
 
 use bl\cms\shop\common\entities\Product;
+use bl\cms\shop\common\entities\ProductPrice;
 use Yii;
 use yii\db\ActiveRecord;
 
@@ -13,11 +14,13 @@ use yii\db\ActiveRecord;
  *
  * @property integer $id
  * @property integer $product_id
+ * @property integer $price_id
  * @property integer $order_id
  * @property integer $count
  *
  * @property Order $order
  * @property Product $product
+ * @property ProductPrice $productPrice
  */
 class OrderProduct extends ActiveRecord
 {
@@ -36,7 +39,8 @@ class OrderProduct extends ActiveRecord
     {
         return [
             [['product_id', 'order_id', 'count'], 'required'],
-            [['product_id', 'order_id', 'count'], 'integer'],
+            [['product_id', 'order_id', 'price_id', 'count'], 'integer'],
+            [['price_id'], 'exist', 'skipOnError' => true, 'targetClass' => ProductPrice::className(), 'targetAttribute' => ['price_id' => 'id']],
             [['order_id'], 'exist', 'skipOnError' => true, 'targetClass' => Order::className(), 'targetAttribute' => ['order_id' => 'id']],
             [['product_id'], 'exist', 'skipOnError' => true, 'targetClass' => Product::className(), 'targetAttribute' => ['product_id' => 'id']],
         ];
@@ -68,5 +72,13 @@ class OrderProduct extends ActiveRecord
     public function getProduct()
     {
         return $this->hasOne(Product::className(), ['id' => 'product_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getProductPrice()
+    {
+        return $this->hasOne(ProductPrice::className(), ['id' => 'price_id']);
     }
 }

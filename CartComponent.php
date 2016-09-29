@@ -30,10 +30,7 @@ class CartComponent extends Component
     const SESSION_KEY = 'shop_order';
 
     /*Order status constants*/
-    const STATUS_INCOMPLETE = 'incomplete';
-    const STATUS_CONFIRMED = 'confirmed';
-    const STATUS_SHIPPED = 'shipped';
-    const STATUS_CANCELED = 'canceled';
+    const STATUS_INCOMPLETE = 1;
 
 
     public function __construct($config)
@@ -47,17 +44,17 @@ class CartComponent extends Component
     }
 
 
-    public function add($productId, $count) {
+    public function add($productId, $count, $priceId) {
 
         if ($this->saveToDataBase) {
-            $this->saveProductToDataBase($productId, $count);
+            $this->saveProductToDataBase($productId, $count, $priceId);
         }
         else {
-            $this->saveProductToSession($productId, $count);
+            $this->saveProductToSession($productId, $count, $priceId);
         }
     }
 
-    private function saveProductToDataBase($productId, $count) {
+    private function saveProductToDataBase($productId, $count, $priceId) {
         if (!\Yii::$app->user->isGuest) {
 
             $order = Order::find()->where(['user_id' => \Yii::$app->user->id, 'status' => self::STATUS_INCOMPLETE])->one();
@@ -65,22 +62,34 @@ class CartComponent extends Component
                 $order = new Order();
                 $order->user_id = \Yii::$app->user->id;
                 $order->status = self::STATUS_INCOMPLETE;
-                $order->save();
+                if (!$order->save()) {
+                    die(var_dump($order->errors));
+                }
             }
-            $orderProduct = OrderProduct::findOne(['product_id' => $productId, 'order_id' => $order->id]);
+
+            $orderProduct = (!empty($price_id)) ? OrderProduct::findOne(['price_id' => $priceId, 'order_id' => $order->id]) :
+                OrderProduct::findOne(['product_id' => $productId, 'order_id' => $order->id]);
+
             if (empty($orderProduct)) {
                 $orderProduct = new OrderProduct();
                 $orderProduct->product_id = $productId;
+
+                if (!empty($priceId)) {
+                    $orderProduct->price_id = $priceId;
+                }
                 $orderProduct->order_id = $order->id;
             }
 
             $orderProduct->count += $count;
-            $orderProduct->save();
+            if (!$orderProduct->save()) {
+                die(var_dump($orderProduct->errors));
+            }
+
         }
         else throw new ForbiddenHttpException();
     }
 
-    private function saveProductToSession($productId, $count) {
+    private function saveProductToSession($productId, $count, $priceId) {
         if (!Yii::$app->session->has(self::SESSION_KEY)) {
             $products = Yii::$app->session->get(self::SESSION_KEY);
 
