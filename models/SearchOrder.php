@@ -2,6 +2,7 @@
 
 namespace bl\cms\cart\models;
 
+use bl\cms\cart\CartComponent;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -41,7 +42,7 @@ class SearchOrder extends Order
      */
     public function search($params)
     {
-        $query = Order::find();
+        $query = Order::find()->where(['not in','status', [CartComponent::STATUS_INCOMPLETE]]);
 
         // add conditions that should always apply here
 

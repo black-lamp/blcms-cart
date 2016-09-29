@@ -31,6 +31,7 @@ class CartComponent extends Component
 
     /*Order status constants*/
     const STATUS_INCOMPLETE = 1;
+    const STATUS_CONFIRMED = 2;
 
 
     public function __construct($config)
