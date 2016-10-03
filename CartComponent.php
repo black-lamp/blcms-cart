@@ -45,9 +45,9 @@ class CartComponent extends Component
     }
 
 
-    public function add($productId, $count, $priceId) {
+    public function add($productId, $count, $priceId = null) {
 
-        if ($this->saveToDataBase) {
+        if ($this->saveToDataBase && !\Yii::$app->user->isGuest) {
             $this->saveProductToDataBase($productId, $count, $priceId);
         }
         else {
@@ -55,7 +55,7 @@ class CartComponent extends Component
         }
     }
 
-    private function saveProductToDataBase($productId, $count, $priceId) {
+    private function saveProductToDataBase($productId, $count, $priceId = null) {
         if (!\Yii::$app->user->isGuest) {
 
             $order = Order::find()->where(['user_id' => \Yii::$app->user->id, 'status' => self::STATUS_INCOMPLETE])->one();
@@ -90,26 +90,56 @@ class CartComponent extends Component
         else throw new ForbiddenHttpException();
     }
 
-    private function saveProductToSession($productId, $count, $priceId) {
-        if (!Yii::$app->session->has(self::SESSION_KEY)) {
-            $products = Yii::$app->session->get(self::SESSION_KEY);
+    private function saveProductToSession($productId, $count, $priceId = null) {
+        $session = Yii::$app->session;
 
-            $productInSession = array_filter($products, function($innerArray){
-                global $needle;
-                //return in_array($needle, $innerArray);    //Поиск по всему массиву
-                return ($innerArray[0] == $needle); //Поиск по первому значению
-            });
+        if ($session->has(self::SESSION_KEY)) {
+
+            $products = $session[self::SESSION_KEY];
+
+            if (!empty($products)) {
+                foreach ($products as $key => $product) {
+                    if ($product['id'] == $productId) {
+                        $products[$key]['count'] += $count;
+                        break;
+                    }
+                    else {
+                        if (count($products) == $products[count($products) - 1]) {
+                            $products[] = ['id' => $productId, 'count' => $count];
+                        }
+                    }
+                }
+                $session[self::SESSION_KEY] = $products;
+
+            }
+
+
+//            $products = Yii::$app->session->get(self::SESSION_KEY);
+//            $productInSession = array_filter($products, function($innerArray){
+//                global $needle;
+//                //return in_array($needle, $innerArray);    //Поиск по всему массиву
+//                return ($innerArray[0] == $needle); //Поиск по первому значению
+//            });
 
         }
         else {
-            Yii::$app->session->set(self::SESSION_KEY, [$productId, $count]);
+
+            $session[self::SESSION_KEY] = [['id' => $productId, 'count' => $count]];
+//            Yii::$app->session->set(self::SESSION_KEY, ['productId' => $productId, 'count' => $count]);
+//            die(var_dump(Yii::$app->session->get(self::SESSION_KEY)));
         }
     }
 
     public function getOrderItems() {
-        $order = Order::find()->where(['user_id' => \Yii::$app->user->id, 'status' => $this::STATUS_INCOMPLETE])->one();
-        $order = OrderProduct::find()->where(['order_id' => $order->id])->one();
-        return $order;
+        if (\Yii::$app->user->isGuest) {
+            $session = \Yii::$app->session;
+            $products = $session[self::SESSION_KEY];
+        }
+        else {
+            $order = Order::find()->where(['user_id' => \Yii::$app->user->id, 'status' => self::STATUS_INCOMPLETE])->one();
+            $products = OrderProduct::find()->asArray()->where(['order_id' => $order->id])->all();
+        }
+        return $products;
     }
 
     public function getAllUserOrders() {
@@ -171,5 +201,10 @@ class CartComponent extends Component
 //                die(var_dump($ex));
             }
         }
+    }
+
+    public function clearCart() {
+        $session = \Yii::$app->session;
+        $session->remove(self::SESSION_KEY);
     }
 }
