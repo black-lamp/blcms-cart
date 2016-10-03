@@ -1,6 +1,7 @@
 <?php
 namespace bl\cms\cart;
 
+use bl\cms\shop\common\components\user\models\UserAddress;
 use Yii;
 use yii\base\Component;
 use yii\base\Exception;
@@ -152,26 +153,35 @@ class CartComponent extends Component
 
     public function makeOrder($customerData) {
         $order = Order::find()->where(['user_id' => \Yii::$app->user->id, 'status' => self::STATUS_INCOMPLETE])->one();
-        if (empty($order)) {
-            Yii::$app->session->setFlash('error', \Yii::t('shop', 'You did not add to cart no one product.'));
-            return false;
-        }
-        else {
-            $order->first_name = $customerData['Order']['first_name'];
-            $order->last_name = $customerData['Order']['last_name'];
-            $order->email = $customerData['Order']['email'];
-            $order->phone = $customerData['Order']['phone'];
-            $order->address = $customerData['Order']['address'];
-            $order->status = self::STATUS_CONFIRMED;
-            if ($order->validate()) {
-                $order->save();
 
-                if ($this->emailNotifications) {
-                    $this->sendMail($order);
-                }
-            }
-            return true;
+        if (empty($order)) {
+            $order = new Order();
         }
+
+        $address = new UserAddress();
+
+        $order->status = self::STATUS_CONFIRMED;
+        if ($order->load($customerData) && $address->load($customerData)) {
+
+            $order->user_id = (!empty($order->user_id)) ? $order->user_id : \Yii::$app->user->id;
+            $order->first_name = (!empty($order->first_name)) ? $order->first_name : \Yii::$app->user->identity->profile->name;
+            $order->last_name = (!empty($order->last_name)) ? $order->last_name : \Yii::$app->user->identity->profile->surname;
+            $order->email = (!empty($order->email)) ? $order->email : \Yii::$app->user->identity->email;
+            $order->phone = (!empty($order->phone)) ? $order->phone : \Yii::$app->user->identity->profile->phone;
+
+            $order->address = $address->id;
+            $address->user_profile_id = \Yii::$app->user->id;
+
+
+            if ($order->validate() && $address->validate()) {
+
+                $order->save();
+                $address->save();
+                $this->sendMail($order);
+                return true;
+            }
+        }
+        return false;
     }
 
     private function sendMail($order) {
