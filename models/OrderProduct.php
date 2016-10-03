@@ -4,6 +4,7 @@ namespace bl\cms\cart\models;
 
 use bl\cms\shop\common\entities\Product;
 use bl\cms\shop\common\entities\ProductPrice;
+use bl\cms\shop\common\entities\ProductTranslation;
 use Yii;
 use yii\db\ActiveRecord;
 
