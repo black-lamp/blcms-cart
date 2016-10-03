@@ -92,7 +92,6 @@ class CartComponent extends Component
 
     private function saveProductToSession($productId, $count, $priceId = null) {
         $session = Yii::$app->session;
-
         if ($session->has(self::SESSION_KEY)) {
 
             $products = $session[self::SESSION_KEY];
@@ -104,7 +103,7 @@ class CartComponent extends Component
                         break;
                     }
                     else {
-                        if (count($products) == $products[count($products) - 1]) {
+                        if (count($products) - 1 == $key) {
                             $products[] = ['id' => $productId, 'count' => $count];
                         }
                     }
@@ -112,14 +111,6 @@ class CartComponent extends Component
                 $session[self::SESSION_KEY] = $products;
 
             }
-
-
-//            $products = Yii::$app->session->get(self::SESSION_KEY);
-//            $productInSession = array_filter($products, function($innerArray){
-//                global $needle;
-//                //return in_array($needle, $innerArray);    //Поиск по всему массиву
-//                return ($innerArray[0] == $needle); //Поиск по первому значению
-//            });
 
         }
         else {
@@ -136,10 +127,17 @@ class CartComponent extends Component
             $products = $session[self::SESSION_KEY];
         }
         else {
+
             $order = Order::find()->where(['user_id' => \Yii::$app->user->id, 'status' => self::STATUS_INCOMPLETE])->one();
-            $products = OrderProduct::find()->asArray()->where(['order_id' => $order->id])->all();
+            if (!empty($order)) {
+                $products = OrderProduct::find()->asArray()->where(['order_id' => $order->id])->all();
+
+            }
+            else return false;
+
         }
         return $products;
+
     }
 
     public function getAllUserOrders() {
@@ -198,13 +196,62 @@ class CartComponent extends Component
                     ->send();
             }
             catch(Exception $ex) {
-//                die(var_dump($ex));
             }
         }
     }
 
     public function clearCart() {
-        $session = \Yii::$app->session;
-        $session->remove(self::SESSION_KEY);
+        if (\Yii::$app->user->isGuest) {
+            $session = \Yii::$app->session;
+            $session->remove(self::SESSION_KEY);
+        }
+        else {
+            $order = Order::find()->where(['user_id' => \Yii::$app->user->id, 'status' => self::STATUS_INCOMPLETE])->one();
+            $order->delete();
+        }
+    }
+
+    public function transportSessionDataToDB() {
+
+        $session = Yii::$app->session;
+
+        if ($session->has(self::SESSION_KEY)) {
+
+            $order = Order::find()->where(['user_id' => \Yii::$app->user->id, 'status' => self::STATUS_INCOMPLETE])->one();
+            if (empty($order)) {
+                $order = new Order();
+                $order->user_id = \Yii::$app->user->id;
+                $order->status = self::STATUS_INCOMPLETE;
+                if ($order->validate()) {
+                    $order->save();
+                }
+            }
+
+            $products = $session[self::SESSION_KEY];
+            foreach ($products as $product) {
+
+                $orderProduct = OrderProduct::find()->where(['product_id' => $product['id']])->one();
+                if (empty($orderProduct)) {
+                    $orderProduct = new OrderProduct;
+
+                    $orderProduct->order_id = $order->id;
+                    $orderProduct->product_id = $product['id'];
+                    $orderProduct->count = $product['count'];
+                }
+                else {
+                    $orderProduct->count += $product['count'];
+                }
+
+
+                if ($orderProduct->validate()) {
+                    $orderProduct->save();
+                }
+                else throw new Exception($orderProduct->errors);
+
+            }
+
+        }
+        \Yii::$app->getResponse()->redirect(\Yii::$app->request->referrer);
+        \Yii::$app->end();
     }
 }
