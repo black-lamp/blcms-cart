@@ -11,39 +11,30 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /**
- * @var yii\web\View              $this
+ * @var yii\web\View $this
  * @var dektrium\user\models\User $user
- * @var dektrium\user\Module      $module
+ * @var dektrium\user\Module $module
  */
 
-$this->title = Yii::t('user', 'Sign up');
-$this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="row">
-    <div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title"><?= Html::encode($this->title) ?></h3>
-            </div>
+<?php $form = ActiveForm::begin([
+    'action' => '/user/registration/register',
+    'id' => 'registration-form',
+]); ?>
+<div class="modal-body">
+    <div class="row">
+        <div class="col-md-12">
             <div class="panel-body">
-                <?php $form = ActiveForm::begin([
-                    'action' => '/user/registration/register',
-                    'id' => 'registration-form',
-                ]); ?>
-
                 <?= $form->field($model, 'email') ?>
-
                 <?= $form->field($model, 'username') ?>
-
                 <?= $form->field($model, 'password')->passwordInput() ?>
-
-                <?= Html::submitButton(Yii::t('user', 'Sign up'), ['class' => 'btn btn-success btn-block']) ?>
-
-                <?php ActiveForm::end(); ?>
             </div>
         </div>
-        <p class="text-center">
-            <?= Html::a(Yii::t('user', 'Already registered? Sign in!'), ['/user/security/login']) ?>
-        </p>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+        <?= Html::submitButton(Yii::t('user', 'Sign up'), ['class' => 'btn btn-success']) ?>
     </div>
 </div>
+<?php ActiveForm::end(); ?>
