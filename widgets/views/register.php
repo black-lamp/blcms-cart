@@ -29,6 +29,7 @@ use yii\widgets\ActiveForm;
                 <?= $form->field($model, 'password')->passwordInput() ?>
                 <?= $form->field($profile, 'name') ?>
                 <?= $form->field($profile, 'surname') ?>
+                <?= $form->field($profile, 'patronymic') ?>
                 <?= $form->field($profile, 'phone') ?>
             </div>
         </div>
