@@ -254,6 +254,7 @@ class CartComponent extends Component
 
 
                 if ($orderProduct->validate()) {
+
                     $orderProduct->save();
                 }
                 else throw new Exception($orderProduct->errors);
