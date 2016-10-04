@@ -1,6 +1,7 @@
 <?php
 namespace bl\cms\cart\widgets;
 
+use bl\cms\shop\common\components\user\models\Profile;
 use dektrium\user\models\RegistrationForm;
 use yii\base\Widget;
 
@@ -23,6 +24,7 @@ class Register extends Widget
     public function run()
     {
         return $this->render('register', [
+            'profile' => \Yii::createObject(Profile::className()),
             'model' => \Yii::createObject(RegistrationForm::className()),
         ]);
     }

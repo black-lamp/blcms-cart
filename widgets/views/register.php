@@ -13,7 +13,6 @@ use yii\widgets\ActiveForm;
 /**
  * @var yii\web\View $this
  * @var dektrium\user\models\User $user
- * @var dektrium\user\Module $module
  */
 
 ?>
@@ -28,6 +27,9 @@ use yii\widgets\ActiveForm;
                 <?= $form->field($model, 'email') ?>
                 <?= $form->field($model, 'username') ?>
                 <?= $form->field($model, 'password')->passwordInput() ?>
+                <?= $form->field($profile, 'name') ?>
+                <?= $form->field($profile, 'surname') ?>
+                <?= $form->field($profile, 'phone') ?>
             </div>
         </div>
     </div>
