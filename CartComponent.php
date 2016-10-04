@@ -1,6 +1,7 @@
 <?php
 namespace bl\cms\cart;
 
+use bl\cms\shop\common\components\user\models\Profile;
 use bl\cms\shop\common\components\user\models\UserAddress;
 use Yii;
 use yii\base\Component;
@@ -161,25 +162,30 @@ class CartComponent extends Component
         $address = new UserAddress();
 
         $order->status = self::STATUS_CONFIRMED;
-        if ($order->load($customerData) && $address->load($customerData)) {
+
+        $profile = Profile::find()->where(['user_id' => \Yii::$app->user->id])->one();
+
+        if ($profile->load($customerData)) {
+            if ($profile->validate()) {
+                $profile->save();
+            }
+            else throw new Exception($profile->errors);
+        }
+        if ($address->load($customerData)) {
 
             $order->user_id = (!empty($order->user_id)) ? $order->user_id : \Yii::$app->user->id;
-            $order->first_name = (!empty($order->first_name)) ? $order->first_name : \Yii::$app->user->identity->profile->name;
-            $order->last_name = (!empty($order->last_name)) ? $order->last_name : \Yii::$app->user->identity->profile->surname;
-            $order->email = (!empty($order->email)) ? $order->email : \Yii::$app->user->identity->email;
-            $order->phone = (!empty($order->phone)) ? $order->phone : \Yii::$app->user->identity->profile->phone;
 
-            $order->address = $address->id;
-            $address->user_profile_id = \Yii::$app->user->id;
+            $order->address_id = $address->id;
+            $address->user_profile_id = \Yii::$app->user->identity->profile->id;
 
-
-            if ($order->validate() && $address->validate()) {
+            if ($address->validate()) {
 
                 $order->save();
                 $address->save();
                 $this->sendMail($order);
                 return true;
             }
+
         }
         return false;
     }
