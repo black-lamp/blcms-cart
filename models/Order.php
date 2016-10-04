@@ -1,6 +1,7 @@
 <?php
 namespace bl\cms\cart\models;
 
+use bl\cms\shop\common\components\user\models\UserAddress;
 use dektrium\user\models\User;
 use Yii;
 use yii\db\ActiveRecord;
@@ -12,14 +13,11 @@ use yii\db\ActiveRecord;
  *
  * @property integer $id
  * @property integer $user_id
- * @property string $first_name
- * @property string $last_name
- * @property string $email
- * @property string $phone
- * @property string $address
  * @property integer $status
+ * @property integer $address_id
  *
  * @property User $user
+ * @property UserAddress $address
  * @property OrderStatus $orderStatus
  * @property OrderProduct[] $OrderProducts
  */
@@ -40,11 +38,10 @@ class Order extends ActiveRecord
     public function rules()
     {
         return [
-            [['status'], 'required'],
-            [['user_id', 'phone', 'status'], 'integer'],
-            [['first_name', 'last_name', 'email', 'address'], 'string', 'max' => 255],
-            [['email'], 'email'],
+            [['user_id'], 'required'],
+            [['user_id', 'status', 'address_id'], 'integer'],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
+            [['address_id'], 'exist', 'skipOnError' => true, 'targetClass' => UserAddress::className(), 'targetAttribute' => ['address_id' => 'id']],
             [['status'], 'exist', 'skipOnError' => true, 'targetClass' => OrderStatus::className(), 'targetAttribute' => ['status' => 'id']],
         ];
     }
@@ -55,12 +52,6 @@ class Order extends ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('shop', 'ID'),
-            'first_name' => Yii::t('shop', 'First Name'),
-            'last_name' => Yii::t('shop', 'Last Name'),
-            'email' => Yii::t('shop', 'Email'),
-            'phone' => Yii::t('shop', 'Phone'),
-            'address' => Yii::t('shop', 'Address'),
             'status' => Yii::t('shop', 'Status'),
         ];
     }
@@ -72,6 +63,15 @@ class Order extends ActiveRecord
     {
         return $this->hasOne(User::className(), ['id' => 'user_id']);
     }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAddress()
+    {
+        return $this->hasOne(UserAddress::className(), ['id' => 'address_id']);
+    }
+
 
     /**
      * @return \yii\db\ActiveQuery
