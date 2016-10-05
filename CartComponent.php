@@ -6,6 +6,7 @@ use bl\cms\shop\common\components\user\models\UserAddress;
 use Yii;
 use yii\base\Component;
 use yii\base\Exception;
+use yii\helpers\Url;
 use yii\web\ForbiddenHttpException;
 use bl\cms\cart\models\Order;
 use bl\cms\cart\models\OrderProduct;
@@ -266,11 +267,8 @@ class CartComponent extends Component
                     $orderProduct->count = $product['count'];
                 }
                 else {
-                    die(var_dump($orderProduct));
-
                     $orderProduct->count += $product['count'];
                 }
-
 
                 if ($orderProduct->validate()) {
 
@@ -281,7 +279,7 @@ class CartComponent extends Component
             }
 
         }
-        \Yii::$app->getResponse()->redirect(\Yii::$app->request->referrer);
+        \Yii::$app->getResponse()->redirect(Url::toRoute('/shop/cart/show'));
         \Yii::$app->end();
     }
 }

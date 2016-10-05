@@ -20,7 +20,8 @@ class SearchOrder extends Order
     {
         return [
             [['id', 'user_id'], 'integer'],
-            [['first_name', 'last_name', 'email', 'phone', 'address', 'status'], 'safe'],
+//            [['first_name', 'last_name', 'email', 'phone', 'address', 'status'], 'safe'],
+            [['status'], 'safe'],
         ];
     }
 
@@ -64,11 +65,12 @@ class SearchOrder extends Order
             'user_id' => $this->user_id,
         ]);
 
-        $query->andFilterWhere(['like', 'first_name', $this->first_name])
-            ->andFilterWhere(['like', 'last_name', $this->last_name])
-            ->andFilterWhere(['like', 'email', $this->email])
-            ->andFilterWhere(['like', 'phone', $this->phone])
-            ->andFilterWhere(['like', 'address', $this->address])
+        $query
+//            ->andFilterWhere(['like', 'first_name', $this->first_name])
+//            ->andFilterWhere(['like', 'last_name', $this->last_name])
+//            ->andFilterWhere(['like', 'email', $this->email])
+//            ->andFilterWhere(['like', 'phone', $this->phone])
+//            ->andFilterWhere(['like', 'address', $this->address])
             ->andFilterWhere(['like', 'status', $this->status]);
 
         return $dataProvider;
