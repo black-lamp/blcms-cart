@@ -14,7 +14,7 @@ class m161004_113936_delete_columns_from_shop_order_table extends Migration
 
         $this->addColumn('shop_order', 'address_id', $this->integer());
 
-        $this->addForeignKey('shop_order_address:user_address_id', 'shop_order', 'address_id', 'user_address', 'id');
+        $this->addForeignKey('shop_order_address:user_address_id', 'shop_order', 'address_id', 'user_address', 'id', 'cascade', 'cascade');
 
     }
 
