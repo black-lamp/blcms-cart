@@ -159,8 +159,6 @@ class CartComponent extends Component
             $order = new Order();
         }
 
-        $address = new UserAddress();
-
         $order->status = self::STATUS_CONFIRMED;
 
         $profile = Profile::find()->where(['user_id' => \Yii::$app->user->id])->one();
@@ -171,22 +169,32 @@ class CartComponent extends Component
             }
             else throw new Exception($profile->errors);
         }
-        if ($address->load($customerData)) {
 
-            $order->user_id = (!empty($order->user_id)) ? $order->user_id : \Yii::$app->user->id;
+        if (empty($order->address_id)) {
+            $address = new UserAddress();
 
-            $order->address_id = $address->id;
-            $address->user_profile_id = \Yii::$app->user->identity->profile->id;
+            if ($address->load($customerData)) {
+                $address->user_profile_id = \Yii::$app->user->identity->profile->id;
 
-            if ($address->validate()) {
+                if ($address->validate()) {
+                    $address->save();
+                    $order->address_id = $address->id;
+                    $order->user_id = (!empty($order->user_id)) ? $order->user_id : \Yii::$app->user->id;
+                    $order->save();
+                    $this->sendMail($order);
+                    return true;
+                }
 
-                $order->save();
-                $address->save();
-                $this->sendMail($order);
-                return true;
             }
-
         }
+        else {
+            $order->user_id = (!empty($order->user_id)) ? $order->user_id : \Yii::$app->user->id;
+            $order->save();
+            $this->sendMail($order);
+            return true;
+        }
+
+
         return false;
     }
 
@@ -223,7 +231,7 @@ class CartComponent extends Component
         }
         else {
             $order = Order::find()->where(['user_id' => \Yii::$app->user->id, 'status' => self::STATUS_INCOMPLETE])->one();
-            $order->delete();
+            $order->deleteAll();
         }
     }
 
@@ -244,10 +252,13 @@ class CartComponent extends Component
             }
 
             $products = $session[self::SESSION_KEY];
+
             foreach ($products as $product) {
 
-                $orderProduct = OrderProduct::find()->where(['product_id' => $product['id']])->one();
+                $orderProduct = OrderProduct::find()
+                    ->where(['product_id' => $product['id'], 'order_id' => $order->id])->one();
                 if (empty($orderProduct)) {
+
                     $orderProduct = new OrderProduct;
 
                     $orderProduct->order_id = $order->id;
@@ -255,6 +266,8 @@ class CartComponent extends Component
                     $orderProduct->count = $product['count'];
                 }
                 else {
+                    die(var_dump($orderProduct));
+
                     $orderProduct->count += $product['count'];
                 }
 
