@@ -4,7 +4,6 @@ namespace bl\cms\cart\models;
 
 use bl\cms\shop\common\entities\Product;
 use bl\cms\shop\common\entities\ProductPrice;
-use bl\cms\shop\common\entities\ProductTranslation;
 use Yii;
 use yii\db\ActiveRecord;
 
@@ -75,11 +74,14 @@ class OrderProduct extends ActiveRecord
         return $this->hasOne(Product::className(), ['id' => 'product_id']);
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getProductPrice()
+    public function getPrice()
     {
-        return $this->hasOne(ProductPrice::className(), ['id' => 'price_id']);
+        $product = $this->product;
+
+        if (!empty($this->price_id)) {
+            $product->price = ProductPrice::findOne($this->price_id)->salePrice;
+        }
+
+        return $product->price;
     }
 }
