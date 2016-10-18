@@ -9,6 +9,7 @@ use yii\db\ActiveRecord;
  * @author Albert Gainutdinov <xalbert.einsteinx@gmail.com>
  *
  * @property integer $id
+ * @property integer $language_id
  * @property integer $delivery_method_id
  * @property string $title
  * @property string $description
@@ -31,7 +32,7 @@ class DeliveryMethodTranslation extends ActiveRecord
     public function rules()
     {
         return [
-            [['delivery_method_id'], 'integer'],
+            [['delivery_method_id', 'language_id'], 'integer'],
             [['title', 'description'], 'string', 'max' => 255],
             [['delivery_method_id'], 'exist', 'skipOnError' => true, 'targetClass' => DeliveryMethod::className(), 'targetAttribute' => ['delivery_method_id' => 'id']],
         ];

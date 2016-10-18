@@ -1,6 +1,7 @@
 <?php
 namespace bl\cms\cart\models;
 
+use bl\multilang\behaviors\TranslationBehavior;
 use Yii;
 use yii\db\ActiveRecord;
 
@@ -9,9 +10,8 @@ use yii\db\ActiveRecord;
  * @author Albert Gainutdinov <xalbert.einsteinx@gmail.com>
  *
  * @property integer $id
- * @property string $post_office
  *
- * @property DeliveryTranslation[] $deliveryTranslations
+ * @property DeliveryMethodTranslation[] $deliveryTranslations
  * @property Order[] $orders
  */
 class DeliveryMethod extends ActiveRecord
@@ -27,10 +27,23 @@ class DeliveryMethod extends ActiveRecord
     /**
      * @inheritdoc
      */
+    public function behaviors()
+    {
+        return [
+            'translation' => [
+                'class' => TranslationBehavior::className(),
+                'translationClass' => DeliveryMethodTranslation::className(),
+                'relationColumn' => 'delivery_method_id'
+            ],
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function rules()
     {
         return [
-            [['post_office'], 'string', 'max' => 255],
         ];
     }
 
@@ -49,7 +62,7 @@ class DeliveryMethod extends ActiveRecord
      */
     public function getShopDeliveryTranslations()
     {
-        return $this->hasMany(DeliveryTranslation::className(), ['delivery_method_id' => 'id']);
+        return $this->hasMany(DeliveryMethodTranslation::className(), ['delivery_method_id' => 'id']);
     }
 
     /**
