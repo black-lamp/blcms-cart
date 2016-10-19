@@ -8,6 +8,7 @@ class m161018_213803_add_delivery_method_to_order extends Migration
     {
         $this->createTable('shop_delivery_method', [
             'id' => $this->primaryKey(4),
+            'image_name' => $this->string(),
         ]);
         $this->createTable('shop_delivery_method_translation', [
             'id' => $this->primaryKey(4),
