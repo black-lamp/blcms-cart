@@ -15,6 +15,8 @@ use yii\db\ActiveRecord;
  * @property integer $user_id
  * @property integer $status
  * @property integer $address_id
+ * @property integer $delivery_id
+ * @property string $delivery_post_office
  *
  * @property User $user
  * @property UserAddress $address
@@ -43,6 +45,7 @@ class Order extends ActiveRecord
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
             [['address_id'], 'exist', 'skipOnError' => true, 'targetClass' => UserAddress::className(), 'targetAttribute' => ['address_id' => 'id']],
             [['status'], 'exist', 'skipOnError' => true, 'targetClass' => OrderStatus::className(), 'targetAttribute' => ['status' => 'id']],
+            [['delivery_id'], 'exist', 'skipOnError' => true, 'targetClass' => DeliveryMethod::className(), 'targetAttribute' => ['delivery_id' => 'id']],
         ];
     }
 
@@ -87,5 +90,13 @@ class Order extends ActiveRecord
     public function getOrderProducts()
     {
         return $this->hasMany(OrderProduct::className(), ['order_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDeliveryMethod()
+    {
+        return $this->hasMany(DeliveryMethod::className(), ['delivery_id' => 'id']);
     }
 }
