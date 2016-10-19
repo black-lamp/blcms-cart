@@ -69,10 +69,11 @@ class DeliveryMethod extends ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getShopDeliveryTranslations()
+    public function getTranslations()
     {
         return $this->hasMany(DeliveryMethodTranslation::className(), ['delivery_method_id' => 'id']);
     }
+
 
     /**
      * @return \yii\db\ActiveQuery

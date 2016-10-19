@@ -1,4 +1,6 @@
 <?php
+use yii\bootstrap\Html;
+
 /**
  * @author Albert Gainutdinov <xalbert.einsteinx@gmail.com>
  *
@@ -6,14 +8,22 @@
  * @var $form \yii\bootstrap\ActiveForm
  */
 
-use yii\bootstrap\Html;
+\bl\cms\cart\widgets\assets\DeliveryAsset::register($this);
 ?>
 
-<h3><?=Yii::t('cart', 'Select delivery method'); ?>:</h3>
+<div id="delivery-methods">
+    <h3><?= Yii::t('cart', 'Select delivery method'); ?>:</h3>
 
-<?php foreach ($deliveryMethods as $deliveryMethod) : ?>
-    <?= Html::radio('delivery_id', false, ['value' => $deliveryMethod->id, 'label' => $deliveryMethod->translation->title]); ?>
-<?php endforeach; ?>
+    <div class="row">
+        <ul class="col-md-4">
+            <?php foreach ($deliveryMethods as $deliveryMethod) : ?>
+                <li>
+                    <?= Html::radio('delivery_id', true, ['value' => $deliveryMethod->id, 'label' => $deliveryMethod->translation->title]); ?>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
+</div>
 
 
 
