@@ -19,9 +19,12 @@ DeliveryAsset::register($this);
 
     <div class="row">
 
-        <?= $form->field($model, 'delivery_id')->radioList(ArrayHelper::map($deliveryMethods, 'id', function ($item) {
-            return $item->translation->title;
-        }))->label(false); ?>
+        <?= $form->field($model, 'delivery_id')
+            ->radioList(ArrayHelper::map($deliveryMethods, 'id',
+                function ($item) {
+                    return $item->translation->title;
+                }))
+            ->label(false); ?>
 
         <div class="col-md-12 delivery-info">
             <div class="col-md-2">
@@ -31,14 +34,17 @@ DeliveryAsset::register($this);
                 <p id="delivery-title"></p>
                 <p id="delivery-description"></p>
 
-                <?= $form->field($model, 'delivery_post_office')->textInput(['id' => 'delivery_post_office']); ?>
+                <div class="post-office">
+                    <?= $form->field($model, 'delivery_post_office')->textInput(); ?>
 
-                <?= \bl\cms\cart\widgets\NovaPoshta::widget([
-                    'token' => 'b696152fde625f5e9b3c6a7a0318701f',
-                    'language' => (\Yii::$app->language == 'ru') ? 'ru' : 'ua',
-                    'formModel' => $config['addressModel'],
-                    'formAttribute' => 'postoffice'
-                ]); ?>
+                    <?= \bl\cms\cart\widgets\NovaPoshta::widget([
+                        'token' => 'b696152fde625f5e9b3c6a7a0318701f',
+                        'language' => (\Yii::$app->language == 'ru') ? 'ru' : 'ua',
+                        'formModel' => $config['addressModel'],
+                        'formAttribute' => 'postoffice'
+                    ]); ?>
+                </div>
+
             </div>
 
         </div>

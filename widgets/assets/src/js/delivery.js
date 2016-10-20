@@ -40,6 +40,22 @@ function getElementInfo(elementValue) {
             var methodDescription = $('#delivery-description');
             $(methodDescription).html(method.translations[1]['description']);
 
+            var postOfficeField = $('.post-office');
+            var addressFields = $('div.address');
+
+            switch (method.show_address_or_post_office) {
+                case '0' :
+                    postOfficeField.hide();
+                    addressFields.hide();
+                    break;
+                case '1' :
+                    postOfficeField.hide();
+                    addressFields.show();
+                    break;
+                case '2' :
+                    postOfficeField.show();
+                    addressFields.hide();
+            }
         }
     });
 }
