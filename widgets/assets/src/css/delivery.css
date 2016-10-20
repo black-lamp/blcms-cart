@@ -1,14 +1,11 @@
 #delivery-methods {
     min-height: 250px;
 }
-#delivery-methods > div > ul.methods-list {
-    margin: 0;
-    padding: 0;
-}
-#delivery-methods > div > ul.methods-list > li {
-    list-style: none;
-    padding: 15px;
+
+#delivery-methods div.radio {
     float: left;
+    padding: 15px;
+    margin: 0;
 }
 
 #delivery-methods img#delivery-logo {

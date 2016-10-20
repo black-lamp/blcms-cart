@@ -17,6 +17,7 @@ use yii\base\Widget;
  */
 class Delivery extends Widget
 {
+    public $form;
     public $model;
 
     public function init()
@@ -29,6 +30,7 @@ class Delivery extends Widget
         $deliveryMethods = DeliveryMethod::find()->all();
         return $this->render('delivery', [
             'deliveryMethods' => $deliveryMethods,
+            'form' => $this->form,
             'model' => $this->model,
         ]);
     }

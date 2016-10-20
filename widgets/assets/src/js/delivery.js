@@ -3,8 +3,9 @@
 $(document).ready(function () {
 
     /*CHECKED ELEMENT SETTINGS*/
-    var checkedElementValue = $('#delivery-methods input:checked').val();
-    getElementInfo(checkedElementValue);
+    var radioButtons = $('#delivery-methods input[type="radio"]');
+    $(radioButtons[0]).attr("checked","checked");
+    getElementInfo($(radioButtons[0]).val());
 
     /*SELECTED ELEMENT SETTINGS*/
     var inputs = $('#delivery-methods input[type="radio"]');
@@ -26,7 +27,6 @@ function getElementInfo(elementValue) {
 
         success: function (data) {
             var method = $.parseJSON(data).method;
-            console.log(method);
 
             /*METHOD LOGO SETTING*/
             var methodLogo = $('#delivery-logo');
