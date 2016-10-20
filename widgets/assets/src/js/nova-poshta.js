@@ -1,34 +1,45 @@
 $(document).ready(function () {
 
-    var novaPoshtaButton = $('#delivery-methods input[value="2"]');
+    var postOfficeField = $('#order-delivery_post_office');
 
-    if (!novaPoshtaButton.checked) {
-        $('#delivery_post_office').parent().hide();
-    }
 
-    novaPoshtaButton.change(function () {
-        if(this.checked){
-            $('#delivery_post_office').parent().show();
-        }
-        else{
-            $('#delivery_post_office').parent().hide();
-        }
+    $("#nova-poshta").change(function () {
+        var selectedValue = $("#useraddress-postoffice").val();
+        $(postOfficeField).val(selectedValue);
     });
+
+
+    // var novaPoshtaButton = $('#delivery-methods input[value="2"]');
+    //
+    // if (!novaPoshtaButton.checked) {
+    //     $('#delivery_post_office').parent().hide();
+    // }
+    //
+    // var novaPoshtaSelecting = $('#nova-poshta');
+    //
+    // novaPoshtaButton.change(function () {
+    //     if(this.checked){
+    //         $(novaPoshtaSelecting).show();
+    //     }
+    //     else{
+    //         $(novaPoshtaSelecting).hide();
+    //     }
+    // });
     
 
     
-    radioButtons.each(function() {
-        if ($(this).attr('value') == 1) {
-            if (this.checked) {
-                $('#delivery_post_office').parent().hide();
-            }
-        }
-        if ($(this).attr('value') == 1) {
-            if (this.checked) {
-                $('#delivery_post_office').parent().hide();
-            }
-        }
-
-    });
+    // radioButtons.each(function() {
+    //     if ($(this).attr('value') == 1) {
+    //         if (this.checked) {
+    //             $('#delivery_post_office').parent().hide();
+    //         }
+    //     }
+    //     if ($(this).attr('value') == 1) {
+    //         if (this.checked) {
+    //             $('#delivery_post_office').parent().hide();
+    //         }
+    //     }
+    //
+    // });
 
 });

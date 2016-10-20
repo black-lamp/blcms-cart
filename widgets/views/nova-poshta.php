@@ -12,13 +12,15 @@ use yii\bootstrap\Html;
 use yii\helpers\ArrayHelper;
 ?>
 
-<?= Html::activeDropDownList(
-    $model,
-    $attribute,
-    ArrayHelper::map($warehouses->data, 'Number', 'DescriptionRu'),
-    [
-        'class' => ''
-    ]);
-?>
+<div id="nova-poshta">
+    <?= Html::activeDropDownList(
+        $model,
+        $attribute,
+        ArrayHelper::map($warehouses->data, 'Number', 'DescriptionRu'),
+        [
+            'class' => ''
+        ]);
+    ?>
+</div>
 
 
