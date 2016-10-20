@@ -42,6 +42,7 @@ class Order extends ActiveRecord
         return [
             [['user_id'], 'required'],
             [['user_id', 'status', 'address_id'], 'integer'],
+            [['delivery_post_office'], 'string', 'max' => 255],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
             [['address_id'], 'exist', 'skipOnError' => true, 'targetClass' => UserAddress::className(), 'targetAttribute' => ['address_id' => 'id']],
             [['status'], 'exist', 'skipOnError' => true, 'targetClass' => OrderStatus::className(), 'targetAttribute' => ['status' => 'id']],
@@ -56,6 +57,7 @@ class Order extends ActiveRecord
     {
         return [
             'status' => Yii::t('shop', 'Status'),
+            'delivery_post_office' => Yii::t('shop', 'Post office'),
         ];
     }
 
