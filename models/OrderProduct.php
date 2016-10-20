@@ -3,7 +3,9 @@
 namespace bl\cms\cart\models;
 
 use bl\cms\shop\common\entities\Product;
+use bl\cms\shop\common\entities\ProductImage;
 use bl\cms\shop\common\entities\ProductPrice;
+use bl\imagable\helpers\FileHelper;
 use Yii;
 use yii\db\ActiveRecord;
 
@@ -83,5 +85,28 @@ class OrderProduct extends ActiveRecord
         }
 
         return $product->price;
+    }
+
+    public function getSmallPhoto() {
+        return $image = $this->getPhoto('small');
+    }
+    public function getThumbPhoto() {
+        return $image = $this->getPhoto('thumb');
+    }
+    public function getBigPhoto() {
+        return $image = $this->getPhoto('big');
+    }
+
+    private function getPhoto($size) {
+        $image = ProductImage::findOne($this->product_id);
+
+        if (!empty($image)) {
+            $imageName = $image->file_name;
+
+            $logo = \Yii::$app->shop_imagable->get('shop-product', $size, $imageName);
+
+            return '/images/shop-product/' . FileHelper::getFullName($logo);
+        }
+        else return false;
     }
 }
