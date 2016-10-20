@@ -23,6 +23,9 @@ class DeliveryMethod extends ActiveRecord
 
     public $logo;
 
+    const DO_NOT_SHOW_ADDRESS_OR_POST_OFFICE_FIELDS = 0;
+    const SHOW_ADDRESS_FIELDS = 1;
+    const SHOW_POST_OFFICE_FIELD = 2;
     /**
      * @inheritdoc
      */
@@ -52,6 +55,7 @@ class DeliveryMethod extends ActiveRecord
     {
         return [
             [['logo'], 'file', 'skipOnEmpty' => true, 'extensions' => 'png, jpg'],
+            [['show_address_or_post_office'], 'integer'],
             [['image_name'], 'string']
         ];
     }
@@ -63,6 +67,7 @@ class DeliveryMethod extends ActiveRecord
     {
         return [
             'logo' => Yii::t('shop', 'Logo'),
+            'show_address_or_post_office' => Yii::t('shop', 'Show address or post office fields')
         ];
     }
 
