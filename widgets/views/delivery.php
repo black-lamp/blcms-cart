@@ -15,13 +15,22 @@ use yii\bootstrap\Html;
     <h3><?= Yii::t('cart', 'Select delivery method'); ?>:</h3>
 
     <div class="row">
-        <ul class="col-md-4">
+        <ul class="methods-list col-md-12">
             <?php foreach ($deliveryMethods as $deliveryMethod) : ?>
                 <li>
                     <?= Html::radio('delivery_id', true, ['value' => $deliveryMethod->id, 'label' => $deliveryMethod->translation->title]); ?>
                 </li>
             <?php endforeach; ?>
         </ul>
+        <div class="col-md-12 delivery-info">
+            <div class="col-md-2">
+                <img id="delivery-logo" src="" alt="">
+            </div>
+            <div class="col-md-10">
+                <p id="delivery-title"></p>
+                <p id="delivery-description"></p>
+            </div>
+        </div>
     </div>
 </div>
 

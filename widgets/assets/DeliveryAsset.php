@@ -13,6 +13,7 @@ class DeliveryAsset extends AssetBundle
     public $sourcePath = '@vendor/black-lamp/blcms-cart/widgets/assets/src';
 
     public $css = [
+        'css/delivery.css'
     ];
     public $js = [
         'js/delivery.js'

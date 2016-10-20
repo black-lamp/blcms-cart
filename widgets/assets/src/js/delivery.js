@@ -1,41 +1,45 @@
+/*This script gets delivery method info used CartController by Blcms-Shop module*/
+
 $(document).ready(function () {
 
-    var inputs = $('#delivery-methods input[type="radio"]');
+    /*CHECKED ELEMENT SETTINGS*/
+    var checkedElementValue = $('#delivery-methods input:checked').val();
+    getElementInfo(checkedElementValue);
 
+    /*SELECTED ELEMENT SETTINGS*/
+    var inputs = $('#delivery-methods input[type="radio"]');
     inputs.change(function() {
         if(this.checked) {
-
-            var element = this;
-            $.ajax({
-                type: "GET",
-                url: '/shop/cart/get-delivery-method',
-                data: 'id=' + this.value,
-
-                success: function (data) {
-                    var method = $.parseJSON(data).method;
-
-                    var div = document.createElement('div');
-                    $(div).addClass('col-md-8 delivery-info');
-                    var img = document.createElement('img');
-                    $(img).attr('src', method.image_name);
-                    $(img).addClass('delivery-logo');
-                    var field = data.field;
-
-
-
-                    div.appendChild(img);
-
-                    var ul = $(element).parent().parent().parent();
-
-                    var oldDeliveryInfo = $('.delivery-info');
-                    oldDeliveryInfo.remove();
-                    $(div).insertAfter(ul);
-
-
-                }
-            });
-
+            var elementValue = this.value;
+            getElementInfo(elementValue);
         }
     });
 
 });
+
+/*GETTING METHOD INFO BY IT VALUE*/
+function getElementInfo(elementValue) {
+    $.ajax({
+        type: "GET",
+        url: '/shop/cart/get-delivery-method',
+        data: 'id=' + elementValue,
+
+        success: function (data) {
+            var method = $.parseJSON(data).method;
+            console.log(method);
+
+            /*METHOD LOGO SETTING*/
+            var methodLogo = $('#delivery-logo');
+            $(methodLogo).attr('src', method.image_name);
+
+            /*METHOD TITLE SETTING*/
+            var methodTitle = $('#delivery-title');
+            $(methodTitle).text(method.translations[1]['title']);
+
+            /*METHOD DESCRIPTION SETTING*/
+            var methodDescription = $('#delivery-description');
+            $(methodDescription).html(method.translations[1]['description']);
+
+        }
+    });
+}
