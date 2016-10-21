@@ -18,7 +18,7 @@ use yii\helpers\ArrayHelper;
         $attribute,
         ArrayHelper::map($warehouses, 'Number', 'DescriptionRu'),
         [
-            'id' => ''
+            'id' => 'useraddress-postoffice'
         ]);
     ?>
 </div>
