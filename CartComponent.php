@@ -152,6 +152,7 @@ class CartComponent extends Component
 
     public function makeOrder($customerData) {
         $order = Order::find()->where(['user_id' => \Yii::$app->user->id, 'status' => self::STATUS_INCOMPLETE])->one();
+        $user = $order->user;
 
         if (empty($order)) {
             $order = new Order();
@@ -179,7 +180,7 @@ class CartComponent extends Component
                     $order->address_id = $address->id;
                     $order->user_id = (!empty($order->user_id)) ? $order->user_id : \Yii::$app->user->id;
                     $order->save();
-                    $this->sendMail($order);
+                    $this->sendMail($profile, $products = null, $user, $order, $address);
                     return true;
                 }
 
@@ -188,7 +189,7 @@ class CartComponent extends Component
         else {
             $order->user_id = (!empty($order->user_id)) ? $order->user_id : \Yii::$app->user->id;
             $order->save();
-            $this->sendMail($order);
+            $this->sendMail($profile, $products = null, $user, $order, $address = null);
             return true;
         }
 
@@ -196,14 +197,14 @@ class CartComponent extends Component
         return false;
     }
 
-    private function sendMail($order) {
+    private function sendMail($profile = null, $products = null, $user = null, $order = null, $address = null) {
         $products = OrderProduct::find()->where(['order_id' => $order->id])->all();
 
         if (!empty($this->sender) && !empty($order)) {
             try {
                 foreach ($this->sendTo as $admin) {
                     Yii::$app->mailer->compose($this->mailDir . 'new-order',
-                        ['order' => $order, 'products' => $products])
+                        ['products' => $products, 'user' => $user, 'profile' => $profile, 'order' => $order, 'address' => $address])
                         ->setFrom($this->sender)
                         ->setTo($admin)
                         ->setSubject(Yii::t('shop', 'New order'))
@@ -211,7 +212,7 @@ class CartComponent extends Component
                 }
 
                 Yii::$app->mailer->compose($this->mailDir . 'order-success',
-                    ['products' => $products])
+                    ['products' => $products, 'user' => $user, 'profile' => $profile, 'order' => $order, 'address' => $address])
                     ->setFrom($this->sender)
                     ->setTo($order->email)
                     ->setSubject(Yii::t('shop', 'Success order'))
