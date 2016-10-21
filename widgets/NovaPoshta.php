@@ -15,8 +15,7 @@ class NovaPoshta extends Widget
     public $token;
     public $url = 'https://api.novaposhta.ua/v2.0/json/';
 
-    public $modelName = 'AddressGeneral';
-    public $calledMethod = 'getWarehouses';
+
     public $language = 'ru';
     public $defaultCityName = 'Киев';
 
@@ -31,13 +30,17 @@ class NovaPoshta extends Widget
     public function run($params = null)
     {
 
+        $areas = json_decode($this->getAreas());
+        $cities = json_decode($this->getCities());
         $warehouses = json_decode($this->getWarehouses());
 
         return $this->render('nova-poshta', [
             'language' => $this->language,
             'model' => $this->formModel,
             'attribute' => $this->formAttribute,
-            'warehouses' => $warehouses,
+            'areas' => $areas->data,
+            'cities' => $cities->data,
+            'warehouses' => $warehouses->data,
         ]);
     }
 
@@ -49,10 +52,24 @@ class NovaPoshta extends Widget
             'CityName' => $cityName
         ];
 
+        return $this->getResponse('AddressGeneral', 'getWarehouses', $methodProperties);
+    }
+
+    public function getAreas() {
+
+        return $this->getResponse('Address', 'getAreas');
+    }
+    public function getCities() {
+
+        return $this->getResponse('AddressGeneral', 'getSettlements');
+    }
+
+    private function getResponse($modelName, $calledMethod, $methodProperties = null) {
+
         $data = [
             'apiKey' => $this->token,
-            'modelName' => $this->modelName,
-            'calledMethod' => $this->calledMethod,
+            'modelName' => $modelName,
+            'calledMethod' => $calledMethod,
             'language' => $this->language,
             'methodProperties' => $methodProperties
         ];
@@ -69,5 +86,4 @@ class NovaPoshta extends Widget
 
         return $result;
     }
-
 }

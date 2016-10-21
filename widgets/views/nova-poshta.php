@@ -16,9 +16,9 @@ use yii\helpers\ArrayHelper;
     <?= Html::activeDropDownList(
         $model,
         $attribute,
-        ArrayHelper::map($warehouses->data, 'Number', 'DescriptionRu'),
+        ArrayHelper::map($warehouses, 'Number', 'DescriptionRu'),
         [
-            'class' => ''
+            'id' => ''
         ]);
     ?>
 </div>

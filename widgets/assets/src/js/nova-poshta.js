@@ -1,9 +1,15 @@
 $(document).ready(function () {
 
+    var novaPoshtaWidget = $("#nova-poshta");
+
+    // $(novaPoshtaWidget).change(function () {
+    //     var selectedArea = $('#nova-poshta-area').val();
+    //
+    // });
+
     var postOfficeField = $('#order-delivery_post_office');
 
-
-    $("#nova-poshta").change(function () {
+    $(novaPoshtaWidget).change(function () {
         var selectedValue = $("#useraddress-postoffice").val();
         $(postOfficeField).val(selectedValue);
     });
@@ -25,9 +31,9 @@ $(document).ready(function () {
     //         $(novaPoshtaSelecting).hide();
     //     }
     // });
-    
 
-    
+
+
     // radioButtons.each(function() {
     //     if ($(this).attr('value') == 1) {
     //         if (this.checked) {
