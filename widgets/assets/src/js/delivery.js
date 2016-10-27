@@ -4,18 +4,17 @@ $(document).ready(function () {
 
     /*CHECKED ELEMENT SETTINGS*/
     var radioButtons = $('#delivery-methods input[type="radio"]');
-    $(radioButtons[0]).attr("checked","checked");
+    $(radioButtons[0]).attr("checked", "checked");
     getElementInfo($(radioButtons[0]).val());
 
     /*SELECTED ELEMENT SETTINGS*/
     var inputs = $('#delivery-methods input[type="radio"]');
-    inputs.change(function() {
-        if(this.checked) {
+    inputs.change(function () {
+        if (this.checked) {
             var elementValue = this.value;
             getElementInfo(elementValue);
         }
     });
-
 });
 
 /*GETTING METHOD INFO BY IT VALUE*/

@@ -37,7 +37,7 @@ DeliveryAsset::register($this);
                 <div class="post-office">
                     <?= $form->field($model, 'delivery_post_office')->textInput(); ?>
 
-                    <?= \bl\cms\cart\widgets\NovaPoshta::widget([
+                    <?= \bl\cms\shop\widgets\NovaPoshta::widget([
                         'token' => 'b696152fde625f5e9b3c6a7a0318701f',
                         'language' => (\Yii::$app->language == 'ru') ? 'ru' : 'ua',
                         'formModel' => $config['addressModel'],
