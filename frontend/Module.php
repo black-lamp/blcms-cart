@@ -7,6 +7,7 @@ namespace bl\cms\cart\frontend;
 class Module extends \yii\base\Module
 {
     public $controllerNamespace = 'bl\cms\cart\frontend\controllers';
+    public $defaultRoute = 'cart';
 
     public function init()
     {
