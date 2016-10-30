@@ -7,6 +7,7 @@ use bl\multilang\entities\Language;
 use Exception;
 use Yii;
 use bl\cms\cart\models\SearchOrderStatus;
+use yii\db\ActiveRecord;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -72,14 +73,17 @@ class OrderStatusController extends Controller
     public function actionSave($id = null, $languageId)
     {
         if (!empty($languageId)) {
-            $model = (!empty($id)) ? $this->findModel($id) : new OrderStatus();
-
-            $modelTranslation = OrderStatusTranslation::find()->where(['order_status_id' => $model->id, 'language_id' => $languageId])->one();
-            if (empty($modelTranslation)) {
-                $modelTranslation = new OrderStatusTranslation();
+            if (!empty($id)) {
+                $model = $this->findModel($id);
+            }
+            else {
+                $model = new OrderStatus();
             }
 
+            $modelTranslation = $this->findOrCreateModelTranslation($model->id, $languageId);
+
             if ($modelTranslation->load(Yii::$app->request->post())) {
+                $model->save();
                 $modelTranslation->language_id = $languageId;
                 $modelTranslation->order_status_id = $model->id;
                 if ($modelTranslation->validate()) {
@@ -144,5 +148,19 @@ class OrderStatusController extends Controller
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
+    }
+
+    /**
+     * Finds the OrderStatusTranslation model based on 'order_status_id' property.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param integer $id
+     * @param integer $languageId
+     * @return OrderStatusTranslation|ActiveRecord the loaded model
+     */
+    protected function findOrCreateModelTranslation($id, $languageId)
+    {
+        $modelTranslations = OrderStatusTranslation::find()
+            ->where(['order_status_id' => $id, 'language_id' => $languageId])->one();
+        return (!empty($modelTranslations)) ? $modelTranslations : new OrderStatusTranslation();
     }
 }
