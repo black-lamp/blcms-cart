@@ -183,14 +183,12 @@ class CartController extends Controller
                     ->setSubject(Yii::t('cart', 'New order.'))
                     ->send();
             }
-            if (Yii::$app->mailer->compose('@vendor/black-lamp/blcms-cart/views/mail/order-success',
+            Yii::$app->mailer->compose('@vendor/black-lamp/blcms-cart/views/mail/order-success',
                 ['products' => $products, 'user' => $user, 'profile' => $profile, 'order' => $order, 'address' => $address])
                 ->setFrom(\Yii::$app->cart->sender)
                 ->setTo($user->email)
                 ->setSubject(Yii::t('cart', 'Your order is accepted.'))
-                ->send()) {
-                die(var_dump(121));
-            }
+                ->send();
 
             return true;
         } catch (Exception $ex) {
