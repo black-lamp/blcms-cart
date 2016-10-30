@@ -239,7 +239,7 @@ class CartComponent extends Component
                        else $price = Product::findOne($id)->price;
                        $session[self::TOTAL_COST_KEY] -= $price * $session[self::SESSION_KEY][$key]['count'];
 
-                       $session->remove([self::SESSION_KEY][$key]);
+                       unset($_SESSION[self::SESSION_KEY][$key]);
                    }
                 }
             }
@@ -417,7 +417,7 @@ class CartComponent extends Component
             $orderProducts = OrderProduct::find()->where(['order_id' => $order->id])->all();
             $totalCost = 0;
             foreach ($orderProducts as $product) {
-                $totalCost = $product->count * $product->price;
+                $totalCost += $product->count * $product->price;
             }
             return $totalCost;
         }
