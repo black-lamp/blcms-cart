@@ -175,6 +175,7 @@ class CartController extends Controller
     {
         try {
             foreach (\Yii::$app->cart->sendTo as $adminMail) {
+
                 Yii::$app->mailer->compose('@vendor/black-lamp/blcms-cart/views/mail/new-order',
                     ['products' => $products, 'user' => $user, 'profile' => $profile, 'order' => $order, 'address' => $address])
                     ->setFrom(\Yii::$app->cart->sender)
@@ -182,12 +183,14 @@ class CartController extends Controller
                     ->setSubject(Yii::t('cart', 'New order.'))
                     ->send();
             }
-            Yii::$app->mailer->compose('@vendor/black-lamp/blcms-cart/views/mail/order-success',
+            if (Yii::$app->mailer->compose('@vendor/black-lamp/blcms-cart/views/mail/order-success',
                 ['products' => $products, 'user' => $user, 'profile' => $profile, 'order' => $order, 'address' => $address])
                 ->setFrom(\Yii::$app->cart->sender)
                 ->setTo($user->email)
                 ->setSubject(Yii::t('cart', 'Your order is accepted.'))
-                ->send();
+                ->send()) {
+                die(var_dump(121));
+            }
 
             return true;
         } catch (Exception $ex) {
