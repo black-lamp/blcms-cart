@@ -152,7 +152,7 @@ class OrderStatusController extends Controller
 
     /**
      * Finds the OrderStatusTranslation model based on 'order_status_id' property.
-     * If the model is not found, a 404 HTTP exception will be thrown.
+     * If the model is not found, a new model will be created.
      * @param integer $id
      * @param integer $languageId
      * @return OrderStatusTranslation|ActiveRecord the loaded model
