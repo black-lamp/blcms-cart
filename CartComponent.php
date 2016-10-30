@@ -138,45 +138,48 @@ class CartComponent extends Component
      * @param integer $productId
      * @param integer $count
      * @param integer $priceId
+     * @return boolean
      */
     private function saveProductToSession($productId, $count, $priceId = null) {
-        $session = Yii::$app->session;
-        if ($session->has(self::SESSION_KEY)) {
+        if (!empty($productId) && (!empty($count))) {
+            $session = Yii::$app->session;
+            if ($session->has(self::SESSION_KEY)) {
 
-            $products = $session[self::SESSION_KEY];
+                $products = $session[self::SESSION_KEY];
 
-            if (!empty($products)) {
-                foreach ($products as $key => $product) {
-                    if ($product['id'] == $productId) {
-                        $products[$key]['count'] += $count;
-                        break;
-                    }
-                    else {
-                        if (count($products) - 1 == $key) {
-                            $products[] = ['id' => $productId, 'count' => $count, 'priceId' => $priceId];
+                if (!empty($products)) {
+                    foreach ($products as $key => $product) {
+                        if ($product['id'] == $productId) {
+                            $products[$key]['count'] += $count;
+                            break;
+                        }
+                        else {
+                            if (count($products) - 1 == $key) {
+                                $products[] = ['id' => $productId, 'count' => $count, 'priceId' => $priceId];
+                            }
                         }
                     }
+                    $session[self::SESSION_KEY] = $products;
                 }
-                $session[self::SESSION_KEY] = $products;
-
+            }
+            else {
+                $session[self::SESSION_KEY] = [['id' => $productId, 'count' => $count, 'priceId' => $priceId]];
             }
 
+            if (empty($priceId)) {
+                $product = Product::findOne($productId);
+                $price = $product->price;
+            }
+            else {
+                $price = ProductPrice::findOne($priceId)->salePrice;
+            }
+            if (!$session->has(self::TOTAL_COST_KEY)) {
+                $session[self::TOTAL_COST_KEY] = 0;
+            }
+            $session[self::TOTAL_COST_KEY] += $price * $count;
+            return true;
         }
-        else {
-            $session[self::SESSION_KEY] = [['id' => $productId, 'count' => $count, 'priceId' => $priceId]];
-        }
-
-        if (empty($priceId)) {
-            $product = Product::findOne($productId);
-            $price = $product->price;
-        }
-        else {
-            $price = ProductPrice::findOne($priceId)->salePrice;
-        }
-        if (!$session->has(self::TOTAL_COST_KEY)) {
-            $session[self::TOTAL_COST_KEY] = 0;
-        }
-        $session[self::TOTAL_COST_KEY] += $price * $count;
+        else return false;
     }
 
     /**
@@ -414,12 +417,16 @@ class CartComponent extends Component
             $order = Order::find()
                 ->where(['user_id' => Yii::$app->user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])
                 ->one();
-            $orderProducts = OrderProduct::find()->where(['order_id' => $order->id])->all();
-            $totalCost = 0;
-            foreach ($orderProducts as $product) {
-                $totalCost += $product->count * $product->price;
+            if (!empty($order)) {
+                $orderProducts = OrderProduct::find()->where(['order_id' => $order->id])->all();
+                $totalCost = 0;
+                if (!empty($orderProducts)) {
+                    foreach ($orderProducts as $product) {
+                        $totalCost += $product->count * $product->price;
+                    }
+                }
+                return $totalCost;
             }
-            return $totalCost;
         }
     }
 }
