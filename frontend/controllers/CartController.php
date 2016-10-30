@@ -21,6 +21,7 @@ use Exception;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
+use yii\web\NotFoundHttpException;
 
 class CartController extends Controller
 {
@@ -165,6 +166,7 @@ class CartController extends Controller
                 'field' => '<input type="text" id="useraddress-zipcode" class="form-control" name="UserAddress[zipcode]">'
             ]);
         }
+        else throw new NotFoundHttpException();
     }
 
     public function actionOrderSuccess() {

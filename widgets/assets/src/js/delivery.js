@@ -21,7 +21,7 @@ $(document).ready(function () {
 function getElementInfo(elementValue) {
     $.ajax({
         type: "GET",
-        url: '/shop/cart/get-delivery-method',
+        url: '/cart/cart/get-delivery-method',
         data: 'id=' + elementValue,
 
         success: function (data) {
