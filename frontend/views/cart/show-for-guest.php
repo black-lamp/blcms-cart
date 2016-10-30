@@ -29,6 +29,11 @@ CartAsset::register($this);
 
     <!--PRODUCTS TABLE-->
 
+    <!--CLEAR CART-->
+    <?php if (!empty($products)) : ?>
+        <?= Html::a(Yii::t('cart', 'Clear cart'), Url::toRoute('/cart/cart/clear'),
+            ['class' => 'btn btn-danger btn-md']); ?>
+    <?php endif; ?>
 
     <table class="table table-hover table-striped products-list">
         <tr>
@@ -63,7 +68,7 @@ CartAsset::register($this);
                         <?= $product->count; ?>
                     </td>
                     <td class="text-center">
-                        <?=Html::a(Html::tag('span', '', ['class' => 'glyphicon glyphicon-remove']),
+                        <?= Html::a(Html::tag('span', '', ['class' => 'glyphicon glyphicon-remove']),
                             Url::to(['/cart/cart/remove', 'id' => $product->id]),
                             [
                                 'class' => 'btn btn-danger btn-xs',
@@ -79,7 +84,7 @@ CartAsset::register($this);
         <!--MODAL WINDOWS-->
 
         <!--REGISTRATION-->
-        <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#registerModal">
+        <button class="btn btn-primary btn-md" data-toggle="modal" data-target="#registerModal">
             <?= \Yii::t('shop', 'I\'m a new user'); ?>
         </button>
         <div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
@@ -98,7 +103,7 @@ CartAsset::register($this);
         </div>
 
         <!--LOGIN-->
-        <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#loginModal">
+        <button class="btn btn-primary btn-md" data-toggle="modal" data-target="#loginModal">
             <?= \Yii::t('shop', 'I already have an account'); ?>
         </button>
         <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
