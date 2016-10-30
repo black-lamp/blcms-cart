@@ -14,7 +14,9 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use bl\cms\shop\widgets\LanguageSwitcher;
 
-$this->title = Yii::t('shop', 'Create order status');
+$this->title = ($modelTranslation->isNewRecord) ?
+    Yii::t('cart', 'Creating new order status') :
+    Yii::t('cart', 'Editing order status');
 ?>
 <div class="panel panel-default">
     <div class="panel-heading">
