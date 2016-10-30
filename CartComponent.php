@@ -5,6 +5,8 @@ use bl\cms\cart\models\OrderStatus;
 use bl\cms\shop\common\components\user\models\Profile;
 use bl\cms\shop\common\components\user\models\User;
 use bl\cms\shop\common\components\user\models\UserAddress;
+use bl\cms\shop\common\entities\Product;
+use bl\cms\shop\common\entities\ProductPrice;
 use Yii;
 use yii\base\Component;
 use yii\base\Exception;
@@ -51,8 +53,10 @@ class CartComponent extends Component
      */
     public $mailDir = '@vendor/black-lamp/blcms-cart/views/mail/';
 
-    /*Session key*/
+    /*Session key of order*/
     const SESSION_KEY = 'shop_order';
+    /*Session key of total cost*/
+    const TOTAL_COST_KEY = 'shop_order_total_cost';
 
     /**
      * @inheritdoc
@@ -161,6 +165,18 @@ class CartComponent extends Component
         else {
             $session[self::SESSION_KEY] = [['id' => $productId, 'count' => $count, 'priceId' => $priceId]];
         }
+
+        if (empty($priceId)) {
+            $product = Product::findOne($productId);
+            $price = $product->price;
+        }
+        else {
+            $price = ProductPrice::findOne($priceId)->salePrice;
+        }
+        if (!$session->has(self::TOTAL_COST_KEY)) {
+            $session[self::TOTAL_COST_KEY] = 0;
+        }
+        $session[self::TOTAL_COST_KEY] += $price * $count;
     }
 
     /**
@@ -216,12 +232,18 @@ class CartComponent extends Component
                 $products = $session[self::SESSION_KEY];
                 foreach ($products as $key => $product) {
                    if ($product['id'] == $id) {
+
+                       if (!empty($session[self::SESSION_KEY][$key]['priceId'])) {
+                           $price = ProductPrice::findOne($session[self::SESSION_KEY][$key]['priceId'])->salePrice;
+                       }
+                       else $price = Product::findOne($id)->price;
+                       $session[self::TOTAL_COST_KEY] -= $price * $session[self::SESSION_KEY][$key]['count'];
+
                        $session->remove([self::SESSION_KEY][$key]);
                    }
                 }
             }
         }
-
     }
 
     /**
@@ -320,6 +342,7 @@ class CartComponent extends Component
         else {
             $session = \Yii::$app->session;
             $session->remove(self::SESSION_KEY);
+            $session->remove(self::TOTAL_COST_KEY);
         }
     }
 
@@ -372,9 +395,31 @@ class CartComponent extends Component
                 }
 
             }
-            \Yii::$app->getResponse()->redirect(Url::toRoute('/shop/cart/show'));
+            \Yii::$app->getResponse()->redirect(Url::toRoute('/cart'));
             \Yii::$app->end();
         }
+    }
 
+    public function getTotalCost() {
+        if (Yii::$app->user->isGuest) {
+            $session = Yii::$app->session;
+            if ($session->has(self::TOTAL_COST_KEY)) {
+                $totalCost = $session[self::TOTAL_COST_KEY];
+                return $totalCost;
+            }
+            else return false;
+        }
+
+        else {
+            $order = Order::find()
+                ->where(['user_id' => Yii::$app->user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])
+                ->one();
+            $orderProducts = OrderProduct::find()->where(['order_id' => $order->id])->all();
+            $totalCost = 0;
+            foreach ($orderProducts as $product) {
+                $totalCost = $product->count * $product->price;
+            }
+            return $totalCost;
+        }
     }
 }
