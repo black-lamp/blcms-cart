@@ -130,8 +130,10 @@ class CartController extends Controller
                 $order->load(\Yii::$app->request->post()) ||
                 $address->load(\Yii::$app->request->post())
             ) {
-                $this->sendMail($profile, $products = null, $user, $order, $address);
-                return $this->render('order-success');
+
+                if ($this->sendMail($profile, $products = null, $user, $order, $address)) {
+                    return $this->render('order-success');
+                };
             }
 
 
@@ -139,7 +141,7 @@ class CartController extends Controller
         else {
             $profile = Profile::find()->where(['user_id' => \Yii::$app->user->id])->one();
             $user = $profile->user;
-            $order = Order::find()->where(['user_id' => \Yii::$app->user->id, 'status' => CartComponent::STATUS_INCOMPLETE])->one();
+            $order = Order::find()->where(['user_id' => \Yii::$app->user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])->one();
             $address = (!empty($order->address)) ? $order->address : '';
 
             $post = Yii::$app->request->post();
@@ -169,10 +171,6 @@ class CartController extends Controller
         else throw new NotFoundHttpException();
     }
 
-    public function actionOrderSuccess() {
-        return $this->render('order-success');
-    }
-
     public function sendMail($profile = null, $products = null, $user = null, $order = null, $address = null)
     {
         try {
@@ -191,13 +189,9 @@ class CartController extends Controller
                 ->setSubject(Yii::t('cart', 'Your order is accepted.'))
                 ->send();
 
-            return $this->redirect(['/shop/cart/order-success']);
+            return true;
         } catch (Exception $ex) {
-            return $this->render('index', [
-                'errors' => [
-                    Yii::t('cart', 'При оформлении заказа возникла ошибка. Просим прощения за неудобства.')
-                ]
-            ]);
+            return false;
         }
     }
 
