@@ -1,7 +1,7 @@
 <?php
 namespace bl\cms\cart\models;
 
-use Yii;
+use bl\multilang\behaviors\TranslationBehavior;
 use yii\db\ActiveRecord;
 
 /**
@@ -9,12 +9,29 @@ use yii\db\ActiveRecord;
  * @author Albert Gainutdinov <xalbert.einsteinx@gmail.com>
  *
  * @property integer $id
- * @property string $title
  *
  * @property Order[] $orders
  */
 class OrderStatus extends ActiveRecord
 {
+
+    const STATUS_INCOMPLETE = 1;
+    const STATUS_CONFIRMED = 2;
+
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return [
+            'translation' => [
+                'class' => TranslationBehavior::className(),
+                'translationClass' => OrderStatusTranslation::className(),
+                'relationColumn' => 'order_status_id'
+            ]
+        ];
+    }
+
     /**
      * @inheritdoc
      */
@@ -29,18 +46,6 @@ class OrderStatus extends ActiveRecord
     public function rules()
     {
         return [
-            [['title'], 'string', 'max' => 255],
-        ];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function attributeLabels()
-    {
-        return [
-            'id' => Yii::t('shop', 'ID'),
-            'title' => Yii::t('shop', 'Title'),
         ];
     }
 

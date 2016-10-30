@@ -1,10 +1,8 @@
 <?php
 namespace bl\cms\cart\models;
 
-use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use bl\cms\cart\models\OrderStatus;
 
 /**
  * SearchOrderStatus represents the model behind the search form about `bl\cms\cart\models\OrderStatus`.
@@ -18,10 +16,10 @@ class SearchOrderStatus extends OrderStatus
     public function rules()
     {
         return [
-            [['id'], 'integer'],
-            [['title'], 'safe'],
+            [['id'], 'integer']
         ];
     }
+
 
     /**
      * @inheritdoc
@@ -62,7 +60,7 @@ class SearchOrderStatus extends OrderStatus
             'id' => $this->id,
         ]);
 
-        $query->andFilterWhere(['like', 'title', $this->title]);
+//        $query->andFilterWhere(['like', 'title', $this->title]);
 
         return $dataProvider;
     }
