@@ -1,7 +1,9 @@
 <?php
 namespace bl\cms\cart;
 
+use bl\cms\cart\models\OrderStatus;
 use bl\cms\shop\common\components\user\models\Profile;
+use bl\cms\shop\common\components\user\models\User;
 use bl\cms\shop\common\components\user\models\UserAddress;
 use Yii;
 use yii\base\Component;
@@ -13,30 +15,48 @@ use bl\cms\cart\models\OrderProduct;
 
 /**
  * This is the component class CartComponent for "Blcms-shop" module.
- *
  * @author Albert Gainutdinov <xalbert.einsteinx@gmail.com>
- * @property Order $order
- * @property string $status
+ *
  */
-
 class CartComponent extends Component
 {
 
-    /*Component configuration*/
+    /**
+     * @var bool
+     * Enabling sending e-mails
+     */
     public $emailNotifications = true;
+
+    /**
+     * @var array
+     * List of managers e-mails to which notification will be sent.
+     */
     public $sendTo = [];
+
+    /**
+     * @var bool
+     * Enabling saving order products to database. If false, order products will only be stored in the session.
+     */
     public $saveToDataBase = true;
+
+    /**
+     * @var string
+     * From this address e-mails will be sent.
+     */
     public $sender;
+
+    /**
+     * @var string
+     * The directory with e-mail views.
+     */
     public $mailDir = '@vendor/black-lamp/blcms-cart/views/mail/';
 
     /*Session key*/
     const SESSION_KEY = 'shop_order';
 
-    /*Order status constants*/
-    const STATUS_INCOMPLETE = 1;
-    const STATUS_CONFIRMED = 2;
-
-
+    /**
+     * @inheritdoc
+     */
     public function __construct($config)
     {
         $this->emailNotifications = $config['emailNotifications'];
@@ -48,6 +68,13 @@ class CartComponent extends Component
     }
 
 
+    /**
+     * Adds product to cart.
+     *
+     * @param integer $productId
+     * @param integer $count
+     * @param integer $priceId
+     */
     public function add($productId, $count, $priceId = null) {
 
         if ($this->saveToDataBase && !\Yii::$app->user->isGuest) {
@@ -58,15 +85,23 @@ class CartComponent extends Component
         }
     }
 
+    /**
+     * Saves product to database if the corresponding property is true.
+     *
+     * @param integer $productId
+     * @param integer $count
+     * @param integer $priceId
+     * @throws ForbiddenHttpException
+     */
     private function saveProductToDataBase($productId, $count, $priceId = null) {
 
-        if (!\Yii::$app->user->isGuest) {
+        if ($this->saveToDataBase === true && !\Yii::$app->user->isGuest) {
 
-            $order = Order::find()->where(['user_id' => \Yii::$app->user->id, 'status' => self::STATUS_INCOMPLETE])->one();
+            $order = Order::find()->where(['user_id' => \Yii::$app->user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])->one();
             if (empty($order)) {
                 $order = new Order();
                 $order->user_id = \Yii::$app->user->id;
-                $order->status = self::STATUS_INCOMPLETE;
+                $order->status = OrderStatus::STATUS_INCOMPLETE;
                 if ($order->validate()) {
                     $order->save();
                 }
@@ -93,6 +128,13 @@ class CartComponent extends Component
         else throw new ForbiddenHttpException();
     }
 
+    /**
+     * Saves product to session if user is guest or if the $saveToDataBase property is false.
+     *
+     * @param integer $productId
+     * @param integer $count
+     * @param integer $priceId
+     */
     private function saveProductToSession($productId, $count, $priceId = null) {
         $session = Yii::$app->session;
         if ($session->has(self::SESSION_KEY)) {
@@ -121,6 +163,11 @@ class CartComponent extends Component
         }
     }
 
+    /**
+     * Gets order items.
+     *
+     * @return array|bool|mixed|\yii\db\ActiveRecord[]
+     */
     public function getOrderItems() {
         if (\Yii::$app->user->isGuest) {
             $session = \Yii::$app->session;
@@ -128,7 +175,7 @@ class CartComponent extends Component
         }
         else {
 
-            $order = Order::find()->where(['user_id' => \Yii::$app->user->id, 'status' => self::STATUS_INCOMPLETE])->one();
+            $order = Order::find()->where(['user_id' => \Yii::$app->user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])->one();
             if (!empty($order)) {
                 $products = OrderProduct::find()->asArray()->where(['order_id' => $order->id])->all();
 
@@ -140,11 +187,24 @@ class CartComponent extends Component
 
     }
 
+    /**
+     * Gets all user orders from database.
+     *
+     * @return bool|\yii\db\ActiveRecord[]
+     */
     public function getAllUserOrders() {
-        $orders = Order::find()->where(['user_id' => \Yii::$app->user->id])->all();
-        return $orders;
+        if (!\Yii::$app->user->isGuest && $this->saveToDataBase === true) {
+            $orders = Order::find()->where(['user_id' => \Yii::$app->user->id])->all();
+            return $orders;
+        }
+        else return false;
     }
 
+    /**
+     * Removes item from order.
+     *
+     * @param $id
+     */
     public function removeItem($id) {
         if (!\Yii::$app->user->isGuest) {
             $orderProduct = OrderProduct::findOne($id);
@@ -164,15 +224,20 @@ class CartComponent extends Component
 
     }
 
+    /**
+     * @param $customerData
+     * @return bool
+     * @throws Exception
+     */
     public function makeOrder($customerData) {
-        $order = Order::find()->where(['user_id' => \Yii::$app->user->id, 'status' => self::STATUS_INCOMPLETE])->one();
+        $order = Order::find()->where(['user_id' => \Yii::$app->user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])->one();
         $user = $order->user;
 
         if (empty($order)) {
             $order = new Order();
         }
 
-        $order->status = self::STATUS_CONFIRMED;
+        $order->status = OrderStatus::STATUS_CONFIRMED;
 
         $profile = Profile::find()->where(['user_id' => \Yii::$app->user->id])->one();
 
@@ -211,6 +276,13 @@ class CartComponent extends Component
         return false;
     }
 
+    /**
+     * @param null|Profile $profile
+     * @param null|OrderProduct $products
+     * @param null|User $user
+     * @param null|Order $order
+     * @param null|UserAddress $address
+     */
     private function sendMail($profile = null, $products = null, $user = null, $order = null, $address = null) {
         $products = OrderProduct::find()->where(['order_id' => $order->id])->all();
 
@@ -237,61 +309,72 @@ class CartComponent extends Component
         }
     }
 
+    /**
+     * Clears cart.
+     */
     public function clearCart() {
-        if (\Yii::$app->user->isGuest) {
+        if (!\Yii::$app->user->isGuest && $this->saveToDataBase === true) {
+            $order = Order::find()->where(['user_id' => \Yii::$app->user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])->one();
+            $order->deleteAll();
+        }
+        else {
             $session = \Yii::$app->session;
             $session->remove(self::SESSION_KEY);
         }
-        else {
-            $order = Order::find()->where(['user_id' => \Yii::$app->user->id, 'status' => self::STATUS_INCOMPLETE])->one();
-            $order->deleteAll();
-        }
     }
 
+    /**
+     * Moves order products from session to database if $saveToDataBase property is true.
+     *
+     * @throws Exception
+     */
     public function transportSessionDataToDB() {
-        $session = Yii::$app->session;
+        if ($this->saveToDataBase === true) {
+            $session = Yii::$app->session;
 
-        if ($session->has(self::SESSION_KEY)) {
+            if ($session->has(self::SESSION_KEY)) {
 
-            $order = Order::find()->where(['user_id' => \Yii::$app->user->id, 'status' => self::STATUS_INCOMPLETE])->one();
-            if (empty($order)) {
-                $order = new Order();
-                $order->user_id = \Yii::$app->user->id;
-                $order->status = self::STATUS_INCOMPLETE;
-                if ($order->validate()) {
-                    $order->save();
+                $order = Order::find()->where(['user_id' => \Yii::$app->user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])->one();
+                if (empty($order)) {
+                    $order = new Order();
+                    $order->user_id = \Yii::$app->user->id;
+                    $order->status = OrderStatus::STATUS_INCOMPLETE;
+                    if ($order->validate()) {
+                        $order->save();
+                    }
                 }
+
+                $products = $session[self::SESSION_KEY];
+
+                foreach ($products as $product) {
+
+                    $orderProduct = OrderProduct::find()
+                        ->where(['product_id' => $product['id'], 'price_id' => $product['priceId'], 'order_id' => $order->id])->one();
+                    if (empty($orderProduct)) {
+
+                        $orderProduct = new OrderProduct;
+
+                        $orderProduct->order_id = $order->id;
+                        $orderProduct->product_id = $product['id'];
+                        $orderProduct->price_id = $product['priceId'];
+                        $orderProduct->count = $product['count'];
+                    }
+                    else {
+                        $orderProduct->count += $product['count'];
+                    }
+
+                    if ($orderProduct->validate()) {
+
+                        $orderProduct->save();
+                    }
+                    else throw new Exception($orderProduct->errors);
+
+                }
+
             }
-
-            $products = $session[self::SESSION_KEY];
-
-            foreach ($products as $product) {
-
-                $orderProduct = OrderProduct::find()
-                    ->where(['product_id' => $product['id'], 'price_id' => $product['priceId'], 'order_id' => $order->id])->one();
-                if (empty($orderProduct)) {
-
-                    $orderProduct = new OrderProduct;
-
-                    $orderProduct->order_id = $order->id;
-                    $orderProduct->product_id = $product['id'];
-                    $orderProduct->price_id = $product['priceId'];
-                    $orderProduct->count = $product['count'];
-                }
-                else {
-                    $orderProduct->count += $product['count'];
-                }
-
-                if ($orderProduct->validate()) {
-
-                    $orderProduct->save();
-                }
-                else throw new Exception($orderProduct->errors);
-
-            }
-
+            \Yii::$app->getResponse()->redirect(Url::toRoute('/shop/cart/show'));
+            \Yii::$app->end();
         }
-        \Yii::$app->getResponse()->redirect(Url::toRoute('/shop/cart/show'));
-        \Yii::$app->end();
+
     }
 }
