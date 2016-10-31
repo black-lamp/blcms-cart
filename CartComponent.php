@@ -58,19 +58,6 @@ class CartComponent extends Component
     /*Session key of total cost*/
     const TOTAL_COST_KEY = 'shop_order_total_cost';
 
-    /**
-     * @inheritdoc
-     */
-    public function __construct($config)
-    {
-        $this->emailNotifications = $config['emailNotifications'];
-        $this->sendTo = $config['sendTo'];
-        $this->saveToDataBase = $config['saveToDataBase'];
-        $this->sender = $config['sender'];
-
-        parent::__construct();
-    }
-
 
     /**
      * Adds product to cart.

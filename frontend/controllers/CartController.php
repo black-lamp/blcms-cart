@@ -5,7 +5,6 @@
 
 namespace bl\cms\cart\frontend\controllers;
 
-use bl\cms\cart\CartComponent;
 use bl\cms\cart\models\CartForm;
 use bl\cms\cart\models\DeliveryMethod;
 use bl\cms\cart\models\Order;
