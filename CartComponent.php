@@ -261,19 +261,14 @@ class CartComponent extends Component
         $order = Order::find()->where(['user_id' => \Yii::$app->user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])->one();
         $user = $order->user;
 
-        if (empty($order)) {
-            $order = new Order();
-        }
-
         $order->status = OrderStatus::STATUS_CONFIRMED;
 
         $profile = Profile::find()->where(['user_id' => \Yii::$app->user->id])->one();
 
-        if ($profile->load($customerData)) {
-            if ($profile->validate()) {
+        if ($order->load(Yii::$app->request->post()) && $profile->load($customerData)) {
+            if ($profile->validate() && $order->validate()) {
                 $profile->save();
             }
-            else throw new Exception($profile->errors);
         }
 
         if (empty($order->address_id)) {

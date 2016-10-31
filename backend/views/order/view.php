@@ -45,8 +45,16 @@ use yii\widgets\DetailView;
         <p><b><?= \Yii::t('shop', 'Surname'); ?>:</b> <?=$model->user->profile->surname; ?></p>
         <p><b><?= \Yii::t('shop', 'Patronymic'); ?>:</b> <?=$model->user->profile->patronymic; ?></p>
         <p><b><?= \Yii::t('shop', 'Phone number'); ?>:</b> <?=$model->user->profile->phone; ?></p>
+    </div>
 
-
+    <!--DELIVERY METHOD-->
+    <div class="panel-body">
+        <h2>
+            <?= Yii::t('shop', 'Delivery method'); ?>
+        </h2>
+        <p>
+            <?= $model->deliveryMethod->translation->title;?>
+        </p>
     </div>
 
     <!--PRODUCT LIST-->
@@ -61,7 +69,15 @@ use yii\widgets\DetailView;
                 ['class' => 'yii\grid\SerialColumn'],
 
                 [
-                    'label' => 'title',
+                    'label' => Yii::t('cart', 'Articulus'),
+                    'headerOptions' => ['class' => 'text-center col-md-1'],
+                    'value' => function ($model) {
+                        return $model->product->articulus;
+                    }
+                ],
+                [
+                    'label' => Yii::t('cart', 'Product title'),
+                    'headerOptions' => ['class' => 'text-center col-md-7'],
                     'format' => 'raw',
                     'value' => function ($model) {
                         return Html::a($model->product->translation->title,
@@ -69,12 +85,14 @@ use yii\widgets\DetailView;
                     }
                 ],
                 [
-                    'label' => 'count',
+                    'label' => Yii::t('cart', 'Count'),
+                    'headerOptions' => ['class' => 'text-center col-md-1'],
                     'format' => 'raw',
                     'value' => 'count'
                 ],
                 [
-                    'label' => 'price',
+                    'label' => Yii::t('cart', 'Price'),
+                    'headerOptions' => ['class' => 'text-center col-md-1'],
                     'value' => function($model) {
                         $price = $model->price;
                         return $price;
@@ -82,7 +100,7 @@ use yii\widgets\DetailView;
                 ],
                 /*ACTIONS*/
                 [
-                    'headerOptions' => ['class' => 'text-center col-md-2'],
+                    'headerOptions' => ['class' => 'text-center col-md-1'],
                     'attribute' => \Yii::t('shop', 'Delete'),
 
                     'value' => function ($model) {

@@ -42,7 +42,7 @@ use yii\helpers\Url;
                 'value' => function($model) {
                     return (!empty($model->uid)) ? $model->uid : '';
                 },
-                'label' => Yii::t('shop', 'Order id'),
+                'label' => Yii::t('cart', 'Order id'),
                 'contentOptions' => ['class' => 'text-center'],
             ],
 

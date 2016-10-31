@@ -115,6 +115,6 @@ class Order extends ActiveRecord
      */
     public function getDeliveryMethod()
     {
-        return $this->hasMany(DeliveryMethod::className(), ['delivery_id' => 'id']);
+        return $this->hasOne(DeliveryMethod::className(), ['id' => 'delivery_id']);
     }
 }
