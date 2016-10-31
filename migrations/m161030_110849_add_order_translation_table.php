@@ -6,16 +6,15 @@ class m161030_110849_add_order_translation_table extends Migration
 {
     public function up()
     {
-//        $this->createTable('shop_order_status_translation', [
-//            'id' =>$this->primaryKey(),
-//            'order_status_id' => $this->integer(),
-//            'language_id' => $this->integer(),
-//            'title' => $this->string(),
-//            'description' => $this->string()
-//        ]);
-//
-//        $this->dropColumn('shop_order_status', 'title');
-return true;
+        $this->createTable('shop_order_status_translation', [
+            'id' =>$this->primaryKey(),
+            'order_status_id' => $this->integer(),
+            'language_id' => $this->integer(),
+            'title' => $this->string(),
+            'description' => $this->string()
+        ]);
+
+        $this->dropColumn('shop_order_status', 'title');
 
         $this->addForeignKey('shop_order_status_translation_language_id:language_id',
             'shop_order_status_translation', 'language_id', 'language', 'id', 'cascade', 'cascade');
