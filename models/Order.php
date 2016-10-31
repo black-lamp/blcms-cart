@@ -57,7 +57,7 @@ class Order extends ActiveRecord
     {
         return [
             [['user_id'], 'required'],
-            [['user_id', 'status', 'address_id'], 'integer'],
+            [['user_id', 'status', 'address_id', 'uid'], 'integer'],
             [['delivery_post_office'], 'string', 'max' => 255],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
             [['address_id'], 'exist', 'skipOnError' => true, 'targetClass' => UserAddress::className(), 'targetAttribute' => ['address_id' => 'id']],

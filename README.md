@@ -32,7 +32,7 @@ php yii migrate --migrationPath=@vendor/black-lamp/blcms-cart/migrations
                 'sendTo' => [
                     'test@mail.com'
                 ],
-                'saveToDataBase' => true
+                'saveToDataBase' => true,
             ],
 ],
 ```

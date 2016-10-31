@@ -37,7 +37,14 @@ use yii\helpers\Url;
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
+            [
+                'headerOptions' => ['class' => 'text-center col-md-1'],
+                'value' => function($model) {
+                    return (!empty($model->uid)) ? $model->uid : '';
+                },
+                'label' => Yii::t('shop', 'Order id'),
+                'contentOptions' => ['class' => 'text-center'],
+            ],
 
             /*Customer*/
             [
@@ -67,7 +74,7 @@ use yii\helpers\Url;
                 'contentOptions' => ['class' => 'text-center'],
             ],
             [
-                'headerOptions' => ['class' => 'text-center col-md-2'],
+                'headerOptions' => ['class' => 'text-center col-md-1'],
                 'value' => function ($model) {
                     $orderProducts = $model->orderProducts;
                     $sum = 0;

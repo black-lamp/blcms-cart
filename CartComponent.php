@@ -53,6 +53,21 @@ class CartComponent extends Component
      */
     public $mailDir = '@vendor/black-lamp/blcms-cart/views/mail/';
 
+    /**
+     * @var integer
+     * The minimal order unique id.
+     */
+    public $minOrderUid = 10000000;
+    /**
+     * @var integer
+     * The maximal order unique id.
+     */
+    public $maxOrderUid = 99999999;/**
+     * @var integer
+     * The order unique id prefix.
+     */
+    public $uidPrefix = '';
+
     /*Session key of order*/
     const SESSION_KEY = 'shop_order';
     /*Session key of total cost*/
@@ -91,6 +106,7 @@ class CartComponent extends Component
             $order = Order::find()->where(['user_id' => \Yii::$app->user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])->one();
             if (empty($order)) {
                 $order = new Order();
+                $order->uid = $this->generateUnicId($this->uidPrefix, $this->minOrderUid, $this->maxOrderUid);
                 $order->user_id = \Yii::$app->user->id;
                 $order->status = OrderStatus::STATUS_INCOMPLETE;
                 if ($order->validate()) {
@@ -415,5 +431,16 @@ class CartComponent extends Component
                 return $totalCost;
             }
         }
+    }
+
+    public function generateUnicId($prefix, $min, $max) {
+        $prefix = (!empty($prefix)) ? $prefix : '';
+
+        $id = random_int($min, $max);
+        $order = Order::find()->where(['uid' => $id])->one();
+        if (empty($order)) {
+            return $prefix . $id;
+        }
+        else $this->generateUnicId($prefix, $min, $max);
     }
 }
