@@ -4,7 +4,9 @@ namespace bl\cms\cart\models;
 use bl\cms\shop\common\components\user\models\UserAddress;
 use dektrium\user\models\User;
 use Yii;
+use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "shop_order".
@@ -32,6 +34,20 @@ class Order extends ActiveRecord
     public static function tableName()
     {
         return 'shop_order';
+    }
+
+    public function behaviors()
+    {
+        return [
+            'timestamp' => [
+                'class' => TimestampBehavior::className(),
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => ['creation_time', 'update_time'],
+                    ActiveRecord::EVENT_BEFORE_UPDATE => ['update_time'],
+                ],
+                'value' => new Expression('NOW()'),
+            ],
+        ];
     }
 
     /**

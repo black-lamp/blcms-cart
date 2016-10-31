@@ -55,11 +55,33 @@ use yii\helpers\Url;
                 },
                 'label' => Yii::t('shop', 'Customer'),
                 'format' => 'html',
-                'contentOptions' => ['class' => 'text-center project-title col-md-3'],
+                'contentOptions' => ['class' => 'text-center project-title'],
             ],
-
             [
-                'headerOptions' => ['class' => 'text-center col-md-3'],
+                'headerOptions' => ['class' => 'text-center col-md-2'],
+                'value' => function ($model) {
+                    return $model->creation_time;
+                },
+                'label' => Yii::t('cart', 'Date'),
+                'format' => 'html',
+                'contentOptions' => ['class' => 'text-center'],
+            ],
+            [
+                'headerOptions' => ['class' => 'text-center col-md-2'],
+                'value' => function ($model) {
+                    $orderProducts = $model->orderProducts;
+                    $sum = 0;
+                    foreach ($orderProducts as $orderProduct) {
+                        $sum += $orderProduct->count * $orderProduct->price;
+                    }
+                    return Yii::$app->formatter->asCurrency($sum);
+                },
+                'label' => Yii::t('cart', 'Sum'),
+                'format' => 'html',
+                'contentOptions' => ['class' => 'text-center'],
+            ],
+            [
+                'headerOptions' => ['class' => 'text-center col-md-2'],
                 'attribute' => 'status',
                 'filter' => ArrayHelper::map(OrderStatus::find()->all(), 'id', function($model) {
                     return $model->translation->title;
@@ -76,7 +98,7 @@ use yii\helpers\Url;
 
             /*ACTIONS*/
             [
-                'headerOptions' => ['class' => 'text-center col-md-2'],
+                'headerOptions' => ['class' => 'text-center col-md-3'],
                 'attribute' => \Yii::t('shop', 'Manage'),
 
                 'value' => function ($model) {

@@ -31,7 +31,7 @@ use yii\widgets\DetailView;
             return $model->translation->title;
         }), ['options' => [$model->status => ['selected' => true]]]); ?>
         <?= Html::submitButton(Yii::t('shop', 'Change status'), ['class' => 'btn btn-primary']); ?>
-        <?= Html::a(Yii::t('shop', 'Close'), Url::toRoute('/shop/order'), ['class' => 'btn btn-danger']) ?>
+        <?= Html::a(Yii::t('shop', 'Close'), Url::toRoute('/cart/order'), ['class' => 'btn btn-danger']) ?>
         <?php $form::end(); ?>
     </div>
 
@@ -65,7 +65,7 @@ use yii\widgets\DetailView;
                     'format' => 'raw',
                     'value' => function ($model) {
                         return Html::a($model->product->translation->title,
-                            Yii::$app->urlManager->hostInfo . '/shop/' . $model->product->category->translation->seoUrl . '/' . $model->product->translation->seoUrl);
+                            Yii::$app->urlManager->hostInfo . '/cart/' . $model->product->category->translation->seoUrl . '/' . $model->product->translation->seoUrl);
                     }
                 ],
                 [
