@@ -26,7 +26,7 @@ php yii migrate --migrationPath=@vendor/black-lamp/blcms-cart/migrations
 ```
 'components' => [
     'cart' => [
-                'class' => 'bl\cms\cart\CartComponent',
+                'class' => bl\cms\cart\CartComponent::className(),
                 'emailNotifications' => true,
                 'sender' => 'info@mail.com',
                 'sendTo' => [
@@ -41,7 +41,7 @@ php yii migrate --migrationPath=@vendor/black-lamp/blcms-cart/migrations
 ```
 'modules' => [
     'cart' => [
-                'class' => 'bl\cms\cart\frontend\Module',
+                'class' => bl\cms\cart\frontend\Module::className(),
             ],
 'components' => [
             'mailer' => [
@@ -63,7 +63,7 @@ php yii migrate --migrationPath=@vendor/black-lamp/blcms-cart/migrations
 ```
 'modules' => [
         'cart' => [
-            'class' => 'bl\cms\cart\backend\Module',
+            'class' => bl\cms\cart\backend\Module::className(),
         ],
     ],
 ```

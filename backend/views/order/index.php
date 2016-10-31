@@ -109,7 +109,7 @@ use yii\helpers\Url;
                 'attribute' => \Yii::t('shop', 'Manage'),
 
                 'value' => function ($model) {
-                    return Html::a('<span class="glyphicon glyphicon-star"></span>', Url::toRoute(['view', 'id' => $model->id]),
+                    return Html::a('<span class="fa fa-eye"></span>', Url::toRoute(['view', 'id' => $model->id]),
                         ['title' => Yii::t('shop', 'Status and details'), 'class' => 'btn btn-primary pjax m-r-md']) .
                     Html::a('<span class="glyphicon glyphicon-remove"></span>', Url::toRoute(['delete', 'id' => $model->id]),
                         ['title' => Yii::t('shop', 'Delete'), 'data-method' => 'post', 'class' => 'btn btn-danger pjax']);

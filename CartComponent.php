@@ -164,6 +164,9 @@ class CartComponent extends Component
                     }
                     $session[self::SESSION_KEY] = $products;
                 }
+                else {
+                    $session[self::SESSION_KEY] = ['id' => $productId, 'count' => $count, 'priceId' => $priceId];
+                }
             }
             else {
                 $session[self::SESSION_KEY] = [['id' => $productId, 'count' => $count, 'priceId' => $priceId]];
