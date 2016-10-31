@@ -62,7 +62,8 @@ class CartComponent extends Component
      * @var integer
      * The maximal order unique id.
      */
-    public $maxOrderUid = 99999999;/**
+    public $maxOrderUid = 99999999;
+    /**
      * @var integer
      * The order unique id prefix.
      */
@@ -81,12 +82,12 @@ class CartComponent extends Component
      * @param integer $count
      * @param integer $priceId
      */
-    public function add($productId, $count, $priceId = null) {
+    public function add($productId, $count, $priceId = null)
+    {
 
         if ($this->saveToDataBase && !\Yii::$app->user->isGuest) {
             $this->saveProductToDataBase($productId, $count, $priceId);
-        }
-        else {
+        } else {
             $this->saveProductToSession($productId, $count, $priceId);
         }
     }
@@ -99,7 +100,8 @@ class CartComponent extends Component
      * @param integer $priceId
      * @throws ForbiddenHttpException
      */
-    private function saveProductToDataBase($productId, $count, $priceId = null) {
+    private function saveProductToDataBase($productId, $count, $priceId = null)
+    {
 
         if ($this->saveToDataBase === true && !\Yii::$app->user->isGuest) {
 
@@ -131,8 +133,7 @@ class CartComponent extends Component
             if ($order->validate()) {
                 $orderProduct->save();
             }
-        }
-        else throw new ForbiddenHttpException();
+        } else throw new ForbiddenHttpException();
     }
 
     /**
@@ -143,40 +144,35 @@ class CartComponent extends Component
      * @param integer $priceId
      * @return boolean
      */
-    private function saveProductToSession($productId, $count, $priceId = null) {
+    private function saveProductToSession($productId, $count, $priceId = null)
+    {
+
         if (!empty($productId) && (!empty($count))) {
             $session = Yii::$app->session;
-            if ($session->has(self::SESSION_KEY)) {
 
-                $products = $session[self::SESSION_KEY];
-
-                if (!empty($products)) {
-                    foreach ($products as $key => $product) {
-                        if ($product['id'] == $productId) {
-                            $products[$key]['count'] += $count;
-                            break;
-                        }
-                        else {
-                            if (count($products) - 1 == $key) {
-                                $products[] = ['id' => $productId, 'count' => $count, 'priceId' => $priceId];
-                            }
+            $productsFromSession = $session[self::SESSION_KEY];
+            if (!empty($productsFromSession)) {
+                foreach ($productsFromSession as $key => $product) {
+                    if ($product['id'] == $productId) {
+                        $productsFromSession[$key]['count'] += $count;
+                        break;
+                    } else {
+                        if (count($productsFromSession) - 1 == $key) {
+                            $productsFromSession[] = ['id' => $productId, 'count' => $count, 'priceId' => $priceId];
                         }
                     }
-                    $session[self::SESSION_KEY] = $products;
                 }
-                else {
-                    $session[self::SESSION_KEY] = ['id' => $productId, 'count' => $count, 'priceId' => $priceId];
-                }
+                $session[self::SESSION_KEY] = $productsFromSession;
             }
             else {
-                $session[self::SESSION_KEY] = [['id' => $productId, 'count' => $count, 'priceId' => $priceId]];
+                $_SESSION[self::SESSION_KEY][] = ['id' => $productId, 'count' => $count, 'priceId' => $priceId];
             }
+
 
             if (empty($priceId)) {
                 $product = Product::findOne($productId);
                 $price = $product->price;
-            }
-            else {
+            } else {
                 $price = ProductPrice::findOne($priceId)->salePrice;
             }
             if (!$session->has(self::TOTAL_COST_KEY)) {
@@ -184,8 +180,8 @@ class CartComponent extends Component
             }
             $session[self::TOTAL_COST_KEY] += $price * $count;
             return true;
-        }
-        else return false;
+        } else return false;
+
     }
 
     /**
@@ -193,19 +189,18 @@ class CartComponent extends Component
      *
      * @return array|bool|mixed|\yii\db\ActiveRecord[]
      */
-    public function getOrderItems() {
+    public function getOrderItems()
+    {
         if (\Yii::$app->user->isGuest) {
             $session = \Yii::$app->session;
             $products = $session[self::SESSION_KEY];
-        }
-        else {
+        } else {
 
             $order = Order::find()->where(['user_id' => \Yii::$app->user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])->one();
             if (!empty($order)) {
                 $products = OrderProduct::find()->asArray()->where(['order_id' => $order->id])->all();
 
-            }
-            else return false;
+            } else return false;
 
         }
         return $products;
@@ -217,12 +212,12 @@ class CartComponent extends Component
      *
      * @return bool|\yii\db\ActiveRecord[]
      */
-    public function getAllUserOrders() {
+    public function getAllUserOrders()
+    {
         if (!\Yii::$app->user->isGuest && $this->saveToDataBase === true) {
             $orders = Order::find()->where(['user_id' => \Yii::$app->user->id])->all();
             return $orders;
-        }
-        else return false;
+        } else return false;
     }
 
     /**
@@ -230,26 +225,25 @@ class CartComponent extends Component
      *
      * @param $id
      */
-    public function removeItem($id) {
+    public function removeItem($id)
+    {
         if (!\Yii::$app->user->isGuest) {
             $orderProduct = OrderProduct::findOne($id);
             $orderProduct->delete();
-        }
-        else {
+        } else {
             $session = Yii::$app->session;
             if ($session->has(self::SESSION_KEY)) {
                 $products = $session[self::SESSION_KEY];
                 foreach ($products as $key => $product) {
-                   if ($product['id'] == $id) {
+                    if ($product['id'] == $id) {
 
-                       if (!empty($session[self::SESSION_KEY][$key]['priceId'])) {
-                           $price = ProductPrice::findOne($session[self::SESSION_KEY][$key]['priceId'])->salePrice;
-                       }
-                       else $price = Product::findOne($id)->price;
-                       $session[self::TOTAL_COST_KEY] -= $price * $session[self::SESSION_KEY][$key]['count'];
+                        if (!empty($session[self::SESSION_KEY][$key]['priceId'])) {
+                            $price = ProductPrice::findOne($session[self::SESSION_KEY][$key]['priceId'])->salePrice;
+                        } else $price = Product::findOne($id)->price;
+                        $session[self::TOTAL_COST_KEY] -= $price * $session[self::SESSION_KEY][$key]['count'];
 
-                       unset($_SESSION[self::SESSION_KEY][$key]);
-                   }
+                        unset($_SESSION[self::SESSION_KEY][$key]);
+                    }
                 }
             }
         }
@@ -260,7 +254,8 @@ class CartComponent extends Component
      * @return bool
      * @throws Exception
      */
-    public function makeOrder($customerData) {
+    public function makeOrder($customerData)
+    {
         $order = Order::find()->where(['user_id' => \Yii::$app->user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])->one();
         $user = $order->user;
 
@@ -290,8 +285,7 @@ class CartComponent extends Component
                 }
 
             }
-        }
-        else {
+        } else {
             $order->user_id = (!empty($order->user_id)) ? $order->user_id : \Yii::$app->user->id;
             $order->save();
             $this->sendMail($profile, $products = null, $user, $order, $address = null);
@@ -309,7 +303,8 @@ class CartComponent extends Component
      * @param null|Order $order
      * @param null|UserAddress $address
      */
-    private function sendMail($profile = null, $products = null, $user = null, $order = null, $address = null) {
+    private function sendMail($profile = null, $products = null, $user = null, $order = null, $address = null)
+    {
         $products = OrderProduct::find()->where(['order_id' => $order->id])->all();
 
         if (!empty($this->sender) && !empty($order)) {
@@ -329,8 +324,7 @@ class CartComponent extends Component
                     ->setTo($order->email)
                     ->setSubject(Yii::t('shop', 'Success order'))
                     ->send();
-            }
-            catch(Exception $ex) {
+            } catch (Exception $ex) {
             }
         }
     }
@@ -338,12 +332,12 @@ class CartComponent extends Component
     /**
      * Clears cart.
      */
-    public function clearCart() {
+    public function clearCart()
+    {
         if (!\Yii::$app->user->isGuest && $this->saveToDataBase === true) {
             $order = Order::find()->where(['user_id' => \Yii::$app->user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])->one();
             $order->deleteAll();
-        }
-        else {
+        } else {
             $session = \Yii::$app->session;
             $session->remove(self::SESSION_KEY);
             $session->remove(self::TOTAL_COST_KEY);
@@ -355,7 +349,8 @@ class CartComponent extends Component
      *
      * @throws Exception
      */
-    public function transportSessionDataToDB() {
+    public function transportSessionDataToDB()
+    {
         if ($this->saveToDataBase === true) {
             $session = Yii::$app->session;
 
@@ -385,16 +380,14 @@ class CartComponent extends Component
                         $orderProduct->product_id = $product['id'];
                         $orderProduct->price_id = $product['priceId'];
                         $orderProduct->count = $product['count'];
-                    }
-                    else {
+                    } else {
                         $orderProduct->count += $product['count'];
                     }
 
                     if ($orderProduct->validate()) {
 
                         $orderProduct->save();
-                    }
-                    else throw new Exception($orderProduct->errors);
+                    } else throw new Exception($orderProduct->errors);
 
                 }
 
@@ -404,17 +397,15 @@ class CartComponent extends Component
         }
     }
 
-    public function getTotalCost() {
+    public function getTotalCost()
+    {
         if (Yii::$app->user->isGuest) {
             $session = Yii::$app->session;
             if ($session->has(self::TOTAL_COST_KEY)) {
                 $totalCost = $session[self::TOTAL_COST_KEY];
                 return $totalCost;
-            }
-            else return false;
-        }
-
-        else {
+            } else return false;
+        } else {
             $order = Order::find()
                 ->where(['user_id' => Yii::$app->user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])
                 ->one();
@@ -431,14 +422,14 @@ class CartComponent extends Component
         }
     }
 
-    public function generateUnicId($prefix, $min, $max) {
+    public function generateUnicId($prefix, $min, $max)
+    {
         $prefix = (!empty($prefix)) ? $prefix : '';
 
         $id = random_int($min, $max);
         $order = Order::find()->where(['uid' => $id])->one();
         if (empty($order)) {
             return $prefix . $id;
-        }
-        else $this->generateUnicId($prefix, $min, $max);
+        } else $this->generateUnicId($prefix, $min, $max);
     }
 }
