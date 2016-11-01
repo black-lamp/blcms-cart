@@ -30,25 +30,28 @@ use yii\helpers\Url;
         ],
         'tableOptions' => [
             'id' => 'my-grid',
-            'class' => 'table table-hover'
+            'class' => 'table table-hover table-striped table-bordered'
         ],
 
         'summary' => "",
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
+
+            /*ORDER NUMBER*/
             [
-                'headerOptions' => ['class' => 'text-center col-md-1'],
+                'attribute' => 'uid',
                 'value' => function($model) {
-                    return (!empty($model->uid)) ? $model->uid : '';
+                    return Html::a($model->uid, Url::toRoute(['view', 'id' => $model->id]));
                 },
-                'label' => Yii::t('cart', 'Order id'),
-                'contentOptions' => ['class' => 'text-center'],
+                'format' => 'html',
+                'headerOptions' => ['class' => 'text-center col-md-1'],
+                'contentOptions' => ['class' => 'text-center project-title'],
             ],
 
             /*Customer*/
             [
-                'headerOptions' => ['class' => 'text-center col-md-3'],
+                'headerOptions' => ['class' => 'text-center col-md-2'],
                 'value' => function ($model) {
 
                     $customer = null;
@@ -58,12 +61,27 @@ use yii\helpers\Url;
                             Url::toRoute(['view', 'id' => $model->id])
                         );
                     }
+                    if (!empty($model->address)) {
+                        $customer .= Html::tag('p', $model->address->city . ', ' . $model->address->country);
+                    }
                     return $customer;
                 },
                 'label' => Yii::t('shop', 'Customer'),
                 'format' => 'html',
                 'contentOptions' => ['class' => 'text-center project-title'],
             ],
+
+            /*NUMBER OF ITEMS*/
+            [
+                'label' => Yii::t('cart', 'Number of items'),
+                'headerOptions' => ['class' => 'text-center col-md-1'],
+                'value' => function($model) {
+                    return count($model->orderProducts);
+                },
+                'contentOptions' => ['class' => 'text-center'],
+            ],
+
+            /*DATE*/
             [
                 'headerOptions' => ['class' => 'text-center col-md-2'],
                 'value' => function ($model) {
@@ -73,6 +91,8 @@ use yii\helpers\Url;
                 'format' => 'html',
                 'contentOptions' => ['class' => 'text-center'],
             ],
+
+            /*SUM*/
             [
                 'headerOptions' => ['class' => 'text-center col-md-1'],
                 'value' => function ($model) {
@@ -87,6 +107,8 @@ use yii\helpers\Url;
                 'format' => 'html',
                 'contentOptions' => ['class' => 'text-center'],
             ],
+
+            /*STATUS*/
             [
                 'headerOptions' => ['class' => 'text-center col-md-2'],
                 'attribute' => 'status',
@@ -100,12 +122,22 @@ use yii\helpers\Url;
                         ['class' => 'btn btn-default btn-xs']);
                 },
                 'format' => 'raw',
-                'contentOptions' => ['class' => 'text-center col-md-3 text-center'],
+                'contentOptions' => ['class' => 'text-center'],
+            ],
+
+            /*DELIVERY METHOD*/
+            [
+                'label' => Yii::t('cart', 'Delivery method'),
+                'headerOptions' => ['class' => 'text-center col-md-1'],
+                'value' => function ($model) {
+                    return $model->deliveryMethod->translation->title;
+                },
+                'contentOptions' => ['class' => 'text-center'],
             ],
 
             /*ACTIONS*/
             [
-                'headerOptions' => ['class' => 'text-center col-md-3'],
+                'headerOptions' => ['class' => 'text-center col-md-2'],
                 'attribute' => \Yii::t('shop', 'Manage'),
 
                 'value' => function ($model) {
@@ -115,7 +147,7 @@ use yii\helpers\Url;
                         ['title' => Yii::t('shop', 'Delete'), 'data-method' => 'post', 'class' => 'btn btn-danger pjax']);
                 },
                 'format' => 'raw',
-                'contentOptions' => ['class' => 'text-center col-md-2 text-center'],
+                'contentOptions' => ['class' => 'text-center'],
             ]
         ],
     ]); ?>

@@ -11,6 +11,7 @@ use yii\widgets\DetailView;
  *
  * @var $this yii\web\View
  * @var $model bl\cms\cart\models\Order
+ * @var $orderProducts bl\cms\cart\models\OrderProduct
  * @var $statuses[] bl\cms\cart\models\OrderStatus
  */
 
@@ -62,57 +63,50 @@ use yii\widgets\DetailView;
         <h2>
             <?= Yii::t('shop', 'Product list'); ?>
         </h2>
-        <?= GridView::widget([
-            'dataProvider' => $dataProvider,
-            'filterModel' => $searchModel,
-            'columns' => [
-                ['class' => 'yii\grid\SerialColumn'],
 
-                [
-                    'label' => Yii::t('cart', 'Articulus'),
-                    'headerOptions' => ['class' => 'text-center col-md-1'],
-                    'value' => function ($model) {
-                        return $model->product->articulus;
-                    }
-                ],
-                [
-                    'label' => Yii::t('cart', 'Product title'),
-                    'headerOptions' => ['class' => 'text-center col-md-7'],
-                    'format' => 'raw',
-                    'value' => function ($model) {
-                        return Html::a($model->product->translation->title,
-                            Yii::$app->urlManager->hostInfo . '/cart/' . $model->product->category->translation->seoUrl . '/' . $model->product->translation->seoUrl);
-                    }
-                ],
-                [
-                    'label' => Yii::t('cart', 'Count'),
-                    'headerOptions' => ['class' => 'text-center col-md-1'],
-                    'format' => 'raw',
-                    'value' => 'count'
-                ],
-                [
-                    'label' => Yii::t('cart', 'Price'),
-                    'headerOptions' => ['class' => 'text-center col-md-1'],
-                    'value' => function($model) {
-                        $price = $model->price;
-                        return $price;
-                    }
-                ],
-                /*ACTIONS*/
-                [
-                    'headerOptions' => ['class' => 'text-center col-md-1'],
-                    'attribute' => \Yii::t('shop', 'Delete'),
+        <table class="table table-hover table-striped table-bordered">
+            <tr>
+                <th>#</th>
+                <th>
+                    <?= Yii::t('cart', 'Articulus'); ?>
+                </th>
+                <th>
+                    <?= Yii::t('cart', 'Product title'); ?>
+                </th>
+                <th>
+                    <?= Yii::t('cart', 'Count'); ?>
+                </th>
+                <th>
+                    <?= Yii::t('cart', 'Price'); ?>
+                </th>
+                <th>
+                    <?= Yii::t('cart', 'Delete'); ?>
+                </th>
+            </tr>
 
-                    'value' => function ($model) {
-
-                        return Html::a('<span class="glyphicon glyphicon-remove"></span>', Url::toRoute(['delete-product', 'id' => $model->id]),
-                            ['title' => Yii::t('yii', 'Delete'), 'class' => 'btn btn-danger pull-right pjax']);
-
-                    },
-                    'format' => 'raw',
-                    'contentOptions' => ['class' => 'col-md-2 text-center'],
-                ],
-            ],
-        ]); ?>
+            <?php $i = 0; foreach ($orderProducts as $orderProduct) : ?>
+            <tr>
+                <td><?=++$i; ?></td>
+                <td>
+                    <?= $orderProduct->product->articulus; ?>
+                </td>
+                <td>
+                    <?= $orderProduct->product->translation->title; ?>
+                    <?= (!empty($orderProduct->priceTitle)) ?
+                        Html::tag('i', '(' . $orderProduct->priceTitle . ')') : ''; ?>
+                </td>
+                <td>
+                    <?= $orderProduct->count; ?>
+                </td>
+                <td>
+                    <?= $orderProduct->price; ?>
+                </td>
+                <td>
+                    <?= Html::a('<span class="glyphicon glyphicon-remove"></span>', Url::toRoute(['delete-product', 'id' => $model->id]),
+                        ['title' => Yii::t('yii', 'Delete'), 'class' => 'btn btn-danger pull-right pjax']); ?>
+                </td>
+            </tr>
+            <?php endforeach; ?>
+        </table>
     </div>
 </div>
