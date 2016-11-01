@@ -19,7 +19,7 @@ class SearchOrder extends Order
     public function rules()
     {
         return [
-            [['id', 'user_id'], 'integer'],
+            [['id', 'user_id', 'uid'], 'integer'],
 //            [['first_name', 'last_name', 'email', 'phone', 'address', 'status'], 'safe'],
             [['status'], 'safe'],
         ];
@@ -43,7 +43,9 @@ class SearchOrder extends Order
      */
     public function search($params)
     {
-        $query = Order::find()->where(['not in','status', [OrderStatus::STATUS_INCOMPLETE]])->orderBy(['id' => SORT_DESC]);
+        $query = Order::find()->where(['not in','status', [OrderStatus::STATUS_INCOMPLETE]]);
+
+        $query->orderBy(['id' => SORT_DESC]);
 
         // add conditions that should always apply here
 
@@ -66,13 +68,8 @@ class SearchOrder extends Order
         ]);
 
         $query
-//            ->andFilterWhere(['like', 'first_name', $this->first_name])
-//            ->andFilterWhere(['like', 'last_name', $this->last_name])
-//            ->andFilterWhere(['like', 'email', $this->email])
-//            ->andFilterWhere(['like', 'phone', $this->phone])
-//            ->andFilterWhere(['like', 'address', $this->address])
-            ->andFilterWhere(['like', 'status', $this->status]);
-
+            ->andFilterWhere(['like', 'status', $this->status])
+            ->andFilterWhere(['like', 'uid', $this->uid]);
         return $dataProvider;
     }
 }

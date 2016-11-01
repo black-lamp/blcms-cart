@@ -87,6 +87,15 @@ class OrderProduct extends ActiveRecord
         return $product->price;
     }
 
+    public function getPriceTitle() {
+        if (!empty($this->price_id)) {
+            $price = ProductPrice::findOne($this->price_id);
+            if (!empty($price->translation->title)) return $price->translation->title;
+            else return false;
+        }
+        else return false;
+    }
+
     public function getSmallPhoto() {
         return $image = $this->getPhoto('small');
     }

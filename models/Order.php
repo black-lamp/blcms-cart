@@ -18,6 +18,7 @@ use yii\db\Expression;
  * @property integer $status
  * @property integer $address_id
  * @property integer $delivery_id
+ * @property integer $uid
  * @property string $delivery_post_office
  *
  * @property User $user
@@ -74,6 +75,7 @@ class Order extends ActiveRecord
         return [
             'status' => Yii::t('shop', 'Status'),
             'delivery_post_office' => Yii::t('shop', 'Post office'),
+            'uid' => Yii::t('cart', 'Order number'),
         ];
     }
 

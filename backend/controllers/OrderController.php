@@ -90,14 +90,12 @@ class OrderController extends Controller
                 }
                 return $this->redirect(['view', 'id' => $id]);
             } else {
-                $searchModel = new SearchOrderProduct();
-                $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+                $orderProducts = $model->orderProducts;
 
                 return $this->render('view', [
                     'model' => $this->findModel($id),
                     'statuses' => OrderStatus::find()->all(),
-                    'searchModel' => $searchModel,
-                    'dataProvider' => $dataProvider,
+                    'orderProducts' => $orderProducts,
                 ]);
             }
         } else throw new NotFoundHttpException();
