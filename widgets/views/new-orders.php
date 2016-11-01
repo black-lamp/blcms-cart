@@ -21,7 +21,7 @@ use yii\helpers\Url;
         <td class="text-center">
             <?= Html::a(
                 $order->uid,
-                Url::toRoute(['/cart/view', 'id' => $order->id])
+                Url::toRoute(['/cart/order/view', 'id' => $order->id])
             ); ?>
         </td>
         <td>
