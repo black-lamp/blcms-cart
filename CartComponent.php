@@ -267,32 +267,31 @@ class CartComponent extends Component
             if ($profile->validate() && $order->validate()) {
                 $profile->save();
             }
-        }
 
-        if (empty($order->address_id)) {
-            $address = new UserAddress();
+            if (empty($order->address_id)) {
+                $address = new UserAddress();
 
-            if ($address->load($customerData)) {
-                if (!empty($address->country && $address->region && $address->city && $address->house)) {
-                    $address->user_profile_id = \Yii::$app->user->identity->profile->id;
+                if ($address->load($customerData)) {
+                    if (!empty($address->country && $address->region && $address->city && $address->house)) {
+                        $address->user_profile_id = \Yii::$app->user->identity->profile->id;
 
-                    if ($address->validate()) {
-                        $address->save();
-                        $order->address_id = $address->id;
+                        if ($address->validate()) {
+                            $address->save();
+                            $order->address_id = $address->id;
+                        }
                     }
                 }
+                $order->user_id = (!empty($order->user_id)) ? $order->user_id : \Yii::$app->user->id;
+                $order->save();
+                $this->sendMail($profile, $products = null, $user, $order, $address);
+                return true;
+            } else {
+                $order->user_id = (!empty($order->user_id)) ? $order->user_id : \Yii::$app->user->id;
+                $order->save();
+                $this->sendMail($profile, $products = null, $user, $order, $address = null);
+                return true;
             }
-            $order->user_id = (!empty($order->user_id)) ? $order->user_id : \Yii::$app->user->id;
-            $order->save();
-            $this->sendMail($profile, $products = null, $user, $order, $address);
-            return true;
-        } else {
-            $order->user_id = (!empty($order->user_id)) ? $order->user_id : \Yii::$app->user->id;
-            $order->save();
-            $this->sendMail($profile, $products = null, $user, $order, $address = null);
-            return true;
         }
-
 
         return false;
     }
