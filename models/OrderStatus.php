@@ -46,6 +46,7 @@ class OrderStatus extends ActiveRecord
     public function rules()
     {
         return [
+            [['color'], 'string'],
         ];
     }
 

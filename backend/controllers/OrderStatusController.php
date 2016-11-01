@@ -82,7 +82,7 @@ class OrderStatusController extends Controller
 
             $modelTranslation = $this->findOrCreateModelTranslation($model->id, $languageId);
 
-            if ($modelTranslation->load(Yii::$app->request->post())) {
+            if ($modelTranslation->load(Yii::$app->request->post()) && $model->load(Yii::$app->request->post())) {
                 $model->save();
                 $modelTranslation->language_id = $languageId;
                 $modelTranslation->order_status_id = $model->id;

@@ -28,16 +28,20 @@ use yii\helpers\Url;
         'options' => [
             'class' => 'project-list'
         ],
+        'layout'=>"{items}\n{pager}\n{summary}",
+
         'tableOptions' => [
             'id' => 'my-grid',
             'class' => 'table table-hover table-striped table-bordered'
         ],
 
-        'summary' => "",
+        'summary' =>  Html::tag('p',
+            \Yii::t('cart', 'Showing items from') . ' {begin} ' . \Yii::t('cart', 'to') . ' {end} ' .
+            \Yii::t('cart', 'by') . ' {totalCount}',
+            ['class' => 'text-center']),
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-
             /*ORDER NUMBER*/
             [
                 'attribute' => 'uid',
@@ -71,16 +75,6 @@ use yii\helpers\Url;
                 'contentOptions' => ['class' => 'text-center project-title'],
             ],
 
-            /*NUMBER OF ITEMS*/
-            [
-                'label' => Yii::t('cart', 'Number of items'),
-                'headerOptions' => ['class' => 'text-center col-md-1'],
-                'value' => function($model) {
-                    return count($model->orderProducts);
-                },
-                'contentOptions' => ['class' => 'text-center'],
-            ],
-
             /*DATE*/
             [
                 'headerOptions' => ['class' => 'text-center col-md-2'],
@@ -89,6 +83,15 @@ use yii\helpers\Url;
                 },
                 'label' => Yii::t('cart', 'Date'),
                 'format' => 'html',
+                'contentOptions' => ['class' => 'text-center'],
+            ],
+            /*NUMBER OF ITEMS*/
+            [
+                'label' => Yii::t('cart', 'Number of items'),
+                'headerOptions' => ['class' => 'text-center col-md-1'],
+                'value' => function($model) {
+                    return count($model->orderProducts);
+                },
                 'contentOptions' => ['class' => 'text-center'],
             ],
 
@@ -108,6 +111,16 @@ use yii\helpers\Url;
                 'contentOptions' => ['class' => 'text-center'],
             ],
 
+            /*DELIVERY METHOD*/
+            [
+                'label' => Yii::t('cart', 'Delivery method'),
+                'headerOptions' => ['class' => 'text-center col-md-1'],
+                'value' => function ($model) {
+                    return $model->deliveryMethod->translation->title;
+                },
+                'contentOptions' => ['class' => 'text-center'],
+            ],
+
             /*STATUS*/
             [
                 'headerOptions' => ['class' => 'text-center col-md-2'],
@@ -119,19 +132,12 @@ use yii\helpers\Url;
                 'value' => function ($model) {
                     $status = $model->orderStatus->translation->title;
                     return Html::a($status, Url::toRoute(['view', 'id' => $model->id]),
-                        ['class' => 'btn btn-default btn-xs']);
+                        [
+                            'class' => 'btn btn-default btn-xs',
+                            'style' => 'color: #f0f0f0; background-color:' . $model->orderStatus->color
+                        ]);
                 },
                 'format' => 'raw',
-                'contentOptions' => ['class' => 'text-center'],
-            ],
-
-            /*DELIVERY METHOD*/
-            [
-                'label' => Yii::t('cart', 'Delivery method'),
-                'headerOptions' => ['class' => 'text-center col-md-1'],
-                'value' => function ($model) {
-                    return $model->deliveryMethod->translation->title;
-                },
                 'contentOptions' => ['class' => 'text-center'],
             ],
 

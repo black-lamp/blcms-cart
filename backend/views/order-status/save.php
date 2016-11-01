@@ -35,7 +35,8 @@ $this->title = ($modelTranslation->isNewRecord) ?
 
         <?php $form = ActiveForm::begin(); ?>
 
-        <?= $form->field($modelTranslation, 'title')->textInput(['maxlength' => true]) ?>
+        <?= $form->field($modelTranslation, 'title')->textInput(['maxlength' => true]); ?>
+        <?= $form->field($model, 'color')->input('color'); ?>
 
         <div class="row">
             <?= Html::a(Yii::t('shop', 'Cancel'), Url::toRoute('/cart/order-status'), ['class' => 'm-r-xs btn btn-danger btn-xs pull-right']); ?>
