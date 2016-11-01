@@ -263,7 +263,7 @@ class CartComponent extends Component
 
         $profile = Profile::find()->where(['user_id' => \Yii::$app->user->id])->one();
 
-        if ($order->load(Yii::$app->request->post()) && $profile->load($customerData)) {
+        if ($order->load($customerData) && $profile->load($customerData)) {
             if ($profile->validate() && $order->validate()) {
                 $profile->save();
             }
@@ -273,18 +273,19 @@ class CartComponent extends Component
             $address = new UserAddress();
 
             if ($address->load($customerData)) {
-                $address->user_profile_id = \Yii::$app->user->identity->profile->id;
+                if (!empty($address->country && $address->region && $address->city && $address->house)) {
+                    $address->user_profile_id = \Yii::$app->user->identity->profile->id;
 
-                if ($address->validate()) {
-                    $address->save();
-                    $order->address_id = $address->id;
-                    $order->user_id = (!empty($order->user_id)) ? $order->user_id : \Yii::$app->user->id;
-                    $order->save();
-                    $this->sendMail($profile, $products = null, $user, $order, $address);
-                    return true;
+                    if ($address->validate()) {
+                        $address->save();
+                        $order->address_id = $address->id;
+                    }
                 }
-
             }
+            $order->user_id = (!empty($order->user_id)) ? $order->user_id : \Yii::$app->user->id;
+            $order->save();
+            $this->sendMail($profile, $products = null, $user, $order, $address);
+            return true;
         } else {
             $order->user_id = (!empty($order->user_id)) ? $order->user_id : \Yii::$app->user->id;
             $order->save();

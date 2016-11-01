@@ -152,7 +152,8 @@ CartAsset::register($this);
         ]); ?>
 
         <!--PERSONAL DATA-->
-        <div class="personal-data">
+        <div class="row">
+        <div class="personal-data col-md-6">
             <h3><?= Yii::t('cart', 'Your personal data'); ?>:</h3>
 
             <!--Name-->
@@ -197,7 +198,8 @@ CartAsset::register($this);
                     <b><?= Yii::t('shop', 'Phone number') ?>:</b> <?= Yii::$app->user->identity->profile->phone; ?>
                 </p>
             <?php else : ?>
-                <?= $form->field($profile, 'phone')->textInput(); ?>
+                <?= $form->field($profile, 'phone')
+                    ->widget(\yii\widgets\MaskedInput::className(), ['mask' => '(999)-999-99-99']); ?>
             <?php endif; ?>
 
             <?=Html::a(\Yii::t('cart', 'Change personal data'), Url::toRoute('/user/settings'),
@@ -206,12 +208,13 @@ CartAsset::register($this);
                 ]); ?>
         </div>
 
-        <br>
         <!--DELIVERY METHOD-->
-        <?= Delivery::widget(['form' => $form, 'model' => $order, 'config' => [
-            'addressModel' => $address
-        ]]); ?>
-
+        <div class="col-md-6">
+            <?= Delivery::widget(['form' => $form, 'model' => $order, 'config' => [
+                'addressModel' => $address
+            ]]); ?>
+        </div>
+        </div>
         <!--Address selecting-->
         <div class="address">
             <h3><?= Yii::t('cart', 'Address'); ?>:</h3>
@@ -230,17 +233,23 @@ CartAsset::register($this);
 
             <!--Address-->
             <h4><?= \Yii::t('shop', 'Address'); ?></h4>
-            <?= $form->field($address, 'country')->textInput(); ?>
-            <?= $form->field($address, 'region')->textInput(); ?>
-            <?= $form->field($address, 'city')->textInput(); ?>
-            <?= $form->field($address, 'street')->textInput(); ?>
-            <?= $form->field($address, 'house')->textInput(); ?>
-            <?= $form->field($address, 'apartment')->textInput(); ?>
-            <?= $form->field($address, 'zipcode')->textInput(); ?>
+            <div class="row">
+                <div class="col-md-6">
+                    <?= $form->field($address, 'country')->textInput(); ?>
+                    <?= $form->field($address, 'region')->textInput(); ?>
+                    <?= $form->field($address, 'city')->textInput(); ?>
+                    <?= $form->field($address, 'zipcode')->textInput(); ?>
+                </div>
+                <div class="col-md-6">
+                    <?= $form->field($address, 'street')->textInput(); ?>
+                    <?= $form->field($address, 'house')->textInput(); ?>
+                    <?= $form->field($address, 'apartment')->textInput(); ?>
+                </div>
+            </div>
         </div>
 
         <?= Html::submitButton(Yii::t('shop', 'Make order'), [
-            'class' => 'btn btn-danger'
+            'class' => 'btn btn-lg btn-danger center-block'
         ]); ?>
         <?php $form::end(); ?>
     <?php endif; ?>

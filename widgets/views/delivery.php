@@ -27,10 +27,10 @@ DeliveryAsset::register($this);
             ->label(false); ?>
 
         <div class="col-md-12 delivery-info">
-            <div class="col-md-2">
+            <div class="col-md-3">
                 <img id="delivery-logo" src="" alt="">
             </div>
-            <div class="col-md-10">
+            <div class="col-md-9">
                 <p id="delivery-title"></p>
                 <p id="delivery-description"></p>
 

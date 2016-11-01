@@ -38,9 +38,6 @@ class CartController extends Controller
         }
 
         return $this->redirect(Yii::$app->request->referrer);
-//        return json_encode([
-//            'success' => Yii::$app->cart->add($postData['product_id'], $postData['OrderProduct']['count']),
-//        ]);
     }
 
     public function actionShow()
@@ -84,7 +81,9 @@ class CartController extends Controller
             }
             /*FOR USER*/
             else {
-                $order = Order::find()->where(['user_id' => \Yii::$app->user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])->one();
+                $order = Order::find()
+                    ->where(['user_id' => \Yii::$app->user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])
+                    ->one();
                 if (!empty($order)) {
                     $orderProducts = OrderProduct::find()->where(['order_id' => $order->id])->all();
 
@@ -134,8 +133,6 @@ class CartController extends Controller
                     return $this->render('order-success');
                 };
             }
-
-
         }
         else {
             $profile = Profile::find()->where(['user_id' => \Yii::$app->user->id])->one();
