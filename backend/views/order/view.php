@@ -15,11 +15,12 @@ use yii\widgets\DetailView;
  * @var $statuses[] bl\cms\cart\models\OrderStatus
  */
 
+$this->title = Yii::t('cart', 'Order details');
 ?>
 <div class="panel panel-default">
 
     <div class="panel-heading">
-        <h1><?= \Yii::t('shop', 'Order #') . $model->id . ':'; ?></h1>
+        <h1><?= \Yii::t('shop', 'Order #') . $model->id; ?></h1>
     </div>
 
     <!--CHANGE STATUS-->

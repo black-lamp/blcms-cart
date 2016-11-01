@@ -13,6 +13,7 @@ use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\helpers\Url;
 
+$this->title = Yii::t('cart', 'Order list');
 ?>
 <div class="panel panel-default">
     <div class="panel-heading">
