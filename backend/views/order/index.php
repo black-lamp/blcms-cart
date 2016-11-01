@@ -70,7 +70,7 @@ use yii\helpers\Url;
                     }
                     return $customer;
                 },
-                'label' => Yii::t('shop', 'Customer'),
+                'label' => Yii::t('cart', 'Customer'),
                 'format' => 'html',
                 'contentOptions' => ['class' => 'text-center project-title'],
             ],
