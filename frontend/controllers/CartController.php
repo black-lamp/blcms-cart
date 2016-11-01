@@ -5,6 +5,7 @@
 
 namespace bl\cms\cart\frontend\controllers;
 
+use bl\cms\cart\CartComponent;
 use bl\cms\cart\models\CartForm;
 use bl\cms\cart\models\DeliveryMethod;
 use bl\cms\cart\models\Order;
@@ -115,38 +116,19 @@ class CartController extends Controller
 
     public function actionMakeOrder()
     {
-        if (\Yii::$app->user->isGuest) {
+        if (Yii::$app->request->isPost) {
 
-            $profile = new Profile();
-            $user = new User();
-            $order = new Order();
-            $address = new UserAddress();
-
-
-            if ($profile->load(\Yii::$app->request->post()) ||
-                $user->load(\Yii::$app->request->post()) ||
-                $order->load(\Yii::$app->request->post()) ||
-                $address->load(\Yii::$app->request->post())
-            ) {
-
-                if ($this->sendMail($profile, $products = null, $user, $order, $address)) {
-                    return $this->render('order-success');
-                };
+            if(\Yii::$app->cart->makeOrder()) {
+                \Yii::$app->session->setFlash('success', \Yii::t('shop', 'Your order is accepted. Thank you.'));
+                return $this->render('order-success');
+            }
+            else {
+                \Yii::$app->session->setFlash('error', \Yii::t('shop', 'Unknown error'));
+                return $this->render('order-error');
             }
         }
         else {
-            $profile = Profile::find()->where(['user_id' => \Yii::$app->user->id])->one();
-            $user = $profile->user;
-            $order = Order::find()->where(['user_id' => \Yii::$app->user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])->one();
-            $address = (!empty($order->address)) ? $order->address : '';
-
-            $post = Yii::$app->request->post();
-            if(\Yii::$app->cart->makeOrder($post)) {
-                $this->sendMail($profile, $products = null, $user, $order, $address);
-                \Yii::$app->session->setFlash('success', \Yii::t('shop', 'Your order is accepted. Thank you.'));
-            }
-            else \Yii::$app->getSession()->setFlash('error', 'Unknown error');
-            return $this->render('show');
+            throw new NotFoundHttpException();
         }
     }
 
@@ -188,6 +170,7 @@ class CartController extends Controller
 
             return true;
         } catch (Exception $ex) {
+            Yii::$app->session->setFlash('error', $ex);
             return false;
         }
     }

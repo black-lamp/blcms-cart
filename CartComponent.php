@@ -250,63 +250,75 @@ class CartComponent extends Component
     }
 
     /**
-     * @param $customerData
+     * @param $orderData
      * @return bool
      * @throws Exception
      */
-    public function makeOrder($customerData)
+    public function makeOrder()
     {
-        $order = Order::find()->where(['user_id' => \Yii::$app->user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])->one();
-        $user = $order->user;
 
-        $order->status = OrderStatus::STATUS_CONFIRMED;
+        if ($this->saveToDataBase === true) {
+            $user = \Yii::$app->user;
+            $order = Order::find()->where(['user_id' => $user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])->one();
+            $order->status = OrderStatus::STATUS_CONFIRMED;
+            $profile = Profile::find()->where(['user_id' => $user->id])->one();
 
-        $profile = Profile::find()->where(['user_id' => \Yii::$app->user->id])->one();
+            if ($order->load(Yii::$app->request->post()) && $profile->load(Yii::$app->request->post())) {
+                if ($order->validate() && $profile->validate()) {
+                    if (empty($order->address_id)) {
+                        $address = new UserAddress();
 
-        if ($order->load($customerData) && $profile->load($customerData)) {
-            if ($profile->validate() && $order->validate()) {
-                $profile->save();
-            }
+                        if ($address->load(Yii::$app->request->post())) {
+                            if (!empty($address->country && $address->region && $address->city && $address->house)) {
+                                $address->user_profile_id = $user->id;
 
-            if (empty($order->address_id)) {
-                $address = new UserAddress();
-
-                if ($address->load($customerData)) {
-                    if (!empty($address->country && $address->region && $address->city && $address->house)) {
-                        $address->user_profile_id = \Yii::$app->user->identity->profile->id;
-
-                        if ($address->validate()) {
-                            $address->save();
-                            $order->address_id = $address->id;
+                                if ($address->validate()) {
+                                    $address->save();
+                                    $order->address_id = $address->id;
+                                }
+                            }
                         }
+                        $profile->save();
+                        $order->user_id = (!empty($order->user_id)) ? $order->user_id : \Yii::$app->user->id;
+                        $order->save();
+                        return true;
                     }
                 }
-                $order->user_id = (!empty($order->user_id)) ? $order->user_id : \Yii::$app->user->id;
-                $order->save();
-                $this->sendMail($profile, $products = null, $user, $order, $address);
-                return true;
-            } else {
-                $order->user_id = (!empty($order->user_id)) ? $order->user_id : \Yii::$app->user->id;
-                $order->save();
-                $this->sendMail($profile, $products = null, $user, $order, $address = null);
-                return true;
             }
         }
+        else {
+            $profile = new Profile();
+            $user = new User();
+            $order = new Order();
+            $address = new UserAddress();
 
-        return false;
+            if ($profile->load(Yii::$app->request->post()) &&
+                $user->load(Yii::$app->request->post())
+            ) {
+                $order->load(Yii::$app->request->post());
+                $address->load(Yii::$app->request->post());
+                if ($this->sendMail($profile, $user, $order, $address)) {
+                    return true;
+                }
+                else {
+                    throw new Exception('Email sending error');
+                }
+            }
+            else return false;
+        }
+
     }
 
     /**
      * @param null|Profile $profile
-     * @param null|OrderProduct $products
      * @param null|User $user
      * @param null|Order $order
      * @param null|UserAddress $address
+     * @return boolean
      */
-    private function sendMail($profile = null, $products = null, $user = null, $order = null, $address = null)
+    private function sendMail($profile = null, $user = null, $order = null, $address = null)
     {
         $products = OrderProduct::find()->where(['order_id' => $order->id])->all();
-
         if (!empty($this->sender) && !empty($order)) {
             try {
                 foreach ($this->sendTo as $admin) {
@@ -321,10 +333,12 @@ class CartComponent extends Component
                 Yii::$app->mailer->compose($this->mailDir . 'order-success',
                     ['products' => $products, 'user' => $user, 'profile' => $profile, 'order' => $order, 'address' => $address])
                     ->setFrom($this->sender)
-                    ->setTo($order->email)
+                    ->setTo($user->email)
                     ->setSubject(Yii::t('shop', 'Success order'))
                     ->send();
+                return true;
             } catch (Exception $ex) {
+                return false;
             }
         }
     }
