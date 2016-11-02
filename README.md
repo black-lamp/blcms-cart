@@ -46,6 +46,18 @@ php yii migrate --migrationPath=@vendor/black-lamp/blcms-cart/migrations
     'cart' => [
                 'class' => bl\cms\cart\frontend\Module::className(),
             ],
+    'user' => [
+                'class' => 'dektrium\user\Module',
+                'modelMap' => [
+                    'User' => 'bl\cms\cart\common\components\user\models\User',
+                    'Profile' => 'bl\cms\cart\common\components\user\models\Profile',
+                ],
+                'controllerMap' => [
+                    'registration' => 'bl\cms\cart\common\components\user\controllers\RegistrationController',
+                    'settings' => 'bl\cms\cart\frontend\components\user\controllers\SettingsController',
+                ],
+                'as frontend' => 'dektrium\user\filters\FrontendFilter',
+            ],
 'components' => [
             'shopMailer' => [
                 'useFileTransport' => true,
@@ -68,6 +80,20 @@ php yii migrate --migrationPath=@vendor/black-lamp/blcms-cart/migrations
         'cart' => [
             'class' => bl\cms\cart\backend\Module::className(),
         ],
+        'user' => [
+                    'class' => 'dektrium\user\Module',
+                    'enableRegistration' => false,
+                    'enableConfirmation' => false,
+                    'admins' => ['admin'],
+                    'adminPermission' => 'rbacManager',
+                    'modelMap' => [
+                        'Profile' => 'bl\cms\cart\common\components\user\models\Profile',
+                    ],
+                    'as backend' => [
+                        'class' => 'dektrium\user\filters\BackendFilter',
+                        'only' => ['register'], // Block View Register Backend
+                    ],
+                ]
     ],
 ```
 
