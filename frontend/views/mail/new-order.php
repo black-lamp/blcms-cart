@@ -8,7 +8,6 @@
  * @var $address \bl\cms\shop\common\components\user\models\UserAddress
  */
 use yii\bootstrap\Html;
-
 ?>
 
 <h1><?=Yii::t('cart', 'New order.'); ?></h1>
