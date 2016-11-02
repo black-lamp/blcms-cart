@@ -33,6 +33,9 @@ php yii migrate --migrationPath=@vendor/black-lamp/blcms-cart/migrations
                     'test@mail.com'
                 ],
                 'saveToDataBase' => true,
+                
+                'newOrderMailView' => ['@frontend/views/new-order'], //The path of e-mail view which will be sent to admins after success order.
+                'orderSuccessView' => ['@frontend/views/order-success'],
             ],
 ],
 ```
@@ -44,7 +47,7 @@ php yii migrate --migrationPath=@vendor/black-lamp/blcms-cart/migrations
                 'class' => bl\cms\cart\frontend\Module::className(),
             ],
 'components' => [
-            'mail' => [
+            'shopMailer' => [
                 'useFileTransport' => true,
                 'class' => 'yii\swiftmailer\Mailer',
                 'transport' => [
