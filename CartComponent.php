@@ -48,10 +48,16 @@ class CartComponent extends Component
     public $sender;
 
     /**
-     * @var string
-     * The directory with e-mail views.
+     * @var array
+     * The path of e-mail view which will be sent to admins after success order.
      */
-    public $mailDir = '@vendor/black-lamp/blcms-cart/views/mail/';
+    public $newOrderMailView = ['@vendor/black-lamp/blcms-cart/frontend/views/mail/new-order'];
+
+    /**
+     * @var array
+     * The path of e-mail view which will be sent to customer after success order.
+     */
+    public $orderSuccessView = ['@vendor/black-lamp/blcms-cart/frontend/views/mail/order-success'];
 
     /**
      * @var integer
@@ -297,12 +303,9 @@ class CartComponent extends Component
             ) {
                 $order->load(Yii::$app->request->post());
                 $address->load(Yii::$app->request->post());
-                if ($this->sendMail($profile, $user, $order, $address)) {
-                    return true;
-                }
-                else {
-                    throw new Exception('Email sending error');
-                }
+                $this->sendMail($profile, $user, $order, $address);
+                $this->clearCart();
+                return true;
             }
             else return false;
         }
@@ -316,13 +319,13 @@ class CartComponent extends Component
      * @param null|UserAddress $address
      * @return boolean
      */
-    private function sendMail($profile = null, $user = null, $order = null, $address = null)
+    private function sendMail($profile, $user, $order, $address)
     {
         $products = OrderProduct::find()->where(['order_id' => $order->id])->all();
         if (!empty($this->sender) && !empty($order)) {
             try {
                 foreach ($this->sendTo as $admin) {
-                    Yii::$app->mailer->compose($this->mailDir . 'new-order',
+                    Yii::$app->shopMailer->compose($this->newOrderMailView,
                         ['products' => $products, 'user' => $user, 'profile' => $profile, 'order' => $order, 'address' => $address])
                         ->setFrom($this->sender)
                         ->setTo($admin)
@@ -330,15 +333,14 @@ class CartComponent extends Component
                         ->send();
                 }
 
-                Yii::$app->mailer->compose($this->mailDir . 'order-success',
+                Yii::$app->shopMailer->compose($this->orderSuccessView,
                     ['products' => $products, 'user' => $user, 'profile' => $profile, 'order' => $order, 'address' => $address])
                     ->setFrom($this->sender)
                     ->setTo($user->email)
                     ->setSubject(Yii::t('shop', 'Success order'))
                     ->send();
-                return true;
             } catch (Exception $ex) {
-                return false;
+                throw new Exception($ex);
             }
         }
     }
