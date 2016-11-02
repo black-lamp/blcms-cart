@@ -21,8 +21,6 @@ use yii\bootstrap\Html;
 <p><?= Html::tag('strong', Yii::t('cart', 'Phone number')) . ': ' . $profile->phone; ?></p>
 <p><?= Html::tag('strong', Yii::t('cart', 'E-mail')) . ': ' . $user->email; ?></p>
 
-<?= $this->render('products', ['products' => $products]); ?>
-
 <h3><?= Yii::t('cart', 'Delivery'); ?></h3>
 
 <?php if (!empty($order->delivery_post_office)) : ?>
@@ -39,5 +37,6 @@ use yii\bootstrap\Html;
     <p><?= Html::tag('strong', Yii::t('cart', 'Zip')) . ': ' . $address->zipcode; ?></p>
 <?php endif; ?>
 
+<?= $this->render('products', ['products' => $products]); ?>
 
 
