@@ -1,7 +1,8 @@
 <?php
 namespace bl\cms\cart\models;
 
-use bl\cms\shop\common\components\user\models\UserAddress;
+use bl\cms\cart\common\components\user\models\Profile;
+use bl\cms\cart\common\components\user\models\UserAddress;
 use dektrium\user\models\User;
 use Yii;
 use yii\behaviors\TimestampBehavior;
@@ -85,6 +86,14 @@ class Order extends ActiveRecord
     public function getUser()
     {
         return $this->hasOne(User::className(), ['id' => 'user_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUserProfile()
+    {
+        return $this->hasOne(Profile::className(), ['user_id' => 'user_id']);
     }
 
     /**

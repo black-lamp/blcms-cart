@@ -1,7 +1,7 @@
 <?php
 namespace bl\cms\cart\widgets;
 
-use bl\cms\shop\common\components\user\models\Profile;
+use bl\cms\cart\common\components\user\models\Profile;
 use dektrium\user\models\RegistrationForm;
 use yii\base\Widget;
 

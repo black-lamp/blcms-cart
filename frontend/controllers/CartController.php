@@ -5,15 +5,14 @@
 
 namespace bl\cms\cart\frontend\controllers;
 
-use bl\cms\cart\CartComponent;
 use bl\cms\cart\models\CartForm;
 use bl\cms\cart\models\DeliveryMethod;
 use bl\cms\cart\models\Order;
 use bl\cms\cart\models\OrderProduct;
 use bl\cms\cart\models\OrderStatus;
-use bl\cms\shop\common\components\user\models\Profile;
-use bl\cms\shop\common\components\user\models\User;
-use bl\cms\shop\common\components\user\models\UserAddress;
+use bl\cms\cart\common\components\user\models\Profile;
+use bl\cms\cart\common\components\user\models\User;
+use bl\cms\cart\common\components\user\models\UserAddress;
 use bl\cms\shop\common\entities\Product;
 use bl\cms\shop\common\entities\ProductPrice;
 use bl\imagable\helpers\FileHelper;

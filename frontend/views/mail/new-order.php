@@ -3,9 +3,9 @@
  * @author Albert Gainutdinov <xalbert.einsteinx@gmail.com>
  *
  * @var $products
- * @var $profile \bl\cms\shop\common\components\user\models\Profile
+ * @var $profile \bl\cms\cart\common\components\user\models\Profile
  * @var $order \bl\cms\cart\models\Order
- * @var $address \bl\cms\shop\common\components\user\models\UserAddress
+ * @var $address \bl\cms\cart\common\components\user\models\UserAddress
  */
 use yii\bootstrap\Html;
 ?>
