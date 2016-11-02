@@ -2,11 +2,13 @@
 /**
  * @author Albert Gainutdinov <xalbert.einsteinx@gmail.com>
  *
+ * @var $user \bl\cms\cart\common\components\user\models\User
  * @var $products
  * @var $profile \bl\cms\cart\common\components\user\models\Profile
  * @var $order \bl\cms\cart\models\Order
  * @var $address \bl\cms\cart\common\components\user\models\UserAddress
  */
+
 use yii\bootstrap\Html;
 ?>
 
@@ -19,3 +21,6 @@ use yii\bootstrap\Html;
 
 
 <p><?=Yii::t('cart', 'Our managers will contact you as soon as possible'); ?></p>
+
+
+<p><?=$user->email;?></p>

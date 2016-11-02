@@ -10,6 +10,7 @@ use bl\cms\shop\common\entities\ProductPrice;
 use Yii;
 use yii\base\Component;
 use yii\base\Exception;
+use yii\db\ActiveRecord;
 use yii\helpers\Url;
 use yii\web\ForbiddenHttpException;
 use bl\cms\cart\models\Order;
@@ -46,18 +47,6 @@ class CartComponent extends Component
      * From this address e-mails will be sent.
      */
     public $sender;
-
-    /**
-     * @var array
-     * The path of e-mail view which will be sent to admins after success order.
-     */
-    public $newOrderMailView = ['@vendor/black-lamp/blcms-cart/frontend/views/mail/new-order'];
-
-    /**
-     * @var array
-     * The path of e-mail view which will be sent to customer after success order.
-     */
-    public $orderSuccessView = ['@vendor/black-lamp/blcms-cart/frontend/views/mail/order-success'];
 
     /**
      * @var integer
@@ -325,9 +314,9 @@ class CartComponent extends Component
     /**
      * @param null|Profile $profile
      * @param null|User $user
-     * @param null|Order $order
-     * @param null|UserAddress $address
-     * @return boolean
+     * @param null|Order|ActiveRecord $order
+     * @param null|UserAddress|ActiveRecord $address
+     * @throws Exception
      */
     private function sendMail($profile, $user, $order, $address)
     {
@@ -335,7 +324,7 @@ class CartComponent extends Component
         if (!empty($this->sender) && !empty($order)) {
             try {
                 foreach ($this->sendTo as $admin) {
-                    Yii::$app->shopMailer->compose($this->newOrderMailView,
+                    Yii::$app->shopMailer->compose('new-order',
                         ['products' => $products, 'user' => $user, 'profile' => $profile, 'order' => $order, 'address' => $address])
                         ->setFrom($this->sender)
                         ->setTo($admin)
@@ -343,7 +332,7 @@ class CartComponent extends Component
                         ->send();
                 }
 
-                Yii::$app->shopMailer->compose($this->orderSuccessView,
+                Yii::$app->shopMailer->compose('order-success',
                     ['products' => $products, 'user' => $user, 'profile' => $profile, 'order' => $order, 'address' => $address])
                     ->setFrom($this->sender)
                     ->setTo($user->email)
