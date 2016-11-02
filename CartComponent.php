@@ -2,9 +2,9 @@
 namespace bl\cms\cart;
 
 use bl\cms\cart\models\OrderStatus;
-use bl\cms\shop\common\components\user\models\Profile;
-use bl\cms\shop\common\components\user\models\User;
-use bl\cms\shop\common\components\user\models\UserAddress;
+use bl\cms\cart\common\components\user\models\Profile;
+use bl\cms\cart\common\components\user\models\User;
+use bl\cms\cart\common\components\user\models\UserAddress;
 use bl\cms\shop\common\entities\Product;
 use bl\cms\shop\common\entities\ProductPrice;
 use Yii;
@@ -256,60 +256,70 @@ class CartComponent extends Component
     }
 
     /**
-     * @param $orderData
      * @return bool
      * @throws Exception
      */
     public function makeOrder()
     {
-
         if ($this->saveToDataBase === true) {
-            $user = \Yii::$app->user;
-            $order = Order::find()->where(['user_id' => $user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])->one();
-            $order->status = OrderStatus::STATUS_CONFIRMED;
-            $profile = Profile::find()->where(['user_id' => $user->id])->one();
-
-            if ($order->load(Yii::$app->request->post()) && $profile->load(Yii::$app->request->post())) {
-                if ($order->validate() && $profile->validate()) {
-                    if (empty($order->address_id)) {
-                        $address = new UserAddress();
-
-                        if ($address->load(Yii::$app->request->post())) {
-                            if (!empty($address->country && $address->region && $address->city && $address->house)) {
-                                $address->user_profile_id = $user->id;
-
-                                if ($address->validate()) {
-                                    $address->save();
-                                    $order->address_id = $address->id;
-                                }
-                            }
-                        }
-                        $profile->save();
-                        $order->user_id = (!empty($order->user_id)) ? $order->user_id : \Yii::$app->user->id;
-                        $order->save();
-                        return true;
-                    }
-                }
-            }
-        }
-        else {
-            $profile = new Profile();
-            $user = new User();
-            $order = new Order();
-            $address = new UserAddress();
-
-            if ($profile->load(Yii::$app->request->post()) &&
-                $user->load(Yii::$app->request->post())
-            ) {
-                $order->load(Yii::$app->request->post());
-                $address->load(Yii::$app->request->post());
-                $this->sendMail($profile, $user, $order, $address);
-                $this->clearCart();
-                return true;
+            if (!Yii::$app->user->isGuest) {
+                return $this->makeOrderFromDB();
             }
             else return false;
         }
+        else {
+            return $this->makeOrderFromSession();
+        }
+    }
 
+    private function makeOrderFromDB() {
+        $user = User::findOne(\Yii::$app->user->id);
+        $order = Order::find()->where(['user_id' => $user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])->one();
+        $profile = $order->userProfile;
+
+        if ($profile->load(Yii::$app->request->post())) {
+            if ($profile->validate()) {
+                $profile->save();
+            }
+        }
+        if ($order->load(Yii::$app->request->post())) {
+            if (empty($order->address_id)) {
+                $address = new UserAddress();
+                if ($address->load(Yii::$app->request->post())) {
+                    $address->user_profile_id = $user->id;
+                    if ($address->validate()) {
+                        $address->save();
+                        $order->address_id = $address->id;
+                    }
+                }
+            }
+            $order->user_id = $user->id;
+            $order->status = OrderStatus::STATUS_CONFIRMED;
+            if ($order->validate()) {
+                $order->save();
+                $this->sendMail($profile, $user, $order, $address);
+                return true;
+            }
+        }
+        else throw new Exception();
+    }
+
+    private function makeOrderFromSession() {
+        $profile = new Profile();
+        $user = new User();
+        $order = new Order();
+        $address = new UserAddress();
+
+        if ($profile->load(Yii::$app->request->post()) &&
+            $user->load(Yii::$app->request->post())
+        ) {
+            $order->load(Yii::$app->request->post());
+            $address->load(Yii::$app->request->post());
+            $this->sendMail($profile, $user, $order, $address);
+            $this->clearCart();
+            return true;
+        }
+        else return false;
     }
 
     /**
