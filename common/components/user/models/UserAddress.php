@@ -37,7 +37,6 @@ class UserAddress extends ActiveRecord
     {
         return [
             [['user_profile_id', 'zipcode'], 'integer'],
-            [['country', 'region', 'city'], 'required'],
             [['country', 'region', 'city', 'street', 'house'], 'string', 'max' => 255],
             [['apartment'], 'string', 'max' => 11],
             [['user_profile_id'], 'exist', 'skipOnError' => true, 'targetClass' => Profile::className(), 'targetAttribute' => ['user_profile_id' => 'id']],
