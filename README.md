@@ -59,20 +59,22 @@ php yii migrate --migrationPath=@vendor/black-lamp/blcms-cart/migrations
                 'as frontend' => 'dektrium\user\filters\FrontendFilter',
             ],
 'components' => [
-    'shopMailer' => [
-                'class' => 'yii\swiftmailer\Mailer',
-                'useFileTransport' => false,
-                'messageConfig' => [
-                    'charset' => 'UTF-8',
-                ],
-                'transport' => [
-                    'class' => 'Swift_SmtpTransport',
-                    'username' => 'info@host.ua',
-                    'password' => 'password',
-                    'host' => 'pop.host.ua',
-                    'port' => '587',
-                ],
+   'shopMailer' => [
+        'class' => yii\swiftmailer\Mailer::className(),
+        'useFileTransport' => false,
+        'messageConfig' => [
+            'charset' => 'UTF-8',
+        ],
+        'viewPath' => '@vendor/black-lamp/blcms-cart/frontend/views/mail',
+        'htmlLayout' => '@vendor/black-lamp/blcms-cart/frontend/views/mail/layout',
+        'transport' => [
+                'class' => 'Swift_SmtpTransport',
+                'username' => 'info@host.ua',
+                'password' => 'password',
+                'host' => 'pop.host.ua',
+                'port' => '587',
             ],
+    ],
 ]
 ```
 

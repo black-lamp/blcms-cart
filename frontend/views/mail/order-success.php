@@ -7,10 +7,15 @@
  * @var $order \bl\cms\cart\models\Order
  * @var $address \bl\cms\cart\common\components\user\models\UserAddress
  */
+use yii\bootstrap\Html;
 
 ?>
 <h1><?=Yii::t('cart', 'Your order is accepted.'); ?></h1>
-<p><?= Yii::t('cart', 'Hallo') . ", $profile->name $profile->surname";?></p>
 <p><?=Yii::t('cart', 'Our managers will contact you as soon as possible'); ?></p>
+
+<p class=""><?= Html::tag('strong', Yii::t('cart', 'Name')) . ': ' . $profile->name;?></p>
+
+<?= $this->render('products', ['products' => $products]); ?>
+
 
 

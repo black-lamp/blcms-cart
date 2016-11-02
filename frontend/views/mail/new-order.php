@@ -13,7 +13,7 @@ use yii\bootstrap\Html;
 ?>
 
 <h1><?=Yii::t('cart', 'New order.'); ?></h1>
-<p><?= Html::tag('strong', Yii::t('cart', 'Name')) . ': ' . $profile->name;?></p>
+<p class="slavik"><?= Html::tag('strong', Yii::t('cart', 'Name')) . ': ' . $profile->name;?></p>
 <p><?= Html::tag('strong', Yii::t('cart', 'Surname')) . ': ' . $profile->surname;?></p>
 <p><?= Html::tag('strong', Yii::t('cart', 'Patronymic')) . ': ' . $profile->patronymic;?></p>
 <br>
@@ -25,3 +25,7 @@ use yii\bootstrap\Html;
 <?php endforeach; ?>
 
 <p><?=$user->email;?></p>
+
+<?= $this->render('products', ['products' => $products]); ?>
+
+
