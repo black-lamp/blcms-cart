@@ -320,7 +320,26 @@ class CartComponent extends Component
      */
     private function sendMail($profile, $user, $order, $address)
     {
-        $products = OrderProduct::find()->where(['order_id' => $order->id])->all();
+        if (Yii::$app->user->isGuest) {
+            $session = \Yii::$app->session;
+            $productsArray = $session[self::SESSION_KEY];
+
+            $ids =[];
+            foreach ($productsArray as $item) {
+                $ids[] = $item['id'];
+            }
+
+            $products = Product::find()->where(['in', 'id', $ids])->all();
+
+            foreach ($products as $product) {
+                foreach ($productsArray as $item) {
+                    if ($item['id'] == $product->id) {
+                        $product->count = $item['count'];
+                    }
+                }
+            }
+        }
+        else $products = OrderProduct::find()->where(['order_id' => $order->id])->all();
         if (!empty($this->sender) && !empty($order)) {
             try {
                 foreach ($this->sendTo as $admin) {

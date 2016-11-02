@@ -20,7 +20,8 @@ use yii\bootstrap\Html;
 <p><?= Html::tag('strong', Yii::t('cart', 'Phone number')) . ': ' . $profile->phone;?></p>
 
 
-<p><?=Yii::t('cart', 'Our managers will contact you as soon as possible'); ?></p>
-
+<?php foreach ($products as $product) : ?>
+    <?= $product->translation->title; ?>
+<?php endforeach; ?>
 
 <p><?=$user->email;?></p>
