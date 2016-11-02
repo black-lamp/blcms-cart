@@ -148,32 +148,6 @@ class CartController extends Controller
         else throw new NotFoundHttpException();
     }
 
-    public function sendMail($profile = null, $products = null, $user = null, $order = null, $address = null)
-    {
-        try {
-            foreach (\Yii::$app->cart->sendTo as $adminMail) {
-
-                Yii::$app->mailer->compose('@vendor/black-lamp/blcms-cart/views/mail/new-order',
-                    ['products' => $products, 'user' => $user, 'profile' => $profile, 'order' => $order, 'address' => $address])
-                    ->setFrom(\Yii::$app->cart->sender)
-                    ->setTo($adminMail)
-                    ->setSubject(Yii::t('cart', 'New order.'))
-                    ->send();
-            }
-            Yii::$app->mailer->compose('@vendor/black-lamp/blcms-cart/views/mail/order-success',
-                ['products' => $products, 'user' => $user, 'profile' => $profile, 'order' => $order, 'address' => $address])
-                ->setFrom(\Yii::$app->cart->sender)
-                ->setTo($user->email)
-                ->setSubject(Yii::t('cart', 'Your order is accepted.'))
-                ->send();
-
-            return true;
-        } catch (Exception $ex) {
-            Yii::$app->session->setFlash('error', $ex);
-            return false;
-        }
-    }
-
     public function actionGetAreasFromNp() {
         return $this->getResponse('Address', 'getAreas');
     }
