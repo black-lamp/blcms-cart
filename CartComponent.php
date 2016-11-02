@@ -335,6 +335,7 @@ class CartComponent extends Component
                 foreach ($productsArray as $item) {
                     if ($item['id'] == $product->id) {
                         $product->count = $item['count'];
+                        if (!empty($item['priceId'])) $product->price = ProductPrice::findOne($item['priceId'])->salePrice;
                     }
                 }
             }

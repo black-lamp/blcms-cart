@@ -2,6 +2,7 @@
 /* @var $this \yii\web\View view component instance */
 /* @var $message \yii\mail\MessageInterface the message being composed */
 /* @var $content string main view render result */
+//die(var_dump(Yii::$app->urlManager->createAbsoluteUrl('/') . 'images/water-pattern.png'));
 ?>
 
 <?php $this->beginPage() ?>
@@ -12,9 +13,9 @@
         <?php $this->head() ?>
     </head>
     <body>
-    <div style="width: 100%; background-image: url('<?=Yii::$app->request->baseUrl;?>/images/water-pattern.png');">
+    <div style="width: 100%; background: #48b2ff; padding: 10px 0;">
         <?php $this->beginBody() ?>
-        <div style="width: 700px; margin: 10px auto;">
+        <div style="width: 700px; margin: 0 auto; background: #fff; padding: 15px;">
             <?= $content ?>
         </div>
         <?php $this->endBody() ?>

@@ -10,22 +10,34 @@
  */
 
 use yii\bootstrap\Html;
+
 ?>
 
-<h1><?=Yii::t('cart', 'New order.'); ?></h1>
-<p class="slavik"><?= Html::tag('strong', Yii::t('cart', 'Name')) . ': ' . $profile->name;?></p>
-<p><?= Html::tag('strong', Yii::t('cart', 'Surname')) . ': ' . $profile->surname;?></p>
-<p><?= Html::tag('strong', Yii::t('cart', 'Patronymic')) . ': ' . $profile->patronymic;?></p>
+<h1 style="text-align: center;"><?= Yii::t('cart', 'New order'); ?></h1>
+<p><?= Html::tag('strong', Yii::t('cart', 'Name')) . ': ' . $profile->name; ?></p>
+<p><?= Html::tag('strong', Yii::t('cart', 'Surname')) . ': ' . $profile->surname; ?></p>
+<p><?= Html::tag('strong', Yii::t('cart', 'Patronymic')) . ': ' . $profile->patronymic; ?></p>
 <br>
-<p><?= Html::tag('strong', Yii::t('cart', 'Phone number')) . ': ' . $profile->phone;?></p>
-
-
-<?php foreach ($products as $product) : ?>
-    <?= $product->translation->title; ?>
-<?php endforeach; ?>
-
-<p><?=$user->email;?></p>
+<p><?= Html::tag('strong', Yii::t('cart', 'Phone number')) . ': ' . $profile->phone; ?></p>
+<p><?= Html::tag('strong', Yii::t('cart', 'E-mail')) . ': ' . $user->email; ?></p>
 
 <?= $this->render('products', ['products' => $products]); ?>
+
+<h3><?= Yii::t('cart', 'Delivery'); ?></h3>
+
+<?php if (!empty($order->delivery_post_office)) : ?>
+    <p><?= Html::tag('strong', Yii::t('cart', 'Delivery method')) . ': ' .
+        $order->deliveryMethod->translation->title; ?>
+    </p>
+    <p><?= Html::tag('strong', Yii::t('cart', 'Post office')) . ': ' . $order->delivery_post_office; ?></p>
+<?php else : ?>
+    <p><?= Html::tag('strong', Yii::t('cart', 'Country')) . ': ' . $address->country; ?></p>
+    <p><?= Html::tag('strong', Yii::t('cart', 'Region')) . ': ' . $address->region; ?></p>
+    <p><?= Html::tag('strong', Yii::t('cart', 'City')) . ': ' . $address->city; ?></p>
+    <p><?= Html::tag('strong', Yii::t('cart', 'House')) . ': ' . $address->house; ?></p>
+    <p><?= Html::tag('strong', Yii::t('cart', 'Apartment')) . ': ' . $address->apartment; ?></p>
+    <p><?= Html::tag('strong', Yii::t('cart', 'Zip')) . ': ' . $address->zipcode; ?></p>
+<?php endif; ?>
+
 
 

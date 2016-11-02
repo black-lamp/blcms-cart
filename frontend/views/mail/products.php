@@ -9,9 +9,11 @@ use yii\bootstrap\Html;
 
 ?>
 
-<?= Html::tag('h3', Yii::t('cart', 'Products list')); ?>
+<h3 style="text-align: center;">
+    <?= Yii::t('cart', 'Products list'); ?>
+</h3>
 
-<table>
+<table style="width: 500px; margin: 0 auto;">
     <tr>
         <th class="slavik"><?= Yii::t('cart', 'Product title'); ?></th>
         <th><?= Yii::t('cart', 'Count'); ?></th>
@@ -20,26 +22,30 @@ use yii\bootstrap\Html;
     <?php if (Yii::$app->cart->saveToDataBase === false) : ?>
         <?php foreach ($products as $product) : ?>
             <tr>
-                <?= $product->translation->title; ?>
-            </tr>
-            <tr>
-                <?= $product->count; ?>
-            </tr>
-            <tr>
-                <?= $product->price; ?>
+                <td>
+                    <?= $product->translation->title; ?>
+                </td>
+                <td>
+                    <?= $product->count; ?>
+                </td>
+                <td>
+                    <?= $product->price; ?>
+                </td>
             </tr>
         <?php endforeach; ?>
 
     <?php else : ?>
         <?php foreach ($products as $orderProduct) : ?>
             <tr>
-                <?= $orderProduct->product->translation->title; ?>
-            </tr>
-            <tr>
-                <?= $orderProduct->count; ?>
-            </tr>
-            <tr>
-                <?= $orderProduct->price; ?>
+                <td>
+                    <?= $orderProduct->product->translation->title; ?>
+                </td>
+                <td>
+                    <?= $orderProduct->count; ?>
+                </td>
+                <td>
+                    <?= $orderProduct->price; ?>
+                </td>
             </tr>
         <?php endforeach; ?>
 
