@@ -343,7 +343,12 @@ class CartComponent extends Component
                 }
             }
         }
-        else $products = OrderProduct::find()->where(['order_id' => $order->id])->all();
+        else {
+            $products = OrderProduct::find()->where(['order_id' => $order->id])->all();
+            if (!empty($addressId)) {
+                $address = UserAddress::findOne($addressId);
+            }
+        }
         if (!empty($this->sender) && !empty($order)) {
             try {
                 foreach ($this->sendTo as $admin) {
