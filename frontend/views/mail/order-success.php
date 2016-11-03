@@ -28,6 +28,9 @@ use yii\bootstrap\Html;
     </p>
     <p><?= Html::tag('strong', Yii::t('cart', 'Post office')) . ': ' . $order->delivery_post_office; ?></p>
 <?php else : ?>
+    <p><?= Html::tag('strong', Yii::t('cart', 'Delivery method')) . ': ' .
+        $order->deliveryMethod->translation->title; ?>
+    </p>
     <p><?= Html::tag('strong', Yii::t('cart', 'Country')) . ': ' . $address->country; ?></p>
     <p><?= Html::tag('strong', Yii::t('cart', 'Region')) . ': ' . $address->region; ?></p>
     <p><?= Html::tag('strong', Yii::t('cart', 'City')) . ': ' . $address->city; ?></p>
