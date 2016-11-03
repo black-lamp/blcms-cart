@@ -23,4 +23,36 @@ class User extends BaseModel
 
         }
     }
+
+    /** @inheritdoc */
+    public function rules()
+    {
+        return [
+            // username rules
+            'usernameRequired' => ['username', 'required', 'on' => ['register', 'create', 'connect', 'update']],
+            'usernameMatch'    => ['username', 'match', 'pattern' => static::$usernameRegexp],
+            'usernameLength'   => ['username', 'string', 'min' => 3, 'max' => 255],
+            'usernameUnique'   => [
+                'username',
+                'unique',
+                'message' => \Yii::t('user', 'This username has already been taken')
+            ],
+            'usernameTrim'     => ['username', 'trim'],
+
+            // email rules
+            [['email'], 'required'],
+            'emailPattern'  => ['email', 'email'],
+            'emailLength'   => ['email', 'string', 'max' => 255],
+            'emailUnique'   => [
+                'email',
+                'unique',
+                'message' => \Yii::t('user', 'This email address has already been taken')
+            ],
+            'emailTrim'     => ['email', 'trim'],
+
+            // password rules
+            'passwordRequired' => ['password', 'required', 'on' => ['register']],
+            'passwordLength'   => ['password', 'string', 'min' => 6, 'max' => 72, 'on' => ['register', 'create']],
+        ];
+    }
 }
