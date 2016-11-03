@@ -24,6 +24,7 @@ php yii migrate --migrationPath=@vendor/black-lamp/blcms-cart/migrations
 
 **Common configuration**
 ```
+'name' => 'Басейн.укр',
 'components' => [
     'cart' => [
                 'class' => bl\cms\cart\CartComponent::className(),
@@ -58,6 +59,22 @@ php yii migrate --migrationPath=@vendor/black-lamp/blcms-cart/migrations
                 'as frontend' => 'dektrium\user\filters\FrontendFilter',
             ],
 'components' => [
+    //For Dektrium User module
+    'mailer' => [
+                'class' => yii\swiftmailer\Mailer::className(),
+                'useFileTransport' => false,
+                'messageConfig' => [
+                    'charset' => 'UTF-8',
+                ],
+                'transport' => [
+                    'class' => 'Swift_SmtpTransport',
+                    'username' => 'info@xn--80abnquv.xn--j1amh',
+                    'password' => 'mTsOmY77',
+                    'host' => 'mail.xn--80abnquv.xn--j1amh',
+                    'port' => '587',
+                ],
+            ],
+    //For cart
    'shopMailer' => [
         'class' => yii\swiftmailer\Mailer::className(),
         'useFileTransport' => false,
@@ -99,6 +116,9 @@ php yii migrate --migrationPath=@vendor/black-lamp/blcms-cart/migrations
                 ]
     ],
 ```
+
+**Params**
+'adminEmail' => 'info@mail.ua',
 
 Usage
 -----
