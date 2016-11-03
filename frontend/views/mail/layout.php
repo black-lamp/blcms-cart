@@ -2,7 +2,6 @@
 /* @var $this \yii\web\View view component instance */
 /* @var $message \yii\mail\MessageInterface the message being composed */
 /* @var $content string main view render result */
-//die(var_dump(Yii::$app->urlManager->createAbsoluteUrl('/') . 'images/water-pattern.png'));
 ?>
 
 <?php $this->beginPage() ?>
