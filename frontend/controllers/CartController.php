@@ -92,7 +92,7 @@ class CartController extends Controller
                     return $this->render('show', [
                         'order' => new Order(),
                         'profile' => $profile,
-                        'user' => \Yii::$app->user->identity,
+                        'user' => new User,
                         'address' => new UserAddress(),
                         'productsFromDB' => $orderProducts,
                     ]);

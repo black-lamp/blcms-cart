@@ -25,10 +25,12 @@ CartAsset::register($this);
 <div class="content cart col-md-12">
     <h1><?= $this->title; ?></h1>
 
-    <!--PRODUCTS TABLE-->
+    <!--EMPTY CART-->
     <?php if (empty($productsFromDB) && empty($productsFromSession)) : ?>
         <p><?= \Yii::t('shop', 'Your cart is empty.'); ?></p>
         <?= Html::a(\Yii::t('shop', 'Go to shop'), Url::toRoute('/shop'), ['class' => 'btn btn-primary']); ?>
+
+    <!--NOT EMPTY CART-->
     <?php else : ?>
         <div>
             <?= Html::a(\Yii::t('shop', 'Clear cart'), Url::toRoute('/cart/cart/clear'), ['class' => 'btn btn-primary pull-right']); ?>
@@ -61,7 +63,7 @@ CartAsset::register($this);
                             <?= $orderProduct->count; ?>
                         </td>
                         <td class="text-center">
-                            <?=Html::a(Html::tag('span', '', ['class' => 'glyphicon glyphicon-remove']),
+                            <?= Html::a(Html::tag('span', '', ['class' => 'glyphicon glyphicon-remove']),
                                 Url::to(['/cart/cart/remove', 'id' => $orderProduct->id]),
                                 [
                                     'class' => 'btn btn-danger btn-xs',
@@ -71,7 +73,7 @@ CartAsset::register($this);
                     </tr>
                 <?php endforeach; ?>
 
-                <!--PRODUCT LIST FROM SESSION-->
+            <!--PRODUCT LIST FROM SESSION-->
             <?php elseif (!empty($productsFromSession)) : ?>
                 <?php foreach ($productsFromSession as $product) : ?>
                     <tr>
@@ -82,7 +84,7 @@ CartAsset::register($this);
                             <?= Html::a($product->translation->title, Url::to(['/shop/product/show', 'id' => $product->id])); ?>
                         </td>
                         <td class="text-center">
-                            <?php if (!empty($orderProduct->price)) : ?>
+                            <?php if (!empty($product->price)) : ?>
                                 <?= $product->price; ?>
                             <?php endif; ?>
                         </td>
@@ -153,67 +155,68 @@ CartAsset::register($this);
 
         <!--PERSONAL DATA-->
         <div class="row">
-        <div class="personal-data col-md-6">
-            <h3><?= Yii::t('cart', 'Your personal data'); ?>:</h3>
+            <div class="personal-data col-md-6">
+                <h3><?= Yii::t('cart', 'Your personal data'); ?>:</h3>
 
-            <!--Name-->
-            <?php if (!empty(Yii::$app->user->identity->profile->name)) : ?>
-                <p>
-                    <b><?= Yii::t('shop', 'Name') ?>:</b> <?= Yii::$app->user->identity->profile->name; ?>
-                </p>
-            <?php else : ?>
-                <?= $form->field($profile, 'name')->textInput(); ?>
-            <?php endif; ?>
+                <!--Name-->
+                <?php if (!empty(Yii::$app->user->identity->profile->name)) : ?>
+                    <p>
+                        <b><?= Yii::t('shop', 'Name') ?>:</b> <?= Yii::$app->user->identity->profile->name; ?>
+                    </p>
+                <?php else : ?>
+                    <?= $form->field($profile, 'name')->textInput(); ?>
+                <?php endif; ?>
 
-            <!--Patronomic-->
-            <?php if (!empty(Yii::$app->user->identity->profile->patronymic)) : ?>
-                <p>
-                    <b><?= Yii::t('shop', 'Patronomic') ?>:</b> <?= Yii::$app->user->identity->profile->patronymic; ?>
-                </p>
-            <?php else : ?>
-                <?= $form->field($profile, 'patronymic')->textInput(); ?>
-            <?php endif; ?>
+                <!--Surname-->
+                <?php if (!empty(Yii::$app->user->identity->profile->surname)) : ?>
+                    <p>
+                        <b><?= Yii::t('shop', 'Surname') ?>:</b> <?= Yii::$app->user->identity->profile->surname; ?>
+                    </p>
+                <?php else : ?>
+                    <?= $form->field($profile, 'surname')->textInput(); ?>
+                <?php endif; ?>
 
-            <!--Surname-->
-            <?php if (!empty(Yii::$app->user->identity->profile->surname)) : ?>
-                <p>
-                    <b><?= Yii::t('shop', 'Surname') ?>:</b> <?= Yii::$app->user->identity->profile->surname; ?>
-                </p>
-            <?php else : ?>
-                <?= $form->field($profile, 'surname')->textInput(); ?>
-            <?php endif; ?>
+                <!--Patronomic-->
+                <?php if (!empty(Yii::$app->user->identity->profile->patronymic)) : ?>
+                    <p>
+                        <b><?= Yii::t('shop', 'Patronomic') ?>
+                            :</b> <?= Yii::$app->user->identity->profile->patronymic; ?>
+                    </p>
+                <?php else : ?>
+                    <?= $form->field($profile, 'patronymic')->textInput(); ?>
+                <?php endif; ?>
 
-            <!--Email-->
-            <?php if (!empty(Yii::$app->user->identity->email)) : ?>
-                <p>
-                    <b><?= Yii::t('shop', 'E-mail') ?>:</b> <?= Yii::$app->user->identity->email; ?>
-                </p>
-            <?php else : ?>
-                <?= $form->field($user, 'email')->textInput(); ?>
-            <?php endif; ?>
+                <!--Email-->
+                <?php if (!empty(Yii::$app->user->identity->email)) : ?>
+                    <p>
+                        <b><?= Yii::t('shop', 'E-mail') ?>:</b> <?= Yii::$app->user->identity->email; ?>
+                    </p>
+                <?php else : ?>
+                    <?= $form->field($user, 'email')->textInput(); ?>
+                <?php endif; ?>
 
-            <!--Phone-->
-            <?php if (!empty(Yii::$app->user->identity->profile->phone)) : ?>
-                <p>
-                    <b><?= Yii::t('shop', 'Phone number') ?>:</b> <?= Yii::$app->user->identity->profile->phone; ?>
-                </p>
-            <?php else : ?>
-                <?= $form->field($profile, 'phone')
-                    ->widget(\yii\widgets\MaskedInput::className(), ['mask' => '(999)-999-99-99']); ?>
-            <?php endif; ?>
+                <!--Phone-->
+                <?php if (!empty(Yii::$app->user->identity->profile->phone)) : ?>
+                    <p>
+                        <b><?= Yii::t('shop', 'Phone number') ?>:</b> <?= Yii::$app->user->identity->profile->phone; ?>
+                    </p>
+                <?php else : ?>
+                    <?= $form->field($profile, 'phone')
+                        ->widget(\yii\widgets\MaskedInput::className(), ['mask' => '(999)-999-99-99']); ?>
+                <?php endif; ?>
 
-            <?=Html::a(\Yii::t('cart', 'Change personal data'), Url::toRoute('/user/settings'),
-                [
-                    'class' => 'btn btn-primary'
-                ]); ?>
-        </div>
+                <?= Html::a(\Yii::t('cart', 'Change personal data'), Url::toRoute('/user/settings'),
+                    [
+                        'class' => 'btn btn-primary'
+                    ]); ?>
+            </div>
 
-        <!--DELIVERY METHOD-->
-        <div class="col-md-6">
-            <?= Delivery::widget(['form' => $form, 'model' => $order, 'config' => [
-                'addressModel' => $address
-            ]]); ?>
-        </div>
+            <!--DELIVERY METHOD-->
+            <div class="col-md-6">
+                <?= Delivery::widget(['form' => $form, 'model' => $order, 'config' => [
+                    'addressModel' => $address
+                ]]); ?>
+            </div>
         </div>
         <!--Address selecting-->
         <div class="address">
@@ -221,11 +224,11 @@ CartAsset::register($this);
 
             <?php if (!empty(\Yii::$app->user->identity->profile->userAddresses)) : ?>
                 <?= $form->field($order, 'address_id')
-                    ->dropDownList(ArrayHelper::map(\Yii::$app->user->identity->profile->userAddresses, 'id', function($model) {
+                    ->dropDownList(ArrayHelper::map(\Yii::$app->user->identity->profile->userAddresses, 'id', function ($model) {
                         $address = (!empty($model->city)) ? $model->city . ', ' : '';
-                        $address .= (!empty($model->street)) ? Yii::t('cart','st.') . $model->street . ', ' : '';
-                        $address .= (!empty($model->house)) ? Yii::t('cart','hse.') . $model->house . ' - ' : '';
-                        $address .= (!empty($model->apartment)) ? Yii::t('cart','apt.') . $model->apartment : '';
+                        $address .= (!empty($model->street)) ? Yii::t('cart', 'st.') . $model->street . ', ' : '';
+                        $address .= (!empty($model->house)) ? Yii::t('cart', 'hse.') . $model->house . ' - ' : '';
+                        $address .= (!empty($model->apartment)) ? Yii::t('cart', 'apt.') . $model->apartment : '';
                         return $address;
                     }),
                         ['prompt' => \Yii::t('shop', 'Select address')])->label(\Yii::t('shop', 'Select address or enter it at the next fields')); ?>
@@ -255,3 +258,9 @@ CartAsset::register($this);
     <?php endif; ?>
 </div>
 
+<?php if (Yii::$app->cart->enablePayment) : ?>
+    <?= \bl\cms\payment\widgets\PaymentSelector::widget([
+        'form' => $form,
+        'order' => $order
+    ]); ?>
+<?php endif; ?>
