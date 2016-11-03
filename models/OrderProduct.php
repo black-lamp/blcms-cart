@@ -97,17 +97,17 @@ class OrderProduct extends ActiveRecord
     }
 
     public function getSmallPhoto() {
-        return $image = $this->getPhoto('small');
+        return $this->getPhoto('small');
     }
     public function getThumbPhoto() {
-        return $image = $this->getPhoto('thumb');
+        return $this->getPhoto('thumb');
     }
     public function getBigPhoto() {
-        return $image = $this->getPhoto('big');
+        return $this->getPhoto('big');
     }
 
     private function getPhoto($size) {
-        $image = ProductImage::findOne($this->product_id);
+        $image = ProductImage::find()->where(['product_id' => $this->product_id])->one();
 
         if (!empty($image)) {
             $imageName = $image->file_name;
