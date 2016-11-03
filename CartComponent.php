@@ -284,11 +284,12 @@ class CartComponent extends Component
                     }
                 }
             }
+            else $address = null;
             $order->user_id = $user->id;
             $order->status = OrderStatus::STATUS_CONFIRMED;
             if ($order->validate()) {
                 $order->save();
-                $this->sendMail($profile, $user, $order, $address);
+                $this->sendMail($profile, $user, $order, $address, $order->address_id);
                 return true;
             }
         }
@@ -320,7 +321,7 @@ class CartComponent extends Component
      * @param null|UserAddress|ActiveRecord $address
      * @throws Exception
      */
-    private function sendMail($profile, $user, $order, $address)
+    private function sendMail($profile, $user, $order, $address = null, $addressId = null)
     {
         if (Yii::$app->user->isGuest) {
             $session = \Yii::$app->session;
