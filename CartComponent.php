@@ -64,6 +64,8 @@ class CartComponent extends Component
      */
     public $uidPrefix = '';
 
+    public $enablePayment = false;
+
     /*Session key of order*/
     const SESSION_KEY = 'shop_order';
     /*Session key of total cost*/

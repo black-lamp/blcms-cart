@@ -34,8 +34,7 @@ php yii migrate --migrationPath=@vendor/black-lamp/blcms-cart/migrations
                 ],
                 'saveToDataBase' => true,
                 
-                'newOrderMailView' => ['@frontend/views/new-order'], //The path of e-mail view which will be sent to admins after success order.
-                'orderSuccessView' => ['@frontend/views/order-success'],
+                'enablePayment' => true, //If true, you need to add blcms-payment module to your composer.json file.
             ],
 ],
 ```
