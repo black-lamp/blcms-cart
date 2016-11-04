@@ -30,7 +30,9 @@ use yii\widgets\ActiveForm;
                 <?= $form->field($profile, 'name') ?>
                 <?= $form->field($profile, 'surname') ?>
                 <?= $form->field($profile, 'patronymic') ?>
-                <?= $form->field($profile, 'phone') ?>
+                <?= $form->field($profile, 'phone')->widget(\yii\widgets\MaskedInput::className(), [
+                    'mask' => '(999)-999-99-99',
+                ]);  ?>
             </div>
         </div>
     </div>
