@@ -3,6 +3,7 @@ namespace bl\cms\cart\models;
 
 use bl\cms\cart\common\components\user\models\Profile;
 use bl\cms\cart\common\components\user\models\UserAddress;
+use bl\cms\payment\common\entities\PaymentMethod;
 use dektrium\user\models\User;
 use Yii;
 use yii\behaviors\TimestampBehavior;
@@ -128,5 +129,13 @@ class Order extends ActiveRecord
     public function getDeliveryMethod()
     {
         return $this->hasOne(DeliveryMethod::className(), ['id' => 'delivery_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPaymentMethod()
+    {
+        return $this->hasOne(PaymentMethod::className(), ['id' => 'payment_method_id']);
     }
 }
