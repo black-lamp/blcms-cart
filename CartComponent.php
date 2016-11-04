@@ -358,7 +358,7 @@ class CartComponent extends Component
                         ['products' => $products, 'user' => $user, 'profile' => $profile, 'order' => $order, 'address' => $address])
                         ->setFrom($this->sender)
                         ->setTo($admin)
-                        ->setSubject(Yii::t('shop', 'New order'))
+                        ->setSubject(Yii::t('cart', 'New order'))
                         ->send();
                 }
 
@@ -366,7 +366,7 @@ class CartComponent extends Component
                     ['products' => $products, 'user' => $user, 'profile' => $profile, 'order' => $order, 'address' => $address])
                     ->setFrom($this->sender)
                     ->setTo($user->email)
-                    ->setSubject(Yii::t('shop', 'Success order'))
+                    ->setSubject(Yii::t('cart', 'Success order'))
                     ->send();
             } catch (Exception $ex) {
                 throw new Exception($ex);
