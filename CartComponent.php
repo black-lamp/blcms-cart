@@ -279,8 +279,10 @@ class CartComponent extends Component
                 if ($address->load(Yii::$app->request->post())) {
                     $address->user_profile_id = $user->id;
                     if ($address->validate()) {
-                        $address->save();
-                        $order->address_id = $address->id;
+                        if (!empty($address->city) && !empty($address->street) && !empty($address->house)) {
+                            $address->save();
+                            $order->address_id = $address->id;
+                        }
                     }
                 }
             }
