@@ -402,6 +402,7 @@ class CartComponent extends Component
                 $order = Order::find()->where(['user_id' => \Yii::$app->user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])->one();
                 if (empty($order)) {
                     $order = new Order();
+                    $order->uid = $this->generateUnicId($this->uidPrefix, $this->minOrderUid, $this->maxOrderUid);
                     $order->user_id = \Yii::$app->user->id;
                     $order->status = OrderStatus::STATUS_INCOMPLETE;
                     if ($order->validate()) {
