@@ -211,8 +211,16 @@ CartAsset::register($this);
                     ]); ?>
             </div>
 
-            <!--DELIVERY METHOD-->
             <div class="col-md-6">
+                <!--PAYMENT METHOD-->
+                <?php if (Yii::$app->cart->enablePayment) : ?>
+                    <?= \bl\cms\payment\widgets\PaymentSelector::widget([
+                        'form' => $form,
+                        'order' => $order
+                    ]); ?>
+                <?php endif; ?>
+
+                <!--DELIVERY METHOD-->
                 <?= Delivery::widget(['form' => $form, 'model' => $order, 'config' => [
                     'addressModel' => $address
                 ]]); ?>
@@ -254,13 +262,9 @@ CartAsset::register($this);
         <?= Html::submitButton(Yii::t('shop', 'Make order'), [
             'class' => 'btn btn-lg btn-danger center-block'
         ]); ?>
+
         <?php $form::end(); ?>
     <?php endif; ?>
 </div>
 
-<?php if (Yii::$app->cart->enablePayment) : ?>
-    <?= \bl\cms\payment\widgets\PaymentSelector::widget([
-        'form' => $form,
-        'order' => $order
-    ]); ?>
-<?php endif; ?>
+
