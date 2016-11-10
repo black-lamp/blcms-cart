@@ -2,10 +2,10 @@
 namespace bl\cms\cart\common\components\user\controllers;
 
 use bl\cms\cart\common\components\user\models\Profile;
+use bl\cms\cart\common\components\user\models\RegistrationForm;
+use bl\cms\cart\common\components\user\models\User;
 use dektrium\user\Finder;
-use dektrium\user\models\RegistrationForm;
 use dektrium\user\models\ResendForm;
-use dektrium\user\models\User;
 use dektrium\user\traits\AjaxValidationTrait;
 use dektrium\user\traits\EventTrait;
 use yii\base\Exception;
@@ -110,6 +110,7 @@ class RegistrationController extends Controller
      *
      * @return string
      * @throws \yii\web\HttpException
+     * @throws Exception
      */
     public function actionRegister()
     {
@@ -117,43 +118,31 @@ class RegistrationController extends Controller
             throw new NotFoundHttpException();
         }
 
-        /** @var RegistrationForm $model */
-        $model = \Yii::createObject(RegistrationForm::className());
-        $event = $this->getFormEvent($model);
+        $user = new RegistrationForm();
+        $profile = new Profile();
 
+        $this->performAjaxValidation($user);
 
-        $this->trigger(self::EVENT_BEFORE_REGISTER, $event);
+        if ($user->load(\Yii::$app->request->post())) {
+            if ($profile->user_id = $user->register()) {
 
-        $this->performAjaxValidation($model);
+                if ($profile->load(\Yii::$app->request->post())) {
+                    if ($profile->validate()) {
+                        $profile->save();
 
-        if ($model->load(\Yii::$app->request->post()) && $model->register()) {
-
-            $newUser = User::find()->where(['username' => $model->username])->one();
-            $profile = Profile::find()->where(['user_id' => $newUser->id])->one();
-            if ($profile->load(\Yii::$app->request->post())) {
-                if ($profile->validate()) {
-
-                    $profile->save();
-
-                    $this->trigger(self::EVENT_AFTER_REGISTER, $event);
-
-                    return $this->render('/message', [
-                        'title'  => \Yii::t('user', 'Your account has been created'),
-                        'module' => $this->module,
-                        'profile' => $profile
-                    ]);
+                        return $this->render('/message', [
+                            'title'  => \Yii::t('user', 'Your account has been created'),
+                            'module' => $this->module,
+                            'profile' => $profile
+                        ]);
+                    }
+                    else throw new Exception('Profile creating is failed.');
                 }
-                else throw new Exception($profile->errors);
             }
-
-
         }
 
-        /** @var Profile $profile */
-        $profile = \Yii::createObject(Profile::className());
-
         return $this->render('register', [
-            'model'  => $model,
+            'model'  => $user,
             'profile' => $profile,
             'module' => $this->module,
         ]);
