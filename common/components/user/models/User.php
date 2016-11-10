@@ -5,14 +5,13 @@
 
 namespace bl\cms\cart\common\components\user\models;
 
+use bl\cms\shop\common\entities\PartnerRequest;
 use dektrium\user\helpers\Password;
 use dektrium\user\models\Token;
 use dektrium\user\models\User as BaseModel;
 
 class User extends BaseModel
 {
-    /** @var Profile|null */
-    private $_profile;
 
     /** @inheritdoc */
     public function afterSave($insert, $changedAttributes)
@@ -89,5 +88,16 @@ class User extends BaseModel
             \Yii::warning($e->getMessage());
             return false;
         }
+    }
+
+    public function getPartnerStatus() {
+        if (!\Yii::$app->user->isGuest) {
+            $partnerRequest = PartnerRequest::find()->where(['sender_id' => $this->id])->one();
+            if (!empty($partnerRequest)) {
+                return $partnerRequest->moderation_status;
+            }
+            else return false;
+        }
+        else return false;
     }
 }
