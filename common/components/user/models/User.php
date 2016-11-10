@@ -5,6 +5,8 @@
 
 namespace bl\cms\cart\common\components\user\models;
 
+use dektrium\user\helpers\Password;
+use dektrium\user\models\Token;
 use dektrium\user\models\User as BaseModel;
 
 class User extends BaseModel
@@ -15,13 +17,7 @@ class User extends BaseModel
     /** @inheritdoc */
     public function afterSave($insert, $changedAttributes)
     {
-        parent::afterSave($insert, $changedAttributes);
 
-        if ($insert) {
-            if ($this->_profile == null) {
-            }
-
-        }
     }
 
     /** @inheritdoc */
@@ -54,5 +50,44 @@ class User extends BaseModel
             'passwordRequired' => ['password', 'required', 'on' => ['register']],
             'passwordLength'   => ['password', 'string', 'min' => 6, 'max' => 72, 'on' => ['register', 'create']],
         ];
+    }
+
+    /**
+     * This method is used to register new user account. If Module::enableConfirmation is set true, this method
+     * will generate new confirmation token and use mailer to send it to the user.
+     *
+     * @return integer | bool If true - returns user id
+     */
+    public function register()
+    {
+        if ($this->getIsNewRecord() == false) {
+            throw new \RuntimeException('Calling "' . __CLASS__ . '::' . __METHOD__ . '" on existing user');
+        }
+
+        $transaction = $this->getDb()->beginTransaction();
+        try {
+            $this->confirmed_at = $this->module->enableConfirmation ? null : time();
+            $this->password     = $this->module->enableGeneratingPassword ? Password::generate(8) : $this->password;
+
+            if (!$this->save()) {
+                $transaction->rollBack();
+                return false;
+            }
+
+            if ($this->module->enableConfirmation) {
+                /** @var Token $token */
+                $token = \Yii::createObject(['class' => Token::className(), 'type' => Token::TYPE_CONFIRMATION]);
+                $token->link('user', $this);
+            }
+
+            $this->mailer->sendWelcomeMessage($this, isset($token) ? $token : null);
+
+            $transaction->commit();
+            return $this->id;
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+            \Yii::warning($e->getMessage());
+            return false;
+        }
     }
 }
