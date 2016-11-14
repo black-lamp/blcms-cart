@@ -19,11 +19,9 @@ class Delivery extends Widget
 {
     public $form;
     public $model;
-    public $config;
 
     public function init()
     {
-//        TreeWidgetAsset::register($this->getView());
     }
 
     public function run()
@@ -33,7 +31,6 @@ class Delivery extends Widget
             'deliveryMethods' => $deliveryMethods,
             'form' => $this->form,
             'model' => $this->model,
-            'config' => $this->config
         ]);
     }
 

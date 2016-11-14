@@ -8,7 +8,6 @@ use yii\helpers\ArrayHelper;
  * @var $deliveryMethods \bl\cms\cart\models\DeliveryMethod[]
  * @var $form \yii\bootstrap\ActiveForm
  * @var $model \yii\base\Model
- * @var array $config
  */
 
 DeliveryAsset::register($this);
@@ -35,11 +34,11 @@ DeliveryAsset::register($this);
                 <p id="delivery-description"></p>
 
                 <div class="post-office">
-                    <?= $form->field($model, 'delivery_post_office')->textInput(); ?>
 
                     <?= \bl\cms\novaposhta\widgets\NovaPoshtaWarehouseSelector::widget([
                         'language' => (\Yii::$app->language == 'ru') ? 'ru' : 'ua',
-                        'formModel' => $config['addressModel'],
+                        'form' => $form,
+                        'formModel' => $model,
                         'formAttribute' => 'postoffice'
                     ]); ?>
                 </div>

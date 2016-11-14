@@ -221,9 +221,7 @@ CartAsset::register($this);
                 <?php endif; ?>
 
                 <!--DELIVERY METHOD-->
-                <?= Delivery::widget(['form' => $form, 'model' => $order, 'config' => [
-                    'addressModel' => $address
-                ]]); ?>
+                <?= Delivery::widget(['form' => $form, 'model' => $order]); ?>
             </div>
         </div>
         <!--Address selecting-->

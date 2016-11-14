@@ -77,7 +77,7 @@ class Order extends ActiveRecord
     {
         return [
             'status' => Yii::t('shop', 'Status'),
-            'delivery_post_office' => Yii::t('shop', 'Post office'),
+            'delivery_post_office' => Yii::t('cart', 'Post office'),
             'uid' => Yii::t('cart', 'Order number'),
         ];
     }
