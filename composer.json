@@ -12,7 +12,8 @@
   ],
   "require": {
     "yiisoft/yii2": ">=2.0.4",
-    "black-lamp/blcms-shop": "*"
+    "black-lamp/blcms-shop": "*",
+    "yiisoft/yii2-jui": "*"
   },
   "require-dev": {
     "black-lamp/blcms-nova-poshta": "dev-master"
