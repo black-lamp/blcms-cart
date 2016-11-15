@@ -9,6 +9,7 @@ use bl\cms\cart\models\Order;
 use bl\cms\cart\models\SearchOrder;
 use yii\filters\AccessControl;
 use yii\web\Controller;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
@@ -34,7 +35,7 @@ class OrderController extends Controller
                     ],
                     [
                         'actions' => ['view'],
-                        'roles' => ['viewOrder'],
+                        'roles' => ['viewOrder', 'changeOrderStatus'],
                         'allow' => true,
                     ],
                     [
@@ -73,6 +74,7 @@ class OrderController extends Controller
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException
+     * @throws ForbiddenHttpException
      */
     public function actionView($id)
     {
@@ -81,26 +83,29 @@ class OrderController extends Controller
             if (empty($model)) {
                 $model = new Order();
             }
-            if ($model->load(Yii::$app->request->post())) {
-                if ($model->save()) {
-                    \Yii::$app->session->setFlash('success', \Yii::t('shop', 'The record was successfully saved.'));
+            if (Yii::$app->user->can('changeOrderStatus')) {
+                if ($model->load(Yii::$app->request->post())) {
+                    if ($model->save()) {
+                        \Yii::$app->session->setFlash('success', \Yii::t('shop', 'The record was successfully saved.'));
 
+                    } else {
+                        \Yii::$app->session->setFlash('error', \Yii::t('shop', 'An error occurred when saving the record.'));
+                    }
+                    return $this->redirect(['view', 'id' => $id]);
                 } else {
-                    \Yii::$app->session->setFlash('error', \Yii::t('shop', 'An error occurred when saving the record.'));
-                }
-                return $this->redirect(['view', 'id' => $id]);
-            } else {
-                $orderProducts = $model->orderProducts;
+                    $orderProducts = $model->orderProducts;
 
-                return $this->render('view', [
-                    'model' => $this->findModel($id),
-                    'statuses' => OrderStatus::find()->all(),
-                    'orderProducts' => $orderProducts,
-                ]);
+                    return $this->render('view', [
+                        'model' => $this->findModel($id),
+                        'statuses' => OrderStatus::find()->all(),
+                        'orderProducts' => $orderProducts,
+                    ]);
+                }
             }
+            else throw new ForbiddenHttpException();
+
         } else throw new NotFoundHttpException();
     }
-
 
     /**
      * Deletes an existing Order model.
