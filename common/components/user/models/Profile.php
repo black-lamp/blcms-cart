@@ -50,7 +50,7 @@ class Profile extends BaseProfile
         return [
             [['user_id'], 'integer'],
             [['phone'], 'string', 'max' => 16],
-            [['name', 'phone'], 'required'],
+            [['name', 'surname', 'phone'], 'required'],
             [['name', 'surname', 'patronymic', 'avatar'], 'string', 'max' => 255],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
         ];
