@@ -1,5 +1,6 @@
 <?php
 use bl\cms\cart\widgets\assets\DeliveryAsset;
+use bl\multilang\entities\Language;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -11,9 +12,11 @@ use yii\helpers\ArrayHelper;
  */
 
 DeliveryAsset::register($this);
+
+$languagePrefix = (Language::getCurrent()->lang_id != Language::getDefault()->lang_id) ? '/' . Language::getCurrent()->lang_id : '';
 ?>
 
-<div id="delivery-methods">
+<div id="delivery-methods" data-language-prefix="<?=$languagePrefix; ?>">
     <h3><?= Yii::t('cart', 'Select delivery method'); ?>:</h3>
 
     <div class="row">

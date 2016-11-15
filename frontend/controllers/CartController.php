@@ -16,6 +16,7 @@ use bl\cms\cart\common\components\user\models\UserAddress;
 use bl\cms\shop\common\entities\Product;
 use bl\cms\shop\common\entities\ProductPrice;
 use bl\imagable\helpers\FileHelper;
+use bl\multilang\entities\Language;
 use Exception;
 use Yii;
 use yii\helpers\ArrayHelper;
@@ -135,7 +136,11 @@ class CartController extends Controller
     {
         if (\Yii::$app->request->isAjax) {
 
-            $method = DeliveryMethod::find()->asArray()->where(['id' => $id])->with('translations')->one();
+            $method = DeliveryMethod::findOne($id);
+            $methodTranslation = $method->translation;
+
+            $method = ArrayHelper::toArray($method);
+            $method['translation'] = ArrayHelper::toArray($methodTranslation);
             $method['image_name'] = '/images/delivery/' .
                 FileHelper::getFullName(
                     \Yii::$app->shop_imagable->get('delivery', 'small', $method['image_name']

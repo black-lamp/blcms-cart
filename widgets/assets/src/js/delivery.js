@@ -8,8 +8,7 @@ $(document).ready(function () {
     getElementInfo($(radioButtons[0]).val());
 
     /*SELECTED ELEMENT SETTINGS*/
-    var inputs = $('#delivery-methods input[type="radio"]');
-    inputs.change(function () {
+    radioButtons.change(function () {
         if (this.checked) {
             var elementValue = this.value;
             getElementInfo(elementValue);
@@ -19,9 +18,13 @@ $(document).ready(function () {
 
 /*GETTING METHOD INFO BY IT VALUE*/
 function getElementInfo(elementValue) {
+
+    /*LANGUAGE PREFIX*/
+    var languagePrefix = $('#delivery-methods').data('language-prefix');
+
     $.ajax({
         type: "GET",
-        url: '/cart/cart/get-delivery-method',
+        url: languagePrefix + '/cart/cart/get-delivery-method',
         data: 'id=' + elementValue,
 
         success: function (data) {
@@ -33,25 +36,25 @@ function getElementInfo(elementValue) {
 
             /*METHOD TITLE SETTING*/
             var methodTitle = $('#delivery-title');
-            $(methodTitle).text(method.translations[1]['title']);
+            $(methodTitle).text(method.translation['title']);
 
             /*METHOD DESCRIPTION SETTING*/
             var methodDescription = $('#delivery-description');
-            $(methodDescription).html(method.translations[1]['description']);
+            $(methodDescription).html(method.translation['description']);
 
             var postOfficeField = $('.post-office');
             var addressFields = $('div.address');
 
             switch (method.show_address_or_post_office) {
-                case '0' :
+                case 0 :
                     postOfficeField.hide();
                     addressFields.hide();
                     break;
-                case '1' :
+                case 1 :
                     postOfficeField.hide();
                     addressFields.show();
                     break;
-                case '2' :
+                case 2 :
                     postOfficeField.show();
                     addressFields.hide();
             }
