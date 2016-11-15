@@ -163,7 +163,8 @@ class OrderController extends Controller
                 ['model' => $model])
                 ->setFrom(Yii::$app->cart->sender)
                 ->setTo($model->user->email)
-                ->setSubject(Yii::t('cart', 'Your order status is changed to') . ' "' . $model->orderStatus->translation->title . '"')
+                ->setSubject(Yii::t('cart', 'Your order') . ' #' . $model->uid . Yii::t('cart', ' is ') .
+                    mb_strtolower($model->orderStatus->translation->title))
                 ->send();
 
         } catch (Exception $ex) {

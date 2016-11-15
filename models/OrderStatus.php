@@ -17,6 +17,7 @@ class OrderStatus extends ActiveRecord
 
     const STATUS_INCOMPLETE = 1;
     const STATUS_CONFIRMED = 2;
+    const STATUS_SENT = 3;
 
     /**
      * @inheritdoc
