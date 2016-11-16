@@ -76,7 +76,7 @@ class Order extends ActiveRecord
     public function attributeLabels()
     {
         return [
-            'status' => Yii::t('shop', 'Status'),
+            'status' => Yii::t('cart', 'Status'),
             'delivery_post_office' => Yii::t('cart', 'Post office'),
             'uid' => Yii::t('cart', 'Order number'),
         ];
