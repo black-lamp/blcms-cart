@@ -31,8 +31,6 @@ $fullAddress = (!empty($model->address_id)) ?
 <?php if (!empty($model->orderStatus->translation->mail)) : ?>
 <?= strtr($model->orderStatus->translation->mail, [
         '{order_id}' => $model->id,
-        '{post_office}' => $model->delivery_post_office,
-        '{address}' => $fullAddress,
         '{created_at}' => Yii::$app->formatter->asDatetime($model->creation_time)
     ]); ?>
 <?php endif; ?>
