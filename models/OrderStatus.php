@@ -2,6 +2,7 @@
 namespace bl\cms\cart\models;
 
 use bl\multilang\behaviors\TranslationBehavior;
+use Yii;
 use yii\db\ActiveRecord;
 
 /**
@@ -48,6 +49,16 @@ class OrderStatus extends ActiveRecord
     {
         return [
             [['color'], 'string'],
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        return [
+            'product_id' => Yii::t('shop', 'Product ID'),
         ];
     }
 
