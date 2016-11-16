@@ -9,10 +9,10 @@ use yii\helpers\Url;
 CartAsset::register($this);
 ?>
 
-<h1 class="text-center"><?= \Yii::t('shop', 'Your cart is empty.'); ?></h1>
+<h1 class="text-center"><?= \Yii::t('cart', 'Your cart is empty.'); ?></h1>
 
 <div class="empty-cart">
-    <?= Html::a(\Yii::t('shop', 'Go to shop'), Url::toRoute('/shop'), ['class' => 'btn btn-primary text-center']); ?>
+    <?= Html::a(\Yii::t('cart', 'Go to shop'), Url::toRoute('/shop'), ['class' => 'btn btn-primary text-center']); ?>
     <div>
         <?= Html::img('/images/empty-cart-image.png'); ?>
     </div>

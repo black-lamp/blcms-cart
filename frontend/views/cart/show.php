@@ -17,7 +17,7 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use bl\cms\shop\frontend\assets\CartAsset;
 
-$this->title = \Yii::t('shop', 'Cart');
+$this->title = \Yii::t('cart', 'Cart');
 
 CartAsset::register($this);
 ?>
@@ -27,13 +27,13 @@ CartAsset::register($this);
 
     <!--EMPTY CART-->
     <?php if (empty($productsFromDB) && empty($productsFromSession)) : ?>
-        <p><?= \Yii::t('shop', 'Your cart is empty.'); ?></p>
-        <?= Html::a(\Yii::t('shop', 'Go to shop'), Url::toRoute('/shop'), ['class' => 'btn btn-primary']); ?>
+        <p><?= \Yii::t('cart', 'Your cart is empty.'); ?></p>
+        <?= Html::a(\Yii::t('cart', 'Go to shop'), Url::toRoute('/shop'), ['class' => 'btn btn-primary']); ?>
 
     <!--NOT EMPTY CART-->
     <?php else : ?>
         <div>
-            <?= Html::a(\Yii::t('shop', 'Clear cart'), Url::toRoute('/cart/cart/clear'), ['class' => 'btn btn-primary pull-right']); ?>
+            <?= Html::a(\Yii::t('cart', 'Clear cart'), Url::toRoute('/cart/cart/clear'), ['class' => 'btn btn-primary pull-right']); ?>
         </div>
         <table class="table table-hover table-striped products-list">
             <tr>
@@ -101,7 +101,7 @@ CartAsset::register($this);
 
             <!--REGISTRATION-->
             <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#registerModal">
-                <?= \Yii::t('shop', 'I\'m a new user'); ?>
+                <?= \Yii::t('cart', 'I\'m a new user'); ?>
             </button>
             <div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
                  aria-hidden="true">
@@ -109,7 +109,7 @@ CartAsset::register($this);
                     <div class="modal-content">
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                            <h4 class="modal-title" id="myModalLabel"><?= Yii::t('shop', 'Registration'); ?></h4>
+                            <h4 class="modal-title" id="myModalLabel"><?= Yii::t('cart', 'Registration'); ?></h4>
                         </div>
 
                         <?= \bl\cms\cart\widgets\Register::widget([
@@ -120,7 +120,7 @@ CartAsset::register($this);
 
             <!--LOGIN-->
             <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#loginModal">
-                <?= \Yii::t('shop', 'I already have an account'); ?>
+                <?= \Yii::t('cart', 'I already have an account'); ?>
             </button>
             <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
                  aria-hidden="true">
@@ -161,7 +161,7 @@ CartAsset::register($this);
                 <!--Name-->
                 <?php if (!empty(Yii::$app->user->identity->profile->name)) : ?>
                     <p>
-                        <b><?= Yii::t('shop', 'Name') ?>:</b> <?= Yii::$app->user->identity->profile->name; ?>
+                        <b><?= Yii::t('cart', 'Name') ?>:</b> <?= Yii::$app->user->identity->profile->name; ?>
                     </p>
                 <?php else : ?>
                     <?= $form->field($profile, 'name')->textInput(); ?>
@@ -170,7 +170,7 @@ CartAsset::register($this);
                 <!--Surname-->
                 <?php if (!empty(Yii::$app->user->identity->profile->surname)) : ?>
                     <p>
-                        <b><?= Yii::t('shop', 'Surname') ?>:</b> <?= Yii::$app->user->identity->profile->surname; ?>
+                        <b><?= Yii::t('cart', 'Surname') ?>:</b> <?= Yii::$app->user->identity->profile->surname; ?>
                     </p>
                 <?php else : ?>
                     <?= $form->field($profile, 'surname')->textInput(); ?>
@@ -179,7 +179,7 @@ CartAsset::register($this);
                 <!--Patronomic-->
                 <?php if (!empty(Yii::$app->user->identity->profile->patronymic)) : ?>
                     <p>
-                        <b><?= Yii::t('shop', 'Patronomic') ?>
+                        <b><?= Yii::t('cart', 'Patronomic') ?>
                             :</b> <?= Yii::$app->user->identity->profile->patronymic; ?>
                     </p>
                 <?php else : ?>
@@ -189,7 +189,7 @@ CartAsset::register($this);
                 <!--Email-->
                 <?php if (!empty(Yii::$app->user->identity->email)) : ?>
                     <p>
-                        <b><?= Yii::t('shop', 'E-mail') ?>:</b> <?= Yii::$app->user->identity->email; ?>
+                        <b><?= Yii::t('cart', 'E-mail') ?>:</b> <?= Yii::$app->user->identity->email; ?>
                     </p>
                 <?php else : ?>
                     <?= $form->field($user, 'email')->textInput(); ?>
@@ -198,7 +198,7 @@ CartAsset::register($this);
                 <!--Phone-->
                 <?php if (!empty(Yii::$app->user->identity->profile->phone)) : ?>
                     <p>
-                        <b><?= Yii::t('shop', 'Phone number') ?>:</b> <?= Yii::$app->user->identity->profile->phone; ?>
+                        <b><?= Yii::t('cart', 'Phone number') ?>:</b> <?= Yii::$app->user->identity->profile->phone; ?>
                     </p>
                 <?php else : ?>
                     <?= $form->field($profile, 'phone')
@@ -237,11 +237,11 @@ CartAsset::register($this);
                         $address .= (!empty($model->apartment)) ? Yii::t('cart', 'apt.') . $model->apartment : '';
                         return $address;
                     }),
-                        ['prompt' => \Yii::t('shop', 'Select address')])->label(\Yii::t('shop', 'Select address or enter it at the next fields')); ?>
+                        ['prompt' => \Yii::t('cart', 'Select address')])->label(\Yii::t('cart', 'Select address or enter it at the next fields')); ?>
             <?php endif; ?>
 
             <!--Address-->
-            <h4><?= \Yii::t('shop', 'Address'); ?></h4>
+            <h4><?= \Yii::t('cart', 'Address'); ?></h4>
             <div class="row">
                 <div class="col-md-6">
                     <?= $form->field($address, 'country')->textInput(); ?>
@@ -257,7 +257,7 @@ CartAsset::register($this);
             </div>
         </div>
 
-        <?= Html::submitButton(Yii::t('shop', 'Make order'), [
+        <?= Html::submitButton(Yii::t('cart', 'Make order'), [
             'class' => 'btn btn-lg btn-danger center-block'
         ]); ?>
 
