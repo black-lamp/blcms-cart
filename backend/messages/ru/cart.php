@@ -5,6 +5,7 @@
  *
  */
 return [
+    'Address' => 'Адрес',
     'Articulus' => 'Артикул',
     'at the post office ' => 'в почтовом отделении ',
     'by' => 'из',
@@ -18,6 +19,7 @@ return [
     'Customer data' => 'Данные заказчика',
     'Customer name' => 'Имя',
     'Date' => 'Дата заказа',
+    'Date and time of creating' => 'Дата и время создания',
     'Delete' => 'Удалить',
     'Delivery method' => 'Способ доставки',
     'Description' => 'Описание',
@@ -25,6 +27,7 @@ return [
     'Editing order status' => 'Редактирование статуса заказа',
     'etc' => 'итд.',
     ' is ' => ' ',
+    'Mail text' => 'Текст письма',
     'Manage' => 'Управление',
     'New orders' => 'Новые заказы',
     'Number of items' => 'Количество наименований',
@@ -33,6 +36,7 @@ return [
     'Order number' => 'Номер заказа',
     'Order status' => 'Статус заказа',
     'Order Statuses' => 'Статусы заказов',
+    'Order unique id' => 'Номер заказа',
     'Order #' => 'Заказ №',
     'Patronymic' => 'Отчество',
     'Payment method' => 'Способ оплаты',
@@ -52,6 +56,7 @@ return [
     'to' => 'по',
     'Total' => 'Всего',
     'You can pick up it ' => 'Вы можете его забрать ',
+    'You can use the next variables:' => 'Вы можете использовате следующие переменные в тексте письма:',
     'Your order' => 'Ваш заказ',
     'Your order status is changed to' => 'Статус вашего заказа изменён на'
 ];
