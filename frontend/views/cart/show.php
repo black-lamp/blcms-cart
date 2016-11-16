@@ -214,6 +214,7 @@ CartAsset::register($this);
             <div class="col-md-6">
                 <!--PAYMENT METHOD-->
                 <?php if (Yii::$app->cart->enablePayment) : ?>
+                    <h3><?=Yii::t('cart', 'Payment method');?></h3>
                     <?= \bl\cms\payment\widgets\PaymentSelector::widget([
                         'form' => $form,
                         'order' => $order

@@ -28,6 +28,7 @@ return [
     'New order' => 'Новый заказ',
     'Our manager will contact you as soon as possible' => 'Наш менеджер свяжется с вами в самое ближайшее время.',
     'Patronymic' => 'Отчество',
+    'Payment method' => 'Способы оплаты',
     'Phone number' => 'Номер телефона',
     'Photo' => 'Фото',
     'Post office' => 'Почтовое отделение',
