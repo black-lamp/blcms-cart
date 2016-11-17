@@ -460,8 +460,6 @@ class CartComponent extends Component
                 }
 
             }
-            \Yii::$app->getResponse()->redirect(Url::toRoute('/cart'));
-            \Yii::$app->end();
         }
     }
 
