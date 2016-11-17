@@ -205,6 +205,28 @@ class CartComponent extends Component
     }
 
     /**
+     * Gets order items count.
+     *
+     * @return integer
+     */
+    public function getOrderItemsCount()
+    {
+        if (\Yii::$app->user->isGuest) {
+            $session = \Yii::$app->session;
+            return count($session[self::SESSION_KEY]);
+        } else {
+            $order = Order::find()->where(['user_id' => \Yii::$app->user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])->one();
+            if (!empty($order)) {
+                $count = OrderProduct::find()->asArray()->where(['order_id' => $order->id])->count();
+
+            } else $count = 0;
+
+        }
+        return $count;
+
+    }
+
+    /**
      * Gets all user orders from database.
      *
      * @return bool|\yii\db\ActiveRecord[]
