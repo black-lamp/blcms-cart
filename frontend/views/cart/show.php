@@ -179,7 +179,7 @@ CartAsset::register($this);
                 <!--Patronomic-->
                 <?php if (!empty(Yii::$app->user->identity->profile->patronymic)) : ?>
                     <p>
-                        <b><?= Yii::t('cart', 'Patronomic') ?>
+                        <b><?= Yii::t('cart', 'Patronymic') ?>
                             :</b> <?= Yii::$app->user->identity->profile->patronymic; ?>
                     </p>
                 <?php else : ?>

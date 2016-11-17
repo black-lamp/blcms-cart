@@ -62,11 +62,11 @@ class Profile extends BaseProfile
     public function attributeLabels()
     {
         return [
-            'name' => Yii::t('shop', 'Name'),
-            'surname' => Yii::t('shop', 'Surname'),
-            'patronymic' => Yii::t('shop', 'Patronymic'),
-            'avatar' => Yii::t('shop', 'Avatar'),
-            'phone' => Yii::t('shop', 'Phone number'),
+            'name' => Yii::t('cart', 'Name'),
+            'surname' => Yii::t('cart', 'Surname'),
+            'patronymic' => Yii::t('cart', 'Patronymic'),
+            'avatar' => Yii::t('cart', 'Avatar'),
+            'phone' => Yii::t('cart', 'Phone number'),
         ];
     }
 
