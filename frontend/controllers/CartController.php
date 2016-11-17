@@ -5,6 +5,7 @@
 
 namespace bl\cms\cart\frontend\controllers;
 
+use bl\cms\cart\frontend\components\events\CartEvents;
 use bl\cms\cart\models\CartForm;
 use bl\cms\cart\models\DeliveryMethod;
 use bl\cms\cart\models\Order;
@@ -26,6 +27,7 @@ use yii\web\NotFoundHttpException;
 class CartController extends Controller
 {
 
+    const EVENT_AFTER_GET_ORDER = 'after-get-order';
     public $defaultAction = 'show';
 
     public function actionAdd()
@@ -120,6 +122,9 @@ class CartController extends Controller
 
             if(\Yii::$app->cart->makeOrder()) {
                 \Yii::$app->session->setFlash('success', \Yii::t('shop', 'Your order is accepted. Thank you.'));
+
+                $this->trigger(self::EVENT_AFTER_GET_ORDER, Yii::$app->user->id);
+
                 return $this->render('order-success');
             }
             else {
