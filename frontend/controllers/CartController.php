@@ -5,7 +5,7 @@
 
 namespace bl\cms\cart\frontend\controllers;
 
-use bl\cms\cart\frontend\components\events\CartEvents;
+use bl\cms\cart\frontend\events\CartEvent;
 use bl\cms\cart\models\CartForm;
 use bl\cms\cart\models\DeliveryMethod;
 use bl\cms\cart\models\Order;
@@ -17,8 +17,6 @@ use bl\cms\cart\common\components\user\models\UserAddress;
 use bl\cms\shop\common\entities\Product;
 use bl\cms\shop\common\entities\ProductPrice;
 use bl\imagable\helpers\FileHelper;
-use bl\multilang\entities\Language;
-use Exception;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
@@ -123,7 +121,9 @@ class CartController extends Controller
             if(\Yii::$app->cart->makeOrder()) {
                 \Yii::$app->session->setFlash('success', \Yii::t('shop', 'Your order is accepted. Thank you.'));
 
-                $this->trigger(self::EVENT_AFTER_GET_ORDER, Yii::$app->user->id);
+                $cartEvent = new CartEvent();
+                $cartEvent->userId = \Yii::$app->user->id;
+                $this->trigger(self::EVENT_AFTER_GET_ORDER, $cartEvent);
 
                 return $this->render('order-success');
             }
