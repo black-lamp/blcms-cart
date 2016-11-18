@@ -26,6 +26,8 @@ return [
     'Make order' => 'Сделать заказ',
     'Name' => 'Имя',
     'New order' => 'Новый заказ',
+    'Order' => 'Заказ',
+    'Order status' => 'Статус заказа',
     'Our manager will contact you as soon as possible' => 'Наш менеджер свяжется с вами в самое ближайшее время.',
     'Patronymic' => 'Отчество',
     'Payment method' => 'Способы оплаты',

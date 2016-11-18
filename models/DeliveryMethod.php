@@ -132,5 +132,6 @@ class DeliveryMethod extends ActiveRecord
         if (!empty($this->image_name)) {
             return \Yii::$app->shop_imagable->get('delivery', $size, $this->image_name);
         }
+        else return '';
     }
 }

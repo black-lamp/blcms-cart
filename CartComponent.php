@@ -234,7 +234,9 @@ class CartComponent extends Component
     public function getAllUserOrders()
     {
         if (!\Yii::$app->user->isGuest && $this->saveToDataBase === true) {
-            $orders = Order::find()->where(['user_id' => \Yii::$app->user->id])->all();
+            $orders = Order::find()
+                ->where(['user_id' => \Yii::$app->user->id])
+                ->andWhere(['!=', 'status', OrderStatus::STATUS_INCOMPLETE])->all();
             return $orders;
         } else return false;
     }
