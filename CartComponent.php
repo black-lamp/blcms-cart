@@ -11,7 +11,7 @@ use Yii;
 use yii\base\Component;
 use yii\base\Exception;
 use yii\db\ActiveRecord;
-use yii\helpers\Url;
+use yii\db\Expression;
 use yii\web\ForbiddenHttpException;
 use bl\cms\cart\models\Order;
 use bl\cms\cart\models\OrderProduct;
@@ -311,11 +311,14 @@ class CartComponent extends Component
             else $address = null;
             $order->user_id = $user->id;
             $order->status = OrderStatus::STATUS_CONFIRMED;
+            $order->confirmation_time = new Expression('NOW()');
+
             if ($order->validate()) {
                 $order->save();
                 $this->sendMail($profile, $user, $order, $address, $order->address_id);
                 return true;
             }
+            else die(var_dump($order->errors));
         }
         else throw new Exception();
     }

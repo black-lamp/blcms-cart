@@ -128,7 +128,7 @@ class CartController extends Controller
                 return $this->render('order-success');
             }
             else {
-                \Yii::$app->session->setFlash('error', \Yii::t('shop', 'Unknown error'));
+                \Yii::$app->session->setFlash('error', \Yii::t('shop', 'Making order error'));
                 return $this->render('order-error');
             }
         }

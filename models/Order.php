@@ -23,6 +23,7 @@ use yii\db\Expression;
  * @property integer $uid
  * @property integer $payment_method_id
  * @property string $delivery_post_office
+ * @property string $confirmation_time
  *
  * @property User $user
  * @property UserAddress $address
