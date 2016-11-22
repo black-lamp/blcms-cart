@@ -1,27 +1,18 @@
 <?php
+namespace bl\cms\cart\frontend\controllers;
+
+use Yii;
+use yii\helpers\ArrayHelper;
+use bl\imagable\helpers\FileHelper;
+use bl\cms\cart\frontend\Events\OrderInfoEvent;
+use yii\web\{Controller, NotFoundHttpException};
+use bl\cms\shop\common\entities\{Product, ProductPrice};
+use bl\cms\cart\common\components\user\models\{Profile, User, UserAddress};
+use bl\cms\cart\models\{CartForm, DeliveryMethod, Order, OrderProduct, OrderStatus};
+
 /**
  * @author Albert Gainutdinov
  */
-
-namespace bl\cms\cart\frontend\controllers;
-
-use bl\cms\cart\frontend\events\CartEvent;
-use bl\cms\cart\models\CartForm;
-use bl\cms\cart\models\DeliveryMethod;
-use bl\cms\cart\models\Order;
-use bl\cms\cart\models\OrderProduct;
-use bl\cms\cart\models\OrderStatus;
-use bl\cms\cart\common\components\user\models\Profile;
-use bl\cms\cart\common\components\user\models\User;
-use bl\cms\cart\common\components\user\models\UserAddress;
-use bl\cms\shop\common\entities\Product;
-use bl\cms\shop\common\entities\ProductPrice;
-use bl\imagable\helpers\FileHelper;
-use Yii;
-use yii\helpers\ArrayHelper;
-use yii\web\Controller;
-use yii\web\NotFoundHttpException;
-
 class CartController extends Controller
 {
 
@@ -121,9 +112,7 @@ class CartController extends Controller
             if(\Yii::$app->cart->makeOrder()) {
                 \Yii::$app->session->setFlash('success', \Yii::t('shop', 'Your order is accepted. Thank you.'));
 
-                $cartEvent = new CartEvent();
-                $cartEvent->userId = \Yii::$app->user->id;
-                $this->trigger(self::EVENT_AFTER_GET_ORDER, $cartEvent);
+                $this->trigger(self::EVENT_AFTER_GET_ORDER, new OrderInfoEvent(['user_id' => \Yii::$app->user->id]));
 
                 return $this->render('order-success');
             }

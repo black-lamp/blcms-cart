@@ -8,7 +8,7 @@ namespace bl\cms\cart\frontend\Events;
 
 use yii\base\Event;
 
-class CartEvent extends Event
+class OrderInfoEvent extends Event
 {
-    public $userId;
+    public $user_id;
 }
