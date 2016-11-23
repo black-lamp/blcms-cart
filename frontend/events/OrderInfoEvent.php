@@ -10,5 +10,13 @@ use yii\base\Event;
 
 class OrderInfoEvent extends Event
 {
+    /**
+     * @var integer
+     */
     public $user_id;
+
+    /**
+     * @var string
+     */
+    public $email;
 }

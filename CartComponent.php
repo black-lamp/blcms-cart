@@ -1,6 +1,7 @@
 <?php
 namespace bl\cms\cart;
 
+use bl\cms\cart\frontend\Events\OrderInfoEvent;
 use bl\cms\cart\models\OrderStatus;
 use bl\cms\cart\common\components\user\models\Profile;
 use bl\cms\cart\common\components\user\models\User;
@@ -71,6 +72,7 @@ class CartComponent extends Component
     /*Session key of total cost*/
     const TOTAL_COST_KEY = 'shop_order_total_cost';
 
+    const EVENT_BEFORE_GET_ORDER = 'after-get-order';
 
     /**
      * Adds product to cart.
@@ -276,6 +278,8 @@ class CartComponent extends Component
      */
     public function makeOrder()
     {
+        $this->trigger(self::EVENT_BEFORE_GET_ORDER, new OrderInfoEvent(['user_id' => \Yii::$app->user->id]));
+
         if ($this->saveToDataBase === true) {
             if (!Yii::$app->user->isGuest) {
                 return $this->makeOrderFromDB();
