@@ -1,7 +1,7 @@
 <?php
 namespace bl\cms\cart;
 
-use bl\cms\cart\frontend\Events\OrderInfoEvent;
+use bl\cms\cart\frontend\events\OrderInfoEvent;
 use bl\cms\cart\models\OrderStatus;
 use bl\cms\cart\common\components\user\models\Profile;
 use bl\cms\cart\common\components\user\models\User;
