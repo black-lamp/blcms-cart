@@ -1,6 +1,7 @@
 <?php
 namespace bl\cms\cart\frontend\controllers;
 
+use bl\cms\seo\StaticPageBehavior;
 use Yii;
 use yii\helpers\ArrayHelper;
 use bl\imagable\helpers\FileHelper;
@@ -14,6 +15,16 @@ use bl\cms\cart\models\{CartForm, DeliveryMethod, Order, OrderProduct, OrderStat
  */
 class CartController extends Controller
 {
+
+    public function behaviors()
+    {
+        return [
+            'staticPage' => [
+                'class' => StaticPageBehavior::className(),
+                'key' => 'cart'
+            ]
+        ];
+    }
 
     public $defaultAction = 'show';
 
@@ -34,6 +45,8 @@ class CartController extends Controller
     {
         $cart = \Yii::$app->cart;
         $items = $cart->getOrderItems();
+
+        $this->registerStaticSeoData();
 
         /*EMPTY CART*/
         if (empty($items)) {

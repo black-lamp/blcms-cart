@@ -23,7 +23,13 @@ CartAsset::register($this);
 ?>
 
 <div class="content cart col-md-12">
-    <h1><?= $this->title; ?></h1>
+    <h1 class="title">
+        <?= $this->context->staticPage->translation->title ?? Yii::t('cart', 'Cart') ?>
+    </h1>
+    <!--DESCRIPTION-->
+    <div>
+        <?= $this->context->staticPage->translation->description ?? '' ?>
+    </div>
 
     <!--EMPTY CART-->
     <?php if (empty($productsFromDB) && empty($productsFromSession)) : ?>
