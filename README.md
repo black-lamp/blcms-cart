@@ -113,7 +113,11 @@ php yii migrate --migrationPath=@vendor/black-lamp/blcms-cart/migrations
                         'class' => 'dektrium\user\filters\BackendFilter',
                         'only' => ['register'], // Block View Register Backend
                     ],
-                ]
+                ],
+        
+        'seo' => [
+            'class' => 'bl\cms\seo\backend\Module'
+        ],
     ],
 ```
 
@@ -142,3 +146,8 @@ Clearing cart
 Yii::$app->cart->clearCart();
 ```
 
+**Static page**
+
+There is page in Static page module for cart show page on frontend. It has key 'cart'. 
+You need to configure it: add title, seo-data etc.
+http://YOUR_DOMAIN.com/admin/seo/static

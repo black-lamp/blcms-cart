@@ -13,7 +13,8 @@
   "require": {
     "yiisoft/yii2": ">=2.0.4",
     "black-lamp/blcms-shop": "*",
-    "yiisoft/yii2-jui": "*"
+    "yiisoft/yii2-jui": "*",
+    "black-lamp/blcms-staticpage": "0.*"
   },
   "require-dev": {
     "black-lamp/blcms-nova-poshta": "dev-master"
