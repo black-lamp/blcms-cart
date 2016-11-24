@@ -14,7 +14,7 @@ CartAsset::register($this);
 </h1>
 <!--DESCRIPTION-->
 <div>
-    <?= $this->context->staticPage->translation->description ?? '' ?>
+    <?= $this->context->staticPage->translation->text ?? '' ?>
 </div>
 
 <p class="text-center"><?= \Yii::t('cart', 'Your cart is empty.'); ?></p>
