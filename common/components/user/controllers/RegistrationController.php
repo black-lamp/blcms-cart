@@ -126,17 +126,15 @@ class RegistrationController extends Controller
         if ($user->load(\Yii::$app->request->post())) {
             if ($profile->user_id = $user->register()) {
 
-                if ($profile->load(\Yii::$app->request->post())) {
-                    if ($profile->validate()) {
-                        $profile->save();
+                $profile->load(\Yii::$app->request->post());
+                if ($profile->validate()) {
+                    $profile->save();
 
-                        return $this->render('/message', [
-                            'title'  => \Yii::t('user', 'Your account has been created'),
-                            'module' => $this->module,
-                            'profile' => $profile
-                        ]);
-                    }
-                    else throw new Exception('Profile creating is failed.');
+                    return $this->render('/message', [
+                        'title'  => \Yii::t('user', 'Your account has been created'),
+                        'module' => $this->module,
+                        'profile' => $profile
+                    ]);
                 }
             }
         }
