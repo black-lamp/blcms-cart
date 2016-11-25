@@ -20,7 +20,8 @@ or add to the require section of your `composer.json` file:
 If you need to save orders to database, apply next migration:
 
 **Migrations**
-php yii migrate --migrationPath=@vendor/black-lamp/blcms-cart/migrations
+- php yii migrate --migrationPath=@vendor/black-lamp/blcms-staticpage/migrations
+- php yii migrate --migrationPath=@vendor/black-lamp/blcms-cart/migrations
 
 **Common configuration**
 ```
