@@ -251,8 +251,12 @@ class CartComponent extends Component
     public function removeItem($id)
     {
         if (!\Yii::$app->user->isGuest) {
-            $orderProduct = OrderProduct::findOne($id);
-            $orderProduct->delete();
+            $orderProduct = OrderProduct::find()->where([
+                'product_id' => $id, 'user_id' => \Yii::$app->user->id
+            ])->one();
+            if (!empty($orderProduct)) {
+                $orderProduct->delete();
+            }
         } else {
             $session = Yii::$app->session;
             if ($session->has(self::SESSION_KEY)) {
