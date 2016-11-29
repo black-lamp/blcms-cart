@@ -561,7 +561,7 @@ class CartComponent extends Component
                         if ($product['id'] == $id) {
 
                             if (!empty($session[self::SESSION_KEY][$key]['count'])) {
-                                $session[self::SESSION_KEY][$key]['count'] = Yii::$app->request->post('count');
+                                $_SESSION[self::SESSION_KEY][$key]['count'] = Yii::$app->request->post('count');
                                 return true;
                             }
                         }
