@@ -73,7 +73,8 @@ class CartComponent extends Component
     /*Session key of total cost*/
     const TOTAL_COST_KEY = 'shop_order_total_cost';
 
-    const EVENT_BEFORE_GET_ORDER = 'after-get-order';
+    const EVENT_BEFORE_GET_ORDER = 'before-get-order';
+    const EVENT_BEFORE_GET_ORDER_FROM_DB = 'before-get-order-from-db';
 
     /**
      * Adds product to cart.
@@ -286,7 +287,7 @@ class CartComponent extends Component
      */
     public function makeOrder()
     {
-        $this->trigger(self::EVENT_BEFORE_GET_ORDER, new OrderInfoEvent(['user_id' => \Yii::$app->user->id]));
+        $this->trigger(self::EVENT_BEFORE_GET_ORDER);
 
         if ($this->saveToDataBase === true) {
             if (!Yii::$app->user->isGuest) {
@@ -300,6 +301,7 @@ class CartComponent extends Component
     }
 
     private function makeOrderFromDB() {
+        $this->trigger(self::EVENT_BEFORE_GET_ORDER_FROM_DB, new OrderInfoEvent(['user_id' => \Yii::$app->user->id]));
         $user = User::findOne(\Yii::$app->user->id);
         $order = Order::find()->where(['user_id' => $user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])->one();
         $profile = $order->userProfile;
