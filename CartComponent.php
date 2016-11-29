@@ -301,7 +301,11 @@ class CartComponent extends Component
     }
 
     private function makeOrderFromDB() {
-        $this->trigger(self::EVENT_BEFORE_GET_ORDER_FROM_DB, new OrderInfoEvent(['user_id' => \Yii::$app->user->id]));
+        $this->trigger(self::EVENT_BEFORE_GET_ORDER_FROM_DB,
+            new OrderInfoEvent([
+                'user_id' => \Yii::$app->user->id,
+                'email' => Profile::find()->where(['user_id' => \Yii::$app->user->id])])
+        );
         $user = User::findOne(\Yii::$app->user->id);
         $order = Order::find()->where(['user_id' => $user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])->one();
         $profile = $order->userProfile;
