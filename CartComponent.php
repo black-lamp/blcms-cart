@@ -16,6 +16,7 @@ use yii\db\Expression;
 use yii\web\ForbiddenHttpException;
 use bl\cms\cart\models\Order;
 use bl\cms\cart\models\OrderProduct;
+use yii\web\NotFoundHttpException;
 
 /**
  * This is the component class CartComponent for "Blcms-shop" module.
@@ -513,5 +514,62 @@ class CartComponent extends Component
         if (empty($order)) {
             return $prefix . $id;
         } else $this->generateUnicId($prefix, $min, $max);
+    }
+
+
+    /**
+     * @param $id
+     * @return boolean
+     *
+     * Changes count of products in incomplete order in database.
+     */
+    public function changeOrderProductCountInDB($id) {
+        if (!empty($id)) {
+            if (!Yii::$app->user->isGuest) {
+                $order = Order::find()
+                    ->where(['user_id' => Yii::$app->user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])->one();
+                if (!empty($order)) {
+                    $orderProduct = OrderProduct::find()
+                        ->where(['product_id' => $id, 'order_id' => $order->id])->one();
+
+
+                    if (!empty($orderProduct)) {
+                        $orderProduct->count = Yii::$app->request->post('count');
+                        $orderProduct->save();
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param $id
+     * @return bool
+     *
+     * Changes count of products in order in session.
+     */
+    public function changeOrderProductCountInSession($id) {
+        if (!empty($id)) {
+            if (Yii::$app->user->isGuest) {
+                $session = Yii::$app->session;
+                if ($session->has(self::SESSION_KEY)) {
+                    $products = $session[self::SESSION_KEY];
+                    foreach ($products as $key => $product) {
+                        if ($product['id'] == $id) {
+
+                            if (!empty($session[self::SESSION_KEY][$key]['count'])) {
+                                $session[self::SESSION_KEY][$key]['count'] = Yii::$app->request->post('count');
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 }

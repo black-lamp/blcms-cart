@@ -5,6 +5,7 @@ use bl\cms\seo\StaticPageBehavior;
 use Yii;
 use yii\helpers\ArrayHelper;
 use bl\imagable\helpers\FileHelper;
+use yii\httpclient\Exception;
 use yii\web\{Controller, NotFoundHttpException};
 use bl\cms\shop\common\entities\{Product, ProductPrice};
 use bl\cms\cart\common\components\user\models\{Profile, User, UserAddress};
@@ -156,5 +157,35 @@ class CartController extends Controller
         else throw new NotFoundHttpException();
     }
 
+    /**
+     * @param $id
+     * @return \yii\web\Response
+     * @throws NotFoundHttpException
+     *
+     * Changes number of products in incomplete order.
+     */
+    public function actionChangeItemsNumber($id) {
 
+        if (Yii::$app->request->isPost) {
+
+            if (Yii::$app->user->isGuest) {
+                if (Yii::$app->cart->changeOrderProductCountInSession($id)) {
+                    \Yii::$app->getSession()->setFlash('success', Yii::t('shop', 'You have successfully changed count of products.'));
+                }
+                else {
+                    \Yii::$app->getSession()->setFlash('error', Yii::t('shop', 'Changing count of products error'));
+                }
+            }
+            else {
+                if (Yii::$app->cart->changeOrderProductCountInDB($id)) {
+                    \Yii::$app->getSession()->setFlash('success', Yii::t('shop', 'You have successfully changed count of products.'));
+                }
+                else {
+                    \Yii::$app->getSession()->setFlash('error', Yii::t('shop', 'Changing count of products error'));
+                }
+            }
+            return $this->redirect(Yii::$app->request->referrer);
+        }
+        throw new NotFoundHttpException();
+    }
 }
