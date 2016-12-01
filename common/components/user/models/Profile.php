@@ -86,4 +86,15 @@ class Profile extends BaseProfile
         return $this->hasMany(UserAddress::className(), ['user_profile_id' => 'id']);
     }
 
+    /**
+     * @return string
+     *
+     * Gets current user name with surname as string.
+     */
+    public function getUserNameWithSurname():string {
+
+        $string = $this->name . ' ' . $this->surname;
+        return $string;
+    }
+
 }
