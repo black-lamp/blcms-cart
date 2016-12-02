@@ -104,7 +104,8 @@ class RegistrationForm extends Model
             return false;
         }
 
-        $user = Yii::createObject(['class' => 'bl\cms\cart\common\components\user\models\User']);
+        /** @var User $user */
+        $user = Yii::createObject(User::className());
         $user->setScenario('register');
         $this->loadAttributes($user);
 

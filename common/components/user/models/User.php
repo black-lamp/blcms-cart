@@ -64,9 +64,12 @@ class User extends BaseModel
         }
 
         $transaction = $this->getDb()->beginTransaction();
+
         try {
             $this->confirmed_at = $this->module->enableConfirmation ? null : time();
             $this->password     = $this->module->enableGeneratingPassword ? Password::generate(8) : $this->password;
+
+            $this->trigger(self::BEFORE_REGISTER);
 
             if (!$this->save()) {
                 $transaction->rollBack();
@@ -80,8 +83,10 @@ class User extends BaseModel
             }
 
             $this->mailer->sendWelcomeMessage($this, isset($token) ? $token : null);
+            $this->trigger(self::AFTER_REGISTER);
 
             $transaction->commit();
+
             return $this->id;
         } catch (\Exception $e) {
             $transaction->rollBack();
