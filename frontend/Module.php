@@ -10,6 +10,12 @@ class Module extends \yii\base\Module
     public $controllerNamespace = 'bl\cms\cart\frontend\controllers';
     public $defaultRoute = 'cart';
 
+    /**
+     * @var bool
+     * Enables logging
+     */
+    public $enableLog = false;
+
     public function init()
     {
         parent::init();

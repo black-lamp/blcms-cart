@@ -1,5 +1,5 @@
 <?php
-namespace bl\cms\cart\common\components\user\controllers;
+namespace bl\cms\cart\frontend\components\user\controllers;
 
 use bl\cms\cart\common\components\user\models\Profile;
 use bl\cms\cart\common\components\user\models\RegistrationForm;
