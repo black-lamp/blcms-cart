@@ -1,18 +1,11 @@
 <?php
 namespace bl\cms\cart\backend\controllers;
 
-use bl\cms\cart\models\OrderProduct;
-use bl\cms\cart\models\OrderStatus;
-use bl\cms\cart\models\SearchOrderProduct;
 use Yii;
-use bl\cms\cart\models\Order;
-use bl\cms\cart\models\SearchOrder;
-use yii\base\Exception;
 use yii\filters\AccessControl;
-use yii\web\Controller;
-use yii\web\ForbiddenHttpException;
-use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
+use bl\cms\cart\backend\events\OrderEvent;
+use bl\cms\cart\models\{OrderProduct, OrderStatus, Order, SearchOrder};
+use yii\web\{Controller, ForbiddenHttpException, NotFoundHttpException};
 
 /**
  * OrdersController implements the CRUD actions for Order model.
@@ -20,6 +13,18 @@ use yii\filters\VerbFilter;
  */
 class OrderController extends Controller
 {
+
+    /**
+     * Event is triggered before changing order status.
+     * Triggered with bl\cms\cart\backend\events\OrderEvent.
+     */
+    const EVENT_BEFORE_CHANGE_ORDER_STATUS = 'beforeChangeOrderStatus';
+    /**
+     * Event is triggered after changing order status.
+     * Triggered with bl\cms\cart\backend\events\OrderEvent.
+     */
+    const EVENT_AFTER_CHANGE_ORDER_STATUS = 'afterChangeOrderStatus';
+
     /**
      * @inheritdoc
      */
@@ -54,7 +59,6 @@ class OrderController extends Controller
         ];
     }
 
-
     /**
      * Lists all Order models.
      * @return mixed
@@ -86,8 +90,13 @@ class OrderController extends Controller
             }
             if (Yii::$app->user->can('changeOrderStatus')) {
                 if ($model->load(Yii::$app->request->post())) {
+                    $this->trigger(self::EVENT_BEFORE_CHANGE_ORDER_STATUS);
                     if ($model->save()) {
-                        $this->send($model);
+
+                        $this->trigger(self::EVENT_AFTER_CHANGE_ORDER_STATUS, new OrderEvent([
+                            'model' => $model
+                        ]));
+
                         \Yii::$app->session->setFlash('success', \Yii::t('shop', 'The record was successfully saved.'));
 
                     } else {
@@ -152,23 +161,6 @@ class OrderController extends Controller
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
-        }
-    }
-
-    private function send($model)
-    {
-
-        try {
-            Yii::$app->shopMailer->compose('change-order-status',
-                ['model' => $model])
-                ->setFrom(Yii::$app->cart->sender)
-                ->setTo($model->user->email)
-                ->setSubject(Yii::t('cart', 'Your order') . ' #' . $model->uid . Yii::t('cart', ' is ') .
-                    mb_strtolower($model->orderStatus->translation->title))
-                ->send();
-
-        } catch (Exception $ex) {
-            throw new Exception($ex);
         }
     }
 }

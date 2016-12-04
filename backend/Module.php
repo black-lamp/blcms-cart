@@ -10,6 +10,12 @@ class Module extends \yii\base\Module
     public $controllerNamespace = 'bl\cms\cart\backend\controllers';
     public $defaultRoute = 'cart';
 
+    /**
+     * @var bool
+     * Enables logging in admin panel
+     */
+    public $enableLog = false;
+
     public function init()
     {
         parent::init();
