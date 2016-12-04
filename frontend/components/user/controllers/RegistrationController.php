@@ -4,6 +4,7 @@ namespace bl\cms\cart\frontend\components\user\controllers;
 use bl\cms\cart\common\components\user\models\Profile;
 use bl\cms\cart\common\components\user\models\RegistrationForm;
 use bl\cms\cart\common\components\user\models\User;
+use bl\cms\cart\frontend\components\events\UserRegistrationEvent;
 use dektrium\user\Finder;
 use dektrium\user\models\ResendForm;
 use dektrium\user\traits\AjaxValidationTrait;
@@ -130,7 +131,9 @@ class RegistrationController extends Controller
                 if ($profile->validate()) {
                     $profile->save();
 
-                    $this->trigger(self::EVENT_AFTER_REGISTER);
+                    $this->trigger(self::EVENT_AFTER_REGISTER, new UserRegistrationEvent([
+                        'id' => $profile->user_id
+                    ]));
 
                     return $this->render('/message', [
                         'title'  => \Yii::t('user', 'Your account has been created'),

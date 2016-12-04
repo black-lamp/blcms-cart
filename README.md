@@ -167,6 +167,7 @@ For enable logging add log component to your common configuration file:
                     'logTable' => 'shop_log',
                     'class' => 'yii\log\DbTarget',
                     'levels' => ['info'],
+                    'logVars' => [],
                     'categories' => [
                         'afterCreateProduct', 'afterDeleteProduct', 'afterEditProduct',
                         'afterCreateCategory', 'afterEditCategory', 'afterDeleteCategory',
@@ -176,6 +177,7 @@ For enable logging add log component to your common configuration file:
                     'logTable' => 'cart_log',
                     'class' => 'yii\log\DbTarget',
                     'levels' => ['info'],
+                    'logVars' => [],
                     'categories' => [
                         'afterChangeOrderStatus'
                     ],
@@ -183,6 +185,7 @@ For enable logging add log component to your common configuration file:
                 [
                     'logTable' => 'user_log',
                     'class' => 'yii\log\DbTarget',
+                    'logVars' => [],
                     'levels' => ['info'],
                     'categories' => [
                         'afterRegister', 'afterConfirm'

@@ -33,10 +33,9 @@ class UserRegistrationBootstrap implements BootstrapInterface
          * If logging is enabled
          */
         $module = \Yii::$app->getModule('cart');
-
         if ($module->enableLog) {
-            $userId = \Yii::$app->user->id;
-            $message = "UserId: $userId";
+
+            $message = "UserId: $event->id";
 
             Yii::info($message, $event->name);
         }
