@@ -130,6 +130,8 @@ class RegistrationController extends Controller
                 if ($profile->validate()) {
                     $profile->save();
 
+                    $this->trigger(self::EVENT_AFTER_REGISTER);
+
                     return $this->render('/message', [
                         'title'  => \Yii::t('user', 'Your account has been created'),
                         'module' => $this->module,

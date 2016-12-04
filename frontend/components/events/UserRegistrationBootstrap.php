@@ -32,7 +32,9 @@ class UserRegistrationBootstrap implements BootstrapInterface
         /**
          * If logging is enabled
          */
-        if ($event->sender->module->enableLog) {
+        $module = \Yii::$app->getModule('cart');
+
+        if ($module->enableLog) {
             $userId = \Yii::$app->user->id;
             $message = "UserId: $userId";
 
