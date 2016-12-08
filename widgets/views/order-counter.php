@@ -10,5 +10,5 @@ use yii\helpers\Html;
 
 <?= Html::tag('span',
     $count,
-    ['id' => 'order-counter', 'style' => ($count) ? 'background-color: red' : 'background-color: #40586f']
+    ['id' => 'order-counter', 'style' => ($count) ? 'background-color: red' : 'background-color: #079276']
 );?>
