@@ -4,6 +4,8 @@
  *
  * @var $orders \bl\cms\cart\models\Order[]
  */
+use bl\cms\cart\models\Order;
+use bl\cms\cart\models\OrderStatus;
 use yii\bootstrap\Html;
 use yii\helpers\Url;
 
@@ -40,4 +42,16 @@ use yii\helpers\Url;
     </tr>
 <?php endforeach; ?>
 </table>
+
+<!--NON-MODERATED ORDERS-->
+<p class="col-md-6">
+    <?php $count = Order::find()->where(['status' => OrderStatus::STATUS_CONFIRMED])->count(); ?>
+    <?=Yii::t('cart', 'Non-moderated orders'); ?>: <?=$count;?>
+</p>
+
+<!--TOTAL ORDERS-->
+<p class="col-md-6">
+    <?php $count = Order::find()->count(); ?>
+    <?=Yii::t('cart', 'Total orders'); ?>: <?=$count;?>
+</p>
 
