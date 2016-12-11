@@ -32,7 +32,7 @@ class CartBootstrap implements BootstrapInterface
         /**
          * If logging is enabled
          */
-        if ($event->sender->module->enableLogOnBackend) {
+        if ($event->sender->module->enableLog) {
 
             $userId = \Yii::$app->user->id;
             $order = $event->model;
