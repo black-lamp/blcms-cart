@@ -30,7 +30,6 @@ use yii\db\Expression;
  * @property OrderStatus $orderStatus
  * @property OrderProduct[] $OrderProducts
  */
-
 class Order extends ActiveRecord
 {
     /**
@@ -107,7 +106,6 @@ class Order extends ActiveRecord
         return $this->hasOne(UserAddress::className(), ['id' => 'address_id']);
     }
 
-
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -138,5 +136,18 @@ class Order extends ActiveRecord
     public function getPaymentMethod()
     {
         return $this->hasOne(PaymentMethod::className(), ['id' => 'payment_method_id']);
+    }
+
+    /**
+     * Gets full order price
+     * @return int
+     */
+    public function getSum()
+    {
+        $sum = 0;
+        foreach ($this->orderProducts as $orderProduct) {
+            $sum += $orderProduct->price;
+        }
+        return $sum;
     }
 }

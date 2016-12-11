@@ -16,8 +16,17 @@ use yii\db\ActiveRecord;
 class OrderStatus extends ActiveRecord
 {
 
+    /**
+     * When user added products to cart, but the order is not completed yet.
+     */
     const STATUS_INCOMPLETE = 1;
+    /**
+     * When order is completed already and waits for moderation.
+     */
     const STATUS_CONFIRMED = 2;
+    /**
+     * When order has sent to user
+     */
     const STATUS_SENT = 3;
 
     /**
