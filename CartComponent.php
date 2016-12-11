@@ -332,6 +332,7 @@ class CartComponent extends Component
             $order->user_id = $user->id;
             $order->status = OrderStatus::STATUS_CONFIRMED;
             $order->confirmation_time = new Expression('NOW()');
+            $order->total_cost = $this->getTotalCost();
 
             if ($order->validate()) {
                 $order->save();
