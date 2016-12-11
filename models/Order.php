@@ -24,6 +24,7 @@ use yii\db\Expression;
  * @property integer $payment_method_id
  * @property string $delivery_post_office
  * @property string $confirmation_time
+ * @property float $total_cost
  *
  * @property User $user
  * @property UserAddress $address
@@ -62,6 +63,7 @@ class Order extends ActiveRecord
         return [
             [['user_id'], 'required'],
             [['user_id', 'status', 'address_id', 'uid', 'payment_method_id'], 'integer'],
+            [['total_cost'], 'double'],
             [['delivery_post_office'], 'string', 'max' => 255],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
             [['address_id'], 'exist', 'skipOnError' => true, 'targetClass' => UserAddress::className(), 'targetAttribute' => ['address_id' => 'id']],
@@ -138,16 +140,4 @@ class Order extends ActiveRecord
         return $this->hasOne(PaymentMethod::className(), ['id' => 'payment_method_id']);
     }
 
-    /**
-     * Gets full order price
-     * @return int
-     */
-    public function getSum()
-    {
-        $sum = 0;
-        foreach ($this->orderProducts as $orderProduct) {
-            $sum += $orderProduct->price;
-        }
-        return $sum;
-    }
 }
