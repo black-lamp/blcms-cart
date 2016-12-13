@@ -58,6 +58,7 @@ $(document).ready(function () {
 
                     /*Draws y-axis values*/
                     var roundedMaxYValue = Math.round(max / 100) * 100;
+                    roundedMaxYValue = (roundedMaxYValue > 0) ? roundedMaxYValue : 100000;
                     ctx.fillText((roundedMaxYValue - i * roundedMaxYValue / 5).toString() + ' ' + sign, 0,
                         i * graphHeight / 5);
                 }
