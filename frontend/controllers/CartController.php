@@ -5,7 +5,6 @@ use bl\cms\seo\StaticPageBehavior;
 use Yii;
 use yii\helpers\ArrayHelper;
 use bl\imagable\helpers\FileHelper;
-use yii\httpclient\Exception;
 use yii\web\{Controller, NotFoundHttpException};
 use bl\cms\shop\common\entities\{Product, ProductPrice};
 use bl\cms\cart\common\components\user\models\{Profile, User, UserAddress};
@@ -34,7 +33,7 @@ class CartController extends Controller
         $model = new CartForm();
         if ($model->load(Yii::$app->request->post())) {
             if ($model->validate()) {
-                Yii::$app->cart->add($model->productId, $model->count, $model->priceId);
+                Yii::$app->cart->add($model->productId, $model->count, $model->priceId, json_encode($model->attribute_value_id));
                 \Yii::$app->getSession()->setFlash('success', Yii::t('shop', 'You have successfully added this product to cart'));
             } else die(var_dump($model->errors));
         }
