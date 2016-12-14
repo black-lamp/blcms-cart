@@ -3,7 +3,7 @@
  * @author Albert Gainutdinov <xalbert.einsteinx@gmail.com>
  */
 
-namespace bl\cms\cart\frontend\Events;
+namespace bl\cms\cart\frontend\events;
 
 
 use yii\base\Event;
