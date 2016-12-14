@@ -13,11 +13,13 @@ class CartForm extends Model
     public $productId;
     public $count;
     public $priceId;
+    public $attribute_value_id;
 
     public function rules()
     {
         return [
-            [['productId', 'count', 'priceId'], 'integer'],
+            [['productId', 'count', 'priceId', ], 'integer'],
+            ['attribute_value_id', 'safe'],
             [['productId', 'count'], 'required'],
         ];
     }
