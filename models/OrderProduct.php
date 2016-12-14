@@ -3,6 +3,7 @@
 namespace bl\cms\cart\models;
 
 use bl\cms\shop\common\entities\Product;
+use bl\cms\shop\common\entities\ProductCombination;
 use bl\cms\shop\common\entities\ProductImage;
 use bl\cms\shop\common\entities\ProductPrice;
 use bl\imagable\helpers\FileHelper;
@@ -17,6 +18,7 @@ use yii\db\ActiveRecord;
  * @property integer $id
  * @property integer $product_id
  * @property integer $price_id
+ * @property integer $combination_id
  * @property integer $order_id
  * @property integer $count
  *
@@ -41,10 +43,12 @@ class OrderProduct extends ActiveRecord
     {
         return [
             [['product_id', 'order_id', 'count'], 'required'],
-            [['product_id', 'order_id', 'price_id', 'count'], 'integer'],
+            [['product_id', 'order_id', 'price_id', 'combination_id', 'count'], 'integer'],
             [['price_id'], 'exist', 'skipOnError' => true, 'targetClass' => ProductPrice::className(), 'targetAttribute' => ['price_id' => 'id']],
             [['order_id'], 'exist', 'skipOnError' => true, 'targetClass' => Order::className(), 'targetAttribute' => ['order_id' => 'id']],
             [['product_id'], 'exist', 'skipOnError' => true, 'targetClass' => Product::className(), 'targetAttribute' => ['product_id' => 'id']],
+            [['combination_id'], 'exist', 'skipOnError' => true,
+                'targetClass' => ProductCombination::className(), 'targetAttribute' => ['combination_id' => 'id']],
         ];
     }
 
@@ -57,6 +61,7 @@ class OrderProduct extends ActiveRecord
             'product_id' => Yii::t('shop', 'Product ID'),
             'order_id' => Yii::t('shop', 'Order ID'),
             'count' => Yii::t('shop', 'Count'),
+            'combination_id' => Yii::t('shop', 'Combination'),
         ];
     }
 
@@ -66,6 +71,14 @@ class OrderProduct extends ActiveRecord
     public function getOrder()
     {
         return $this->hasOne(Order::className(), ['id' => 'order_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCombination()
+    {
+        return $this->hasOne(ProductCombination::className(), ['id' => 'combination_id']);
     }
 
     /**
