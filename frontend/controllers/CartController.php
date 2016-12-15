@@ -2,6 +2,7 @@
 namespace bl\cms\cart\frontend\controllers;
 
 use bl\cms\seo\StaticPageBehavior;
+use bl\cms\shop\common\entities\ProductCombination;
 use Yii;
 use yii\helpers\ArrayHelper;
 use bl\imagable\helpers\FileHelper;
@@ -66,10 +67,19 @@ class CartController extends Controller
                 $products = Product::find()->where(['in', 'id', ArrayHelper::getColumn($items, 'id')])->all();
 
                 foreach ($products as $product) {
-                    foreach ($items as $item) {
+                    foreach ($items as $key => $item) {
+
                         if ($item['id'] == $product->id) {
-                            $product->count = $item['count'];
-                            $product->price = (!empty($item['priceId'])) ? ProductPrice::findOne($item['priceId'])->salePrice : $product->price;
+                            if (\Yii::$app->cart->enableGetPricesFromCombinations) {
+                                $product->combinationIds[] = $item['combinationId'];
+                                $product->count = $item['count'];
+                                $product->price = (!empty($item['priceId'])) ? ProductPrice::findOne($item['priceId'])->salePrice : $product->price;
+                            }
+                            else {
+                                $product->count = $item['count'];
+                                $product->price = (!empty($item['priceId'])) ? ProductPrice::findOne($item['priceId'])->salePrice : $product->price;
+                            }
+
                         }
                     }
                 }
