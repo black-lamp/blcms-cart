@@ -147,7 +147,16 @@ class CartComponent extends Component
                     }
                     else throw new Exception('Such combination does not exist');
                 }
-                else throw new NotFoundHttpException();
+                if (!empty($priceId)) {
+                    $orderProduct = OrderProduct::findOne(['price_id' => $priceId, 'order_id' => $order->id]);
+                    if (empty($orderProduct)) {
+                        $orderProduct = new OrderProduct();
+                        $orderProduct->product_id = $productId;
+                        $orderProduct->price_id = $priceId;
+                        $orderProduct->order_id = $order->id;
+                    }
+                }
+                else throw new Exception('Price can not be empty');
             }
             else {
                 if (!empty($priceId)) {
@@ -181,8 +190,7 @@ class CartComponent extends Component
      */
     private function saveProductToSession($productId, $count, $priceId = null, $attributeValueIds = null)
     {
-//        $session = Yii::$app->session;
-//        die(var_dump($session[self::SESSION_KEY]));
+
         if (!empty($productId) && (!empty($count))) {
 
             if ($this->enableGetPricesFromCombinations) {
@@ -622,7 +630,12 @@ class CartComponent extends Component
                 if (!empty($orderProducts)) {
                     foreach ($orderProducts as $product) {
                         if (\Yii::$app->cart->enableGetPricesFromCombinations) {
-                            $totalCost += $product->count * $product->combination->salePrice;
+                            if (!empty($product->combination)) {
+                                $totalCost += $product->count * $product->combination->salePrice;
+                            }
+                            else {
+                                $totalCost += $product->count * $product->price;
+                            }
                         }
                         else {
                             $totalCost += $product->count * $product->price;
