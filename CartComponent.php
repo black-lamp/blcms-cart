@@ -248,35 +248,33 @@ class CartComponent extends Component
      */
     public function getCombination($attributes, $productId) {
         $combinationIds = [];
+
         foreach ($attributes as $attribute) {
             $attribute = Json::decode($attribute);
 
-            $productCombinationAttribute = ProductCombinationAttribute::find()->asArray()->select('combination_id')
+            $productCombinationAttribute = ProductCombinationAttribute::find()->asArray()
+                ->select('combination_id')
                 ->where(['attribute_id' => $attribute['attributeId'],
                     'attribute_value_id' => $attribute['valueId']])->all();
+
             if (empty($productCombinationAttribute)) return false;
+
             foreach ($productCombinationAttribute as $itemKey => $item) {
                 $productCombinationAttribute[$itemKey] = $productCombinationAttribute[$itemKey]['combination_id'];
             }
             $combinationIds[] = $productCombinationAttribute;
         }
 
-        for ($i = 0; $i < count($combinationIds) - 1; $i++) {
-            $combinationId = array_intersect($combinationIds[$i], $combinationIds[$i + 1]);
-        }
-        if (!empty($combinationId)) {
-
-            if (is_array($combinationId)) {
-                foreach ($combinationId as $item) {
-                    $combination = ProductCombination::find()->where(['id' => $item, 'product_id' => $productId])->one();
-                    if (!empty($combination)) {
-                        return $combination;
-                    }
-                }
+        if (count($combinationIds) > 1) {
+            for ($i = 0; $i < count($combinationIds) - 1; $i++) {
+                $combinationId = array_intersect($combinationIds[$i], $combinationIds[$i + 1]);
             }
-            else {
-                $combination = ProductCombination::findOne($combinationId);
-                if ($combination->product_id == $productId) {
+        }
+        else $combinationId = $combinationIds[0];
+        if (!empty($combinationId)) {
+            foreach ($combinationId as $item) {
+                $combination = ProductCombination::find()->where(['id' => $item, 'product_id' => $productId])->one();
+                if (!empty($combination)) {
                     return $combination;
                 }
             }
