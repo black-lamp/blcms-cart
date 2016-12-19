@@ -1,30 +1,19 @@
 <?php
 namespace bl\cms\cart;
 
-use bl\cms\cart\frontend\events\OrderInfoEvent;
-use bl\cms\cart\models\OrderStatus;
-use bl\cms\cart\common\components\user\models\Profile;
-use bl\cms\cart\common\components\user\models\User;
-use bl\cms\cart\common\components\user\models\UserAddress;
-use bl\cms\shop\common\entities\Product;
-use bl\cms\shop\common\entities\ProductCombination;
-use bl\cms\shop\common\entities\ProductCombinationAttribute;
-use bl\cms\shop\common\entities\ProductPrice;
 use Yii;
-use yii\base\Component;
-use yii\base\Exception;
-use yii\db\ActiveRecord;
-use yii\db\Expression;
 use yii\helpers\Json;
 use yii\web\ForbiddenHttpException;
-use bl\cms\cart\models\Order;
-use bl\cms\cart\models\OrderProduct;
-use yii\web\NotFoundHttpException;
+use yii\base\{Component, Exception};
+use yii\db\{ActiveRecord, Expression};
+use bl\cms\cart\frontend\events\OrderInfoEvent;
+use bl\cms\cart\models\{Order, OrderStatus, OrderProduct};
+use bl\cms\cart\common\components\user\models\{Profile, User, UserAddress};
+use bl\cms\shop\common\entities\{Product, ProductCombination, ProductCombinationAttribute, ProductPrice};
 
 /**
  * This is the component class CartComponent for "Blcms-shop" module.
  * @author Albert Gainutdinov <xalbert.einsteinx@gmail.com>
- *
  */
 class CartComponent extends Component
 {
@@ -244,6 +233,7 @@ class CartComponent extends Component
                     if ($product['id'] == $productId &&
                         (
                             ($this->enableGetPricesFromCombinations && $product['combinationId'] == $combination->id) ||
+                            ($this->enableGetPricesFromCombinations && $product['priceId'] == $priceId) ||
                             (!$this->enableGetPricesFromCombinations && $product['priceId'] == $priceId)
                         )
                     ) {
@@ -272,11 +262,9 @@ class CartComponent extends Component
     }
 
     /**
-     * Gets product combination by attributes values
      * @param $attributes
      * @param $productId
-     * @return ProductCombination|false
-     * @throws Exception
+     * @return array|bool|null|ActiveRecord
      */
     public function getCombination($attributes, $productId)
     {
@@ -376,7 +364,6 @@ class CartComponent extends Component
 
     /**
      * Removes item from order.
-     *
      * @param $id
      */
     public function removeItem($id)
@@ -434,6 +421,10 @@ class CartComponent extends Component
         }
     }
 
+    /**
+     * @return bool
+     * @throws Exception
+     */
     private function makeOrderFromDB()
     {
         $this->trigger(self::EVENT_BEFORE_GET_ORDER_FROM_DB,
@@ -476,6 +467,9 @@ class CartComponent extends Component
         } else throw new Exception();
     }
 
+    /**
+     * @return bool
+     */
     private function makeOrderFromSession()
     {
         $profile = new Profile();
@@ -495,10 +489,11 @@ class CartComponent extends Component
     }
 
     /**
-     * @param null|Profile $profile
-     * @param null|User $user
-     * @param null|Order|ActiveRecord $order
-     * @param null|UserAddress|ActiveRecord $address
+     * @param $profile
+     * @param $user
+     * @param $order
+     * @param null $address
+     * @param null $addressId
      * @throws Exception
      */
     private function sendMail($profile, $user, $order, $address = null, $addressId = null)
@@ -568,7 +563,6 @@ class CartComponent extends Component
 
     /**
      * Moves order products from session to database if $saveToDataBase property is true.
-     *
      * @throws Exception
      */
     public function transportSessionDataToDB()
@@ -578,56 +572,33 @@ class CartComponent extends Component
 
             if ($session->has(self::SESSION_KEY)) {
 
-                $order = Order::find()->where(['user_id' => \Yii::$app->user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])->one();
-                if (empty($order)) {
-                    $order = new Order();
-                    $order->uid = $this->generateUniqueId($this->uidPrefix, $this->minOrderUid, $this->maxOrderUid);
-                    $order->user_id = \Yii::$app->user->id;
-                    $order->status = OrderStatus::STATUS_INCOMPLETE;
-                    if ($order->validate()) {
-                        $order->save();
-                    }
-                }
-
+                $order = $this->getIncompleteOrderFromDB();
                 $products = $session[self::SESSION_KEY];
 
                 foreach ($products as $product) {
 
-                    if (\Yii::$app->cart->enableGetPricesFromCombinations) {
-                        $orderProduct = OrderProduct::find()
-                            ->where(['product_id' => $product['id'], 'price_id' => $product['priceId'],
-                                'order_id' => $order->id, 'combination_id' => $product['combinationId']])->one();
-                    } else {
-                        $orderProduct = OrderProduct::find()
-                            ->where(['product_id' => $product['id'], 'price_id' => $product['priceId'],
-                                'order_id' => $order->id])->one();
+                    if (\Yii::$app->cart->enableGetPricesFromCombinations && !empty($product['combinationId'])) {
+                        $orderProduct = $this->getOrderProductByCombinationId($order->id, $product['id'], $product['combinationId']);
                     }
-                    if (empty($orderProduct)) {
+                    elseif ((\Yii::$app->cart->enableGetPricesFromCombinations && empty($product['combinationId'])) ||
+                        (!\Yii::$app->cart->enableGetPricesFromCombinations && !empty($product['priceId']))) {
+                        $orderProduct = $this->getOrderProductByPriceId($order->id, $product['id'], $product['priceId']);
+                    }
 
-                        $orderProduct = new OrderProduct;
-
-                        $orderProduct->order_id = $order->id;
-                        $orderProduct->product_id = $product['id'];
-                        $orderProduct->price_id = $product['priceId'];
-                        $orderProduct->count = $product['count'];
-                        $orderProduct->combination_id = (\Yii::$app->cart->enableGetPricesFromCombinations) ?
-                            $product['combinationId'] : null;
-
-                    } else {
+                    if (!empty($orderProduct)) {
                         $orderProduct->count += $product['count'];
+                        if ($orderProduct->validate()) {
+                            $orderProduct->save();
+                        } else throw new Exception($orderProduct->errors);
                     }
-
-                    if ($orderProduct->validate()) {
-
-                        $orderProduct->save();
-                    } else throw new Exception($orderProduct->errors);
-
                 }
-
             }
         }
     }
 
+    /**
+     * @return bool|int|mixed
+     */
     public function getTotalCost()
     {
         if (Yii::$app->user->isGuest) {
@@ -637,12 +608,13 @@ class CartComponent extends Component
                 return $totalCost;
             } else return false;
         } else {
+            $totalCost = 0;
             $order = Order::find()
                 ->where(['user_id' => Yii::$app->user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])
                 ->one();
             if (!empty($order)) {
                 $orderProducts = OrderProduct::find()->where(['order_id' => $order->id])->all();
-                $totalCost = 0;
+
                 if (!empty($orderProducts)) {
                     foreach ($orderProducts as $product) {
                         if (\Yii::$app->cart->enableGetPricesFromCombinations) {
@@ -656,11 +628,17 @@ class CartComponent extends Component
                         }
                     }
                 }
-                return $totalCost;
             }
+            return $totalCost;
         }
     }
 
+    /**
+     * @param $prefix
+     * @param $min
+     * @param $max
+     * @return string
+     */
     public function generateUniqueId($prefix, $min, $max)
     {
         $id = random_int($min, $max);
@@ -674,7 +652,6 @@ class CartComponent extends Component
     /**
      * @param $id
      * @return boolean
-     *
      * Changes count of products in incomplete order in database.
      */
     public function changeOrderProductCountInDB($id)
@@ -687,7 +664,6 @@ class CartComponent extends Component
                     $orderProduct = OrderProduct::find()
                         ->where(['product_id' => $id, 'order_id' => $order->id])->one();
 
-
                     if (!empty($orderProduct)) {
                         $orderProduct->count = Yii::$app->request->post('count');
                         $orderProduct->save();
@@ -696,14 +672,12 @@ class CartComponent extends Component
                 }
             }
         }
-
         return false;
     }
 
     /**
      * @param $id
      * @return bool
-     *
      * Changes count of products in order in session.
      */
     public function changeOrderProductCountInSession($id)
@@ -725,7 +699,6 @@ class CartComponent extends Component
                 }
             }
         }
-
         return false;
     }
 }
