@@ -138,7 +138,7 @@ class CartComponent extends Component
      * @param int $combinationId
      * @return OrderProduct
      */
-    private function getOrderProductByCombinationId(int $orderId, int $productId, int $combinationId)
+    private function getOrderProductByCombinationId(int $orderId, int $productId, $combinationId)
     {
         $orderProduct = OrderProduct::findOne(['combination_id' => $combinationId,
             'order_id' => $orderId]);
