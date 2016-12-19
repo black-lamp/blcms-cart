@@ -157,7 +157,7 @@ class CartComponent extends Component
      * @param int $priceId
      * @return OrderProduct
      */
-    private function getOrderProductByPriceId(int $orderId, int $productId, int $priceId)
+    private function getOrderProductByPriceId(int $orderId, int $productId, $priceId)
     {
         $orderProduct = OrderProduct::findOne(['price_id' => $priceId, 'order_id' => $orderId]);
         if (empty($orderProduct)) {
