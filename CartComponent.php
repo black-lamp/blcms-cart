@@ -215,6 +215,7 @@ class CartComponent extends Component
                 }
                 else {
                     if (!empty($priceId)) $price = ProductPrice::findOne($priceId)->salePrice;
+                    else $price = Product::findOne($productId)->price;
                 }
             } else {
                 if (empty($priceId)) {
@@ -230,7 +231,7 @@ class CartComponent extends Component
             $productsFromSession = $session[self::SESSION_KEY];
             if (!empty($productsFromSession)) {
                 foreach ($productsFromSession as $key => $product) {
-                    if ($product['id'] == $productId &&
+                    if ($product['id'] == $productId && (!empty($combination) || !empty($priceId)) &&
                         (
                             ($this->enableGetPricesFromCombinations && $product['combinationId'] == $combination->id) ||
                             ($this->enableGetPricesFromCombinations && $product['priceId'] == $priceId) ||
