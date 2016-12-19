@@ -93,17 +93,17 @@ class CartComponent extends Component
      * @param integer $productId
      * @param integer $count
      * @param integer|null $priceId
-     * @param array|null $attributeValueId
+     * @param array|null $attributesAndValues
      */
-    public function add($productId, $count, $priceId = null, $attributeValueId = null)
+    public function add($productId, $count, $priceId = null, $attributesAndValues = null)
     {
-        if (!empty($attributeValueId)) {
-            $attributeValueId = Json::decode($attributeValueId);
+        if (!empty($attributesAndValues)) {
+            $attributesAndValues = Json::decode($attributesAndValues);
         }
         if ($this->saveToDataBase && !\Yii::$app->user->isGuest) {
-            $this->saveProductToDataBase($productId, $count, $priceId, $attributeValueId);
+            $this->saveProductToDataBase($productId, $count, $priceId, $attributesAndValues);
         } else {
-            $this->saveProductToSession($productId, $count, $priceId, $attributeValueId);
+            $this->saveProductToSession($productId, $count, $priceId, $attributesAndValues);
         }
     }
 
@@ -113,58 +113,27 @@ class CartComponent extends Component
      * @param integer $productId
      * @param integer $count
      * @param integer $priceId
-     * @param array|null $attributeValueIds
+     * @param array|null $attributesAndValues
      * @throws ForbiddenHttpException
      * @throws Exception
      */
-    private function saveProductToDataBase($productId, $count, $priceId = null, $attributeValueIds = null)
+    private function saveProductToDataBase($productId, $count, $priceId = null, $attributesAndValues = null)
     {
-        if ($this->saveToDataBase === true && !\Yii::$app->user->isGuest) {
+        if ($this->saveToDataBase && !\Yii::$app->user->isGuest) {
 
-            $order = Order::find()->where(['user_id' => \Yii::$app->user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])->one();
-            if (empty($order)) {
-                $order = new Order();
-                $order->uid = $this->generateUnicId($this->uidPrefix, $this->minOrderUid, $this->maxOrderUid);
-                $order->user_id = \Yii::$app->user->id;
-                $order->status = OrderStatus::STATUS_INCOMPLETE;
-                if ($order->validate()) {
-                    $order->save();
-                }
-            }
+            $order = $this->getIncompleteOrderFromDB();
 
             if ($this->enableGetPricesFromCombinations) {
-                if (!empty($attributeValueIds)) {
-                    $combination = $this->getCombination($attributeValueIds, $productId);
+                if (!empty($attributesAndValues)) {
+                    $combination = $this->getCombination($attributesAndValues, $productId);
                     if (!empty($combination)) {
-                        $orderProduct = OrderProduct::findOne(['combination_id' => $combination->id,
-                            'order_id' => $order->id]);
-                        if (empty($orderProduct)) {
-                            $orderProduct = new OrderProduct();
-                            $orderProduct->product_id = $productId;
-                            $orderProduct->combination_id = $combination->id;
-                            $orderProduct->order_id = $order->id;
-                        }
-                    } else throw new Exception('Such combination does not exist');
+                        $orderProduct = $this->getOrderProductByCombinationId($order->id, $productId, $combination->id);
+                    } else throw new Exception(\Yii::t('cart', 'Such attributes combination does not exist'));
+                } else {
+                    $orderProduct = $this->getOrderProductByPriceId($order->id, $productId, $priceId);
                 }
-                if (!empty($priceId)) {
-                    $orderProduct = OrderProduct::findOne(['price_id' => $priceId, 'order_id' => $order->id]);
-                    if (empty($orderProduct)) {
-                        $orderProduct = new OrderProduct();
-                        $orderProduct->product_id = $productId;
-                        $orderProduct->price_id = $priceId;
-                        $orderProduct->order_id = $order->id;
-                    }
-                } else throw new Exception('Price can not be empty');
             } else {
-                if (!empty($priceId)) {
-                    $orderProduct = OrderProduct::findOne(['price_id' => $priceId, 'order_id' => $order->id]);
-                    if (empty($orderProduct)) {
-                        $orderProduct = new OrderProduct();
-                        $orderProduct->product_id = $productId;
-                        $orderProduct->price_id = $priceId;
-                        $orderProduct->order_id = $order->id;
-                    }
-                } else throw new Exception('Price can not be empty');
+                $orderProduct = $this->getOrderProductByPriceId($order->id, $productId, $priceId);
             }
 
             $orderProduct->count += $count;
@@ -175,24 +144,89 @@ class CartComponent extends Component
     }
 
     /**
+     * @param int $orderId
+     * @param int $productId
+     * @param int $combinationId
+     * @return OrderProduct
+     */
+    private function getOrderProductByCombinationId(int $orderId, int $productId, int $combinationId)
+    {
+        $orderProduct = OrderProduct::findOne(['combination_id' => $combinationId,
+            'order_id' => $orderId]);
+        if (empty($orderProduct)) {
+            $orderProduct = new OrderProduct();
+            $orderProduct->product_id = $productId;
+            $orderProduct->combination_id = $combinationId;
+            $orderProduct->order_id = $orderId;
+        }
+        return $orderProduct;
+    }
+
+    /**
+     * @param int $orderId
+     * @param int $productId
+     * @param int $priceId
+     * @return OrderProduct
+     */
+    private function getOrderProductByPriceId(int $orderId, int $productId, int $priceId)
+    {
+        $orderProduct = OrderProduct::findOne(['price_id' => $priceId, 'order_id' => $orderId]);
+        if (empty($orderProduct)) {
+            $orderProduct = new OrderProduct();
+            $orderProduct->product_id = $productId;
+            $orderProduct->price_id = $priceId;
+            $orderProduct->order_id = $orderId;
+        }
+
+        return $orderProduct;
+    }
+
+    /**
+     * Gets or creates incomplete order record from database.
+     * @return array|Order|null|ActiveRecord
+     */
+    private function getIncompleteOrderFromDB()
+    {
+        $order = Order::find()->where([
+            'user_id' => \Yii::$app->user->id,
+            'status' => OrderStatus::STATUS_INCOMPLETE])
+            ->one();
+
+        if (empty($order)) {
+            $order = new Order();
+            $order->uid = $this->generateUniqueId($this->uidPrefix, $this->minOrderUid, $this->maxOrderUid);
+            $order->user_id = \Yii::$app->user->id;
+            $order->status = OrderStatus::STATUS_INCOMPLETE;
+            if ($order->validate()) {
+                $order->save();
+            }
+        }
+        return $order;
+    }
+
+    /**
      * Saves product to session if user is guest or if the $saveToDataBase property is false.
      *
      * @param integer $productId
      * @param integer $count
      * @param integer $priceId
-     * @param array|null $$attributeValueIds
+     * @param array|null $attributesAndValues
      * @return boolean
      */
-    private function saveProductToSession($productId, $count, $priceId = null, $attributeValueIds = null)
+    private function saveProductToSession($productId, $count, $priceId = null, $attributesAndValues = null)
     {
-
         if (!empty($productId) && (!empty($count))) {
 
-            if ($this->enableGetPricesFromCombinations && !empty($attributeValueIds)) {
-                $combination = $this->getCombination($attributeValueIds, $productId);
-                if (!empty($combination)) {
-                    $price = $combination->salePrice;
-                } else return false;
+            if ($this->enableGetPricesFromCombinations) {
+                if (!empty($attributesAndValues)) {
+                    $combination = $this->getCombination($attributesAndValues, $productId);
+                    if (!empty($combination)) {
+                        $price = $combination->salePrice;
+                    } else return false;
+                }
+                else {
+                    if (!empty($priceId)) $price = ProductPrice::findOne($priceId)->salePrice;
+                }
             } else {
                 if (empty($priceId)) {
                     $product = Product::findOne($productId);
@@ -240,6 +274,7 @@ class CartComponent extends Component
     /**
      * Gets product combination by attributes values
      * @param $attributes
+     * @param $productId
      * @return ProductCombination|false
      * @throws Exception
      */
@@ -546,7 +581,7 @@ class CartComponent extends Component
                 $order = Order::find()->where(['user_id' => \Yii::$app->user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])->one();
                 if (empty($order)) {
                     $order = new Order();
-                    $order->uid = $this->generateUnicId($this->uidPrefix, $this->minOrderUid, $this->maxOrderUid);
+                    $order->uid = $this->generateUniqueId($this->uidPrefix, $this->minOrderUid, $this->maxOrderUid);
                     $order->user_id = \Yii::$app->user->id;
                     $order->status = OrderStatus::STATUS_INCOMPLETE;
                     if ($order->validate()) {
@@ -626,15 +661,13 @@ class CartComponent extends Component
         }
     }
 
-    public function generateUnicId($prefix, $min, $max)
+    public function generateUniqueId($prefix, $min, $max)
     {
-        $prefix = (!empty($prefix)) ? $prefix : '';
-
         $id = random_int($min, $max);
         $order = Order::find()->where(['uid' => $id])->one();
         if (empty($order)) {
             return $prefix . $id;
-        } else $this->generateUnicId($prefix, $min, $max);
+        } else $this->generateUniqueId($prefix, $min, $max);
     }
 
 
