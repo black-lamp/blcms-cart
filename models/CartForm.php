@@ -15,6 +15,8 @@ class CartForm extends Model
     public $priceId;
     public $attribute_value_id;
 
+    public $additionalProducts;
+
     public function rules()
     {
         return [
