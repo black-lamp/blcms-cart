@@ -7,7 +7,9 @@ use yii\web\ForbiddenHttpException;
 use yii\base\{Component, Exception};
 use yii\db\{ActiveRecord, Expression};
 use bl\cms\cart\frontend\events\OrderInfoEvent;
-use bl\cms\cart\models\{Order, OrderStatus, OrderProduct};
+use bl\cms\cart\models\{
+    Order, OrderProductAdditionalProduct, OrderStatus, OrderProduct
+};
 use bl\cms\cart\common\components\user\models\{Profile, User, UserAddress};
 use bl\cms\shop\common\entities\{Product, ProductCombination, ProductCombinationAttribute, ProductPrice};
 
@@ -84,15 +86,15 @@ class CartComponent extends Component
      * @param integer|null $priceId
      * @param array|null $attributesAndValues
      */
-    public function add($productId, $count, $priceId = null, $attributesAndValues = null)
+    public function add($productId, $count, $priceId = null, $attributesAndValues = null, $additionalProducts = null)
     {
         if (!empty($attributesAndValues)) {
             $attributesAndValues = Json::decode($attributesAndValues);
         }
         if ($this->saveToDataBase && !\Yii::$app->user->isGuest) {
-            $this->saveProductToDataBase($productId, $count, $priceId, $attributesAndValues);
+            $this->saveProductToDataBase($productId, $count, $priceId, $attributesAndValues, $additionalProducts);
         } else {
-            $this->saveProductToSession($productId, $count, $priceId, $attributesAndValues);
+            $this->saveProductToSession($productId, $count, $priceId, $attributesAndValues, $additionalProducts);
         }
     }
 
@@ -103,10 +105,11 @@ class CartComponent extends Component
      * @param integer $count
      * @param integer $priceId
      * @param array|null $attributesAndValues
+     * @param array|null $additionalProducts
      * @throws ForbiddenHttpException
      * @throws Exception
      */
-    private function saveProductToDataBase($productId, $count, $priceId = null, $attributesAndValues = null)
+    private function saveProductToDataBase($productId, $count, $priceId = null, $attributesAndValues = null, $additionalProducts = null)
     {
         if ($this->saveToDataBase && !\Yii::$app->user->isGuest) {
 
@@ -128,6 +131,19 @@ class CartComponent extends Component
             $orderProduct->count += $count;
             if ($orderProduct->validate()) {
                 $orderProduct->save();
+
+                if (!empty($additionalProducts)) {
+                    foreach ($additionalProducts as $additionalProduct) {
+                        $orderProductAdditionalProduct = OrderProductAdditionalProduct::find()
+                            ->where(['order_product_id' => $orderProduct->id, 'additional_product_id' => $additionalProduct])->one();
+                        if (empty($orderProductAdditionalProduct)) {
+                            $orderProductAdditionalProduct = new OrderProductAdditionalProduct();
+                            $orderProductAdditionalProduct->order_product_id = $orderProduct->id;
+                            $orderProductAdditionalProduct->additional_product_id = $additionalProduct;
+                            if ($orderProductAdditionalProduct->validate()) $orderProductAdditionalProduct->save();
+                        }
+                    }
+                }
             } else die(var_dump($orderProduct->errors));
         } else throw new ForbiddenHttpException();
     }
@@ -200,10 +216,19 @@ class CartComponent extends Component
      * @param integer $count
      * @param integer $priceId
      * @param array|null $attributesAndValues
+     * @param array|null $additionalProducts
      * @return boolean
      */
-    private function saveProductToSession($productId, $count, $priceId = null, $attributesAndValues = null)
+    private function saveProductToSession($productId, $count, $priceId = null, $attributesAndValues = null, $additionalProducts = null)
     {
+        $additionalProductsTotalPrice = 0;
+        if (!empty($additionalProducts)) {
+            foreach ($additionalProducts as $additionalProduct) {
+                $product = Product::findOne($additionalProducts);
+                if (!empty($product)) $additionalProductsTotalPrice += $product->getPrice();
+            }
+        }
+
         if (!empty($productId) && (!empty($count))) {
 
             if ($this->enableGetPricesFromCombinations) {
@@ -215,12 +240,12 @@ class CartComponent extends Component
                 }
                 else {
                     if (!empty($priceId)) $price = ProductPrice::findOne($priceId)->salePrice;
-                    else $price = Product::findOne($productId)->price;
+                    else $price = Product::findOne($productId)->getPrice();
                 }
             } else {
                 if (empty($priceId)) {
                     $product = Product::findOne($productId);
-                    $price = $product->price;
+                    $price = $product->getPrice();
                 } else {
                     $price = ProductPrice::findOne($priceId)->salePrice;
                 }
@@ -239,23 +264,32 @@ class CartComponent extends Component
                         )
                     ) {
                         $productsFromSession[$key]['count'] += $count;
+                        $productsFromSession[$key]['additionalProducts'] =
+                            array_merge($productsFromSession[$key]['additionalProducts'], $additionalProducts);
                         break;
                     } else {
                         if (count($productsFromSession) - 1 == $key) {
                             $productsFromSession[] = [
                                 'id' => $productId, 'count' => $count, 'priceId' => $priceId,
-                                'combinationId' => (!empty($combination)) ? $combination->id : null];
+                                'combinationId' => (!empty($combination)) ? $combination->id : null,
+                                'additionalProducts' => $additionalProducts
+                            ];
                         }
                     }
                 }
                 $session[self::SESSION_KEY] = $productsFromSession;
             } else {
-                $_SESSION[self::SESSION_KEY][] = ['id' => $productId, 'count' => $count, 'priceId' => $priceId, 'combinationId' => (!empty($combination)) ? $combination->id : null];
+                $_SESSION[self::SESSION_KEY][] =
+                    ['id' => $productId, 'count' => $count, 'priceId' => $priceId,
+                        'combinationId' => (!empty($combination)) ? $combination->id : null,
+                        'additionalProducts' => $additionalProducts
+                    ];
             }
             if (!$session->has(self::TOTAL_COST_KEY)) {
                 $session[self::TOTAL_COST_KEY] = 0;
             }
             $session[self::TOTAL_COST_KEY] += $price * $count;
+            $session[self::TOTAL_COST_KEY] += $additionalProductsTotalPrice;
             return true;
 
         } else return false;
@@ -394,7 +428,7 @@ class CartComponent extends Component
                         } else {
                             if (!empty($session[self::SESSION_KEY][$key]['priceId'])) {
                                 $price = ProductPrice::findOne($session[self::SESSION_KEY][$key]['priceId'])->salePrice;
-                            } else $price = Product::findOne($id)->price;
+                            } else $price = Product::findOne($id)->getPrice();
                         }
                         $session[self::TOTAL_COST_KEY] -= $price * $session[self::SESSION_KEY][$key]['count'];
 
@@ -622,10 +656,15 @@ class CartComponent extends Component
                             if (!empty($product->combination)) {
                                 $totalCost += $product->count * $product->combination->salePrice;
                             } else {
-                                $totalCost += $product->count * $product->price;
+                                $totalCost += $product->count * $product->getPrice();
                             }
                         } else {
-                            $totalCost += $product->count * $product->price;
+                            $totalCost += $product->count * $product->getPrice();
+                        }
+                        if (!empty($product->orderProductAdditionalProduct)) {
+                            foreach ($product->orderProductAdditionalProduct as $orderProductAdditionalProduct) {
+                                $totalCost += $orderProductAdditionalProduct->additionalProduct->getPrice();
+                            }
                         }
                     }
                 }

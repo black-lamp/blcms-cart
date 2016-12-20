@@ -1,27 +1,22 @@
 <?php
 namespace bl\cms\cart\models;
-
 use yii\base\Model;
 
 /**
  * @author Albert Gainutdinov <xalbert.einsteinx@gmail.com>
  */
-
-class CartForm extends Model
+class AdditionalProductForm extends Model
 
 {
-    public $productId;
-    public $count;
-    public $priceId;
     public $attribute_value_id;
 
-    public $additional_products;
+    public $additionalProducts;
 
     public function rules()
     {
         return [
             [['productId', 'count', 'priceId', ], 'integer'],
-            [['attribute_value_id', 'additional_products'], 'safe'],
+            ['attribute_value_id', 'safe'],
             [['productId', 'count'], 'required'],
         ];
     }

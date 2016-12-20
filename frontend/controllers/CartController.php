@@ -34,8 +34,10 @@ class CartController extends Controller
         $model = new CartForm();
         if ($model->load(Yii::$app->request->post())) {
             if ($model->validate()) {
-                Yii::$app->cart->add($model->productId, $model->count, $model->priceId, json_encode($model->attribute_value_id));
-                \Yii::$app->getSession()->setFlash('success', Yii::t('shop', 'You have successfully added this product to cart'));
+                Yii::$app->cart->add($model->productId, $model->count, $model->priceId,
+                    json_encode($model->attribute_value_id), $model->additional_products);
+                \Yii::$app->getSession()
+                    ->setFlash('success', Yii::t('shop', 'You have successfully added this product to cart'));
             } else die(var_dump($model->errors));
         }
 

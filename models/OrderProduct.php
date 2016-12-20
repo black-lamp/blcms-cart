@@ -131,4 +131,8 @@ class OrderProduct extends ActiveRecord
         }
         else return false;
     }
+
+    public function getOrderProductAdditionalProduct() {
+        return $this->hasMany(OrderProductAdditionalProduct::className(), ['order_product_id' => 'id']);
+    }
 }
