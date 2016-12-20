@@ -611,7 +611,6 @@ class CartComponent extends Component
 
                 $order = $this->getIncompleteOrderFromDB();
                 $products = $session[self::SESSION_KEY];
-                die(var_dump($session[self::SESSION_KEY]));
 
                 foreach ($products as $product) {
 
@@ -627,6 +626,21 @@ class CartComponent extends Component
                         $orderProduct->count += $product['count'];
                         if ($orderProduct->validate()) {
                             $orderProduct->save();
+
+                            if (!empty($product['additionalProducts'])) {
+                                foreach ($product['additionalProducts'] as $productAdditionalProduct) {
+                                    $additionalProduct = OrderProductAdditionalProduct::find()
+                                        ->where(['order_product_id' => $orderProduct->id, 'additional_product_id' => $productAdditionalProduct])->one();
+
+                                    if (empty($additionalProduct)) {
+                                        $additionalProduct = new OrderProductAdditionalProduct();
+                                        $additionalProduct->order_product_id = $orderProduct->id;
+                                        $additionalProduct->additional_product_id = $productAdditionalProduct;
+                                        if ($additionalProduct->validate()) $additionalProduct->save();
+                                    }
+                                }
+                            }
+
                         } else throw new Exception($orderProduct->errors);
                     }
                 }
