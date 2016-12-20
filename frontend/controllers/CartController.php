@@ -81,7 +81,9 @@ class CartController extends Controller
                                 $product->count = $item['count'];
                                 $product->price = (!empty($item['priceId'])) ? ProductPrice::findOne($item['priceId'])->salePrice : $product->price;
                             }
-
+                            foreach ($item['additionalProducts'] as $additionalProduct) {
+                                $product->additionalProducts[] = Product::findOne($additionalProduct);
+                            }
                         }
                     }
                 }
