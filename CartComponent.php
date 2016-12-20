@@ -224,7 +224,7 @@ class CartComponent extends Component
         $additionalProductsTotalPrice = 0;
         if (!empty($additionalProducts)) {
             foreach ($additionalProducts as $additionalProduct) {
-                $product = Product::findOne($additionalProducts);
+                $product = Product::findOne($additionalProduct);
                 if (!empty($product)) $additionalProductsTotalPrice += $product->getPrice();
             }
         }
@@ -259,13 +259,15 @@ class CartComponent extends Component
                     if ($product['id'] == $productId && (!empty($combination) || !empty($priceId)) &&
                         (
                             ($this->enableGetPricesFromCombinations && $product['combinationId'] == $combination->id) ||
-                            ($this->enableGetPricesFromCombinations && $product['priceId'] == $priceId) ||
-                            (!$this->enableGetPricesFromCombinations && $product['priceId'] == $priceId)
+                            ($this->enableGetPricesFromCombinations && !is_null($priceId) && $product['priceId'] == $priceId) ||
+                            (!$this->enableGetPricesFromCombinations && !is_null($priceId) && $product['priceId'] == $priceId)
                         )
                     ) {
                         $productsFromSession[$key]['count'] += $count;
-                        $productsFromSession[$key]['additionalProducts'] =
-                            array_merge($productsFromSession[$key]['additionalProducts'], $additionalProducts);
+                        if (!empty($additionalProducts)) {
+                            $productsFromSession[$key]['additionalProducts'] =
+                                array_merge($productsFromSession[$key]['additionalProducts'], $additionalProducts);
+                        }
                         break;
                     } else {
                         if (count($productsFromSession) - 1 == $key) {
@@ -609,6 +611,7 @@ class CartComponent extends Component
 
                 $order = $this->getIncompleteOrderFromDB();
                 $products = $session[self::SESSION_KEY];
+                die(var_dump($session[self::SESSION_KEY]));
 
                 foreach ($products as $product) {
 
