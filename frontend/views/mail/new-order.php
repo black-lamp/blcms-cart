@@ -2,7 +2,7 @@
 /**
  * @author Albert Gainutdinov <xalbert.einsteinx@gmail.com>
  *
- * @var $user \bl\cms\cart\common\components\user\models\User
+ * @var $user \bl\cms\shop\common\components\user\models\User
  * @var $products
  * @var $profile \bl\cms\cart\common\components\user\models\Profile
  * @var $order \bl\cms\cart\models\Order

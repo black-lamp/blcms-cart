@@ -4,7 +4,7 @@
  *
  * @var $order \bl\cms\cart\models\Order
  * @var $profile \bl\cms\cart\common\components\user\models\Profile
- * @var $user \bl\cms\cart\common\components\user\models\User
+ * @var $user \bl\cms\shop\common\components\user\models\User
  * @var $address \bl\cms\cart\common\components\user\models\UserAddress
  * @var $productsFromDB \bl\cms\cart\models\OrderProduct
  * @var $productsFromSession \bl\cms\shop\common\entities\Product

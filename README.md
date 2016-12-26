@@ -50,7 +50,7 @@ If you need to save orders to database, apply next migration:
     'user' => [
                 'class' => 'dektrium\user\Module',
                 'modelMap' => [
-                    'User' => 'bl\cms\cart\common\components\user\models\User',
+                    'User' => 'bl\cms\shop\common\components\user\models\User',
                     'Profile' => 'bl\cms\cart\common\components\user\models\Profile',
                 ],
                 'controllerMap' => [
