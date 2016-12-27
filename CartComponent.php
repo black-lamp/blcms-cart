@@ -10,7 +10,8 @@ use bl\cms\cart\frontend\events\OrderInfoEvent;
 use bl\cms\cart\models\{
     Order, OrderProductAdditionalProduct, OrderStatus, OrderProduct
 };
-use bl\cms\cart\common\components\user\models\{Profile, User, UserAddress};
+use bl\cms\shop\common\components\user\models\User;
+use bl\cms\cart\common\components\user\models\{Profile, UserAddress};
 use bl\cms\shop\common\entities\{Product, ProductCombination, ProductCombinationAttribute, ProductPrice};
 
 /**
