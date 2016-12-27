@@ -2,13 +2,13 @@
 namespace bl\cms\cart\frontend\controllers;
 
 use bl\cms\seo\StaticPageBehavior;
-use bl\cms\shop\common\entities\ProductCombination;
 use Yii;
 use yii\helpers\ArrayHelper;
 use bl\imagable\helpers\FileHelper;
 use yii\web\{Controller, NotFoundHttpException};
 use bl\cms\shop\common\entities\{Product, ProductPrice};
-use bl\cms\cart\common\components\user\models\{Profile, User, UserAddress};
+use bl\cms\shop\common\components\user\models\User;
+use bl\cms\cart\common\components\user\models\{Profile, UserAddress};
 use bl\cms\cart\models\{CartForm, DeliveryMethod, Order, OrderProduct, OrderStatus};
 
 /**
