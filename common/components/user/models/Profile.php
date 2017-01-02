@@ -1,6 +1,7 @@
 <?php
 namespace bl\cms\cart\common\components\user\models;
 
+use bl\cms\shop\common\components\user\models\User;
 use dektrium\user\traits\ModuleTrait;
 use dektrium\user\models\Profile as BaseProfile;
 use Yii;
