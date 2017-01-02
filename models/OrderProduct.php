@@ -3,9 +3,9 @@
 namespace bl\cms\cart\models;
 
 use bl\cms\shop\common\entities\Product;
-use bl\cms\shop\common\entities\ProductCombination;
+use bl\cms\shop\common\entities\Combination;
 use bl\cms\shop\common\entities\ProductImage;
-use bl\cms\shop\common\entities\ProductPrice;
+use bl\cms\shop\common\entities\Price;
 use bl\imagable\helpers\FileHelper;
 use Yii;
 use yii\db\ActiveRecord;
@@ -24,7 +24,7 @@ use yii\db\ActiveRecord;
  *
  * @property Order $order
  * @property Product $product
- * @property ProductPrice $productPrice
+ * @property Price $productPrice
  */
 class OrderProduct extends ActiveRecord
 {
@@ -44,11 +44,11 @@ class OrderProduct extends ActiveRecord
         return [
             [['product_id', 'order_id', 'count'], 'required'],
             [['product_id', 'order_id', 'price_id', 'combination_id', 'count'], 'integer'],
-            [['price_id'], 'exist', 'skipOnError' => true, 'targetClass' => ProductPrice::className(), 'targetAttribute' => ['price_id' => 'id']],
+            [['price_id'], 'exist', 'skipOnError' => true, 'targetClass' => Price::className(), 'targetAttribute' => ['price_id' => 'id']],
             [['order_id'], 'exist', 'skipOnError' => true, 'targetClass' => Order::className(), 'targetAttribute' => ['order_id' => 'id']],
             [['product_id'], 'exist', 'skipOnError' => true, 'targetClass' => Product::className(), 'targetAttribute' => ['product_id' => 'id']],
             [['combination_id'], 'exist', 'skipOnError' => true,
-                'targetClass' => ProductCombination::className(), 'targetAttribute' => ['combination_id' => 'id']],
+                'targetClass' => Combination::className(), 'targetAttribute' => ['combination_id' => 'id']],
         ];
     }
 
@@ -78,7 +78,7 @@ class OrderProduct extends ActiveRecord
      */
     public function getCombination()
     {
-        return $this->hasOne(ProductCombination::className(), ['id' => 'combination_id']);
+        return $this->hasOne(Combination::className(), ['id' => 'combination_id']);
     }
 
     /**
@@ -94,7 +94,7 @@ class OrderProduct extends ActiveRecord
         $product = $this->product;
 
         if (!empty($this->price_id)) {
-            $product->price = ProductPrice::findOne($this->price_id)->salePrice;
+            $product->price = Price::findOne($this->price_id)->salePrice;
         }
 
         return $product->price;
@@ -102,7 +102,7 @@ class OrderProduct extends ActiveRecord
 
     public function getPriceTitle() {
         if (!empty($this->price_id)) {
-            $price = ProductPrice::findOne($this->price_id);
+            $price = Price::findOne($this->price_id);
             if (!empty($price->translation->title)) return $price->translation->title;
             else return false;
         }

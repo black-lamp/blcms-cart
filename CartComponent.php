@@ -12,7 +12,7 @@ use bl\cms\cart\models\{
 };
 use bl\cms\shop\common\components\user\models\User;
 use bl\cms\cart\common\components\user\models\{Profile, UserAddress};
-use bl\cms\shop\common\entities\{Product, ProductCombination, ProductCombinationAttribute, ProductPrice};
+use bl\cms\shop\common\entities\{Product, Combination, CombinationAttribute, Price};
 
 /**
  * This is the component class CartComponent for "Blcms-shop" module.
@@ -240,7 +240,7 @@ class CartComponent extends Component
                     } else return false;
                 }
                 else {
-                    if (!empty($priceId)) $price = ProductPrice::findOne($priceId)->salePrice;
+                    if (!empty($priceId)) $price = Price::findOne($priceId)->salePrice;
                     else $price = Product::findOne($productId)->getPrice();
                 }
             } else {
@@ -248,7 +248,7 @@ class CartComponent extends Component
                     $product = Product::findOne($productId);
                     $price = $product->getPrice();
                 } else {
-                    $price = ProductPrice::findOne($priceId)->salePrice;
+                    $price = Price::findOne($priceId)->salePrice;
                 }
             }
 
@@ -311,7 +311,7 @@ class CartComponent extends Component
         foreach ($attributes as $attribute) {
             $attribute = Json::decode($attribute);
 
-            $productCombinationAttribute = ProductCombinationAttribute::find()->asArray()
+            $productCombinationAttribute = CombinationAttribute::find()->asArray()
                 ->select('combination_id')
                 ->where(['attribute_id' => $attribute['attributeId'],
                     'attribute_value_id' => $attribute['valueId']])->all();
@@ -331,7 +331,7 @@ class CartComponent extends Component
         } else $combinationId = $combinationIds[0];
         if (!empty($combinationId)) {
             foreach ($combinationId as $item) {
-                $combination = ProductCombination::find()->where(['id' => $item, 'product_id' => $productId])->one();
+                $combination = Combination::find()->where(['id' => $item, 'product_id' => $productId])->one();
                 if (!empty($combination)) {
                     return $combination;
                 }
@@ -425,12 +425,12 @@ class CartComponent extends Component
 
                         if ($this->enableGetPricesFromCombinations) {
                             if (!empty($session[self::SESSION_KEY][$key]['combinationId'])) {
-                                $combination = ProductCombination::findOne($session[self::SESSION_KEY][$key]['combinationId']);
+                                $combination = Combination::findOne($session[self::SESSION_KEY][$key]['combinationId']);
                                 $price = $combination->salePrice;
                             }
                         } else {
                             if (!empty($session[self::SESSION_KEY][$key]['priceId'])) {
-                                $price = ProductPrice::findOne($session[self::SESSION_KEY][$key]['priceId'])->salePrice;
+                                $price = Price::findOne($session[self::SESSION_KEY][$key]['priceId'])->salePrice;
                             } else $price = Product::findOne($id)->getPrice();
                         }
                         $session[self::TOTAL_COST_KEY] -= $price * $session[self::SESSION_KEY][$key]['count'];
@@ -551,7 +551,7 @@ class CartComponent extends Component
                 foreach ($productsArray as $item) {
                     if ($item['id'] == $product->id) {
                         $product->count = $item['count'];
-                        if (!empty($item['priceId'])) $product->price = ProductPrice::findOne($item['priceId'])->salePrice;
+                        if (!empty($item['priceId'])) $product->price = Price::findOne($item['priceId'])->salePrice;
                     }
                 }
             }
