@@ -7,7 +7,7 @@ use yii\helpers\ArrayHelper;
 use bl\imagable\helpers\FileHelper;
 use yii\log\Logger;
 use yii\web\{Controller, NotFoundHttpException};
-use bl\cms\shop\common\entities\{Product, ProductPrice};
+use bl\cms\shop\common\entities\Product;
 use bl\cms\shop\common\components\user\models\User;
 use bl\cms\cart\common\components\user\models\{Profile, UserAddress};
 use bl\cms\cart\models\{CartForm, DeliveryMethod, Order, OrderProduct, OrderStatus};
@@ -35,7 +35,7 @@ class CartController extends Controller
         $model = new CartForm();
         if ($model->load(Yii::$app->request->post())) {
             if ($model->validate()) {
-                Yii::$app->cart->add($model->productId, $model->count, $model->priceId,
+                Yii::$app->cart->add($model->productId, $model->count,
                     json_encode($model->attribute_value_id), $model->additional_products
                 );
                 Yii::$app->getSession()->setFlash('success',
@@ -83,11 +83,9 @@ class CartController extends Controller
                             if (\Yii::$app->cart->enableGetPricesFromCombinations) {
                                 $product->combinationIds[] = $item['combinationId'];
                                 $product->count = $item['count'];
-                                $product->price = (!empty($item['priceId'])) ? ProductPrice::findOne($item['priceId'])->salePrice : $product->price;
                             }
                             else {
                                 $product->count = $item['count'];
-                                $product->price = (!empty($item['priceId'])) ? ProductPrice::findOne($item['priceId'])->salePrice : $product->price;
                             }
 
                             if (!empty($item['additionalProducts'])) {

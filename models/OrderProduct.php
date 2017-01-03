@@ -93,20 +93,11 @@ class OrderProduct extends ActiveRecord
     {
         $product = $this->product;
 
-        if (!empty($this->price_id)) {
-            $product->price = Price::findOne($this->price_id)->salePrice;
+        if (!empty($this->combination_id)) {
+            $product->price = Combination::findOne($this->combination_id)->price->discountPrice;
         }
 
         return $product->price;
-    }
-
-    public function getPriceTitle() {
-        if (!empty($this->price_id)) {
-            $price = Price::findOne($this->price_id);
-            if (!empty($price->translation->title)) return $price->translation->title;
-            else return false;
-        }
-        else return false;
     }
 
     public function getSmallPhoto() {
