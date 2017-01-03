@@ -236,20 +236,14 @@ class CartComponent extends Component
                 if (!empty($attributesAndValues)) {
                     $combination = $this->getCombination($attributesAndValues, $productId);
                     if (!empty($combination)) {
-                        $price = $combination->salePrice;
+                        $price = $combination->price->DiscountPrice;
                     } else return false;
                 }
                 else {
-                    if (!empty($priceId)) $price = Price::findOne($priceId)->salePrice;
-                    else $price = Product::findOne($productId)->getPrice();
+                    $price = Product::findOne($productId)->getPrice();
                 }
             } else {
-                if (empty($priceId)) {
-                    $product = Product::findOne($productId);
-                    $price = $product->getPrice();
-                } else {
-                    $price = Price::findOne($priceId)->salePrice;
-                }
+                $price = Product::findOne($productId)->getPrice();
             }
 
             $session = Yii::$app->session;
@@ -426,12 +420,10 @@ class CartComponent extends Component
                         if ($this->enableGetPricesFromCombinations) {
                             if (!empty($session[self::SESSION_KEY][$key]['combinationId'])) {
                                 $combination = Combination::findOne($session[self::SESSION_KEY][$key]['combinationId']);
-                                $price = $combination->salePrice;
+                                $price = $combination->price->discountPrice;
                             }
                         } else {
-                            if (!empty($session[self::SESSION_KEY][$key]['priceId'])) {
-                                $price = Price::findOne($session[self::SESSION_KEY][$key]['priceId'])->salePrice;
-                            } else $price = Product::findOne($id)->getPrice();
+                            $price = Product::findOne($id)->getPrice();
                         }
                         $session[self::TOTAL_COST_KEY] -= $price * $session[self::SESSION_KEY][$key]['count'];
 
@@ -551,7 +543,8 @@ class CartComponent extends Component
                 foreach ($productsArray as $item) {
                     if ($item['id'] == $product->id) {
                         $product->count = $item['count'];
-                        if (!empty($item['priceId'])) $product->price = Price::findOne($item['priceId'])->salePrice;
+                        if (!empty($item['combination_id'])) $product->price =
+                            Combination::findOne($item['combination_id'])->price->discountPrice;
                     }
                 }
             }
@@ -670,12 +663,8 @@ class CartComponent extends Component
 
                 if (!empty($orderProducts)) {
                     foreach ($orderProducts as $product) {
-                        if (\Yii::$app->cart->enableGetPricesFromCombinations) {
-                            if (!empty($product->combination)) {
-                                $totalCost += $product->count * $product->combination->salePrice;
-                            } else {
-                                $totalCost += $product->count * $product->getPrice();
-                            }
+                        if (\Yii::$app->cart->enableGetPricesFromCombinations && !empty($product->combination)) {
+                            $totalCost += $product->count * $product->combination->price->discountPrice;
                         } else {
                             $totalCost += $product->count * $product->getPrice();
                         }
