@@ -203,7 +203,7 @@ class CartComponent extends Component
         if (!empty($additionalProducts)) {
             foreach ($additionalProducts as $additionalProduct) {
                 $product = Product::findOne($additionalProduct);
-                if (!empty($product)) $additionalProductsTotalPrice += $product->getPrice();
+                if (!empty($product)) $additionalProductsTotalPrice += $product->discountPrice;
             }
         }
 
@@ -217,10 +217,10 @@ class CartComponent extends Component
                     } else return false;
                 }
                 else {
-                    $price = Product::findOne($productId)->getPrice();
+                    $price = Product::findOne($productId)->discountPrice;
                 }
             } else {
-                $price = Product::findOne($productId)->getPrice();
+                $price = Product::findOne($productId)->discountPrice;
             }
 
             $session = Yii::$app->session;
@@ -396,7 +396,7 @@ class CartComponent extends Component
                                 $price = $combination->price->discountPrice;
                             }
                         } else {
-                            $price = Product::findOne($id)->getPrice();
+                            $price = Product::findOne($id)->discountPrice;
                         }
                         $session[self::TOTAL_COST_KEY] -= $price * $session[self::SESSION_KEY][$key]['count'];
 
@@ -634,11 +634,11 @@ class CartComponent extends Component
                         if (\Yii::$app->cart->enableGetPricesFromCombinations && !empty($product->combination)) {
                             $totalCost += $product->count * $product->combination->price->discountPrice;
                         } else {
-                            $totalCost += $product->count * $product->getPrice();
+                            $totalCost += $product->count * $product->discountPrice;
                         }
                         if (!empty($product->orderProductAdditionalProduct)) {
                             foreach ($product->orderProductAdditionalProduct as $orderProductAdditionalProduct) {
-                                $totalCost += $orderProductAdditionalProduct->additionalProduct->getPrice();
+                                $totalCost += $orderProductAdditionalProduct->additionalProduct->discountPrice;
                             }
                         }
                     }
