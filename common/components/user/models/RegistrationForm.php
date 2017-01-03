@@ -11,6 +11,7 @@
 
 namespace bl\cms\cart\common\components\user\models;
 
+use bl\cms\shop\common\components\user\models\User;
 use dektrium\user\traits\ModuleTrait;
 use Yii;
 use yii\base\Model;
@@ -37,6 +38,10 @@ class RegistrationForm extends Model
      * @var string Password
      */
     public $password;
+
+    public $name;
+    public $surname;
+    public $phone;
 
     /**
      * @inheritdoc
@@ -70,6 +75,8 @@ class RegistrationForm extends Model
             // password rules
             'passwordRequired' => ['password', 'required', 'skipOnEmpty' => $this->module->enableGeneratingPassword],
             'passwordLength'   => ['password', 'string', 'min' => 6, 'max' => 72],
+            // profile
+            'profile' => [['name', 'surname', 'phone'], 'required', 'message' => \Yii::t('user', 'These fields are required')]
         ];
     }
 

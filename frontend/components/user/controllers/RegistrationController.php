@@ -125,9 +125,13 @@ class RegistrationController extends Controller
         $this->performAjaxValidation($user);
 
         if ($user->load(\Yii::$app->request->post())) {
+
             if ($profile->user_id = $user->register()) {
 
-                $profile->load(\Yii::$app->request->post());
+                $profile->name = $user->name;
+                $profile->surname = $user->surname;
+                $profile->phone = $user->phone;
+
                 if ($profile->validate()) {
                     $profile->save();
 
@@ -141,6 +145,7 @@ class RegistrationController extends Controller
                         'profile' => $profile
                     ]);
                 }
+                else die(var_dump($profile->errors));
             }
         }
 
