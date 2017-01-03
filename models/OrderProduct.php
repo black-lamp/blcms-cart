@@ -17,7 +17,6 @@ use yii\db\ActiveRecord;
  *
  * @property integer $id
  * @property integer $product_id
- * @property integer $price_id
  * @property integer $combination_id
  * @property integer $order_id
  * @property integer $count
@@ -43,8 +42,7 @@ class OrderProduct extends ActiveRecord
     {
         return [
             [['product_id', 'order_id', 'count'], 'required'],
-            [['product_id', 'order_id', 'price_id', 'combination_id', 'count'], 'integer'],
-            [['price_id'], 'exist', 'skipOnError' => true, 'targetClass' => Price::className(), 'targetAttribute' => ['price_id' => 'id']],
+            [['product_id', 'order_id', 'combination_id', 'count'], 'integer'],
             [['order_id'], 'exist', 'skipOnError' => true, 'targetClass' => Order::className(), 'targetAttribute' => ['order_id' => 'id']],
             [['product_id'], 'exist', 'skipOnError' => true, 'targetClass' => Product::className(), 'targetAttribute' => ['product_id' => 'id']],
             [['combination_id'], 'exist', 'skipOnError' => true,

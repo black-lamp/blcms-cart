@@ -6,7 +6,7 @@
  */
 return [
     'Address' => 'Адрес',
-    'Articulus' => 'Артикул',
+    'SKU' => 'Артикул',
     'at the post office ' => 'в почтовом отделении ',
     'by' => 'из',
     'Change status' => 'Изменить статус',

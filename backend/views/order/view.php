@@ -69,7 +69,7 @@ $this->title = Yii::t('cart', 'Order details');
             <tr>
                 <th>#</th>
                 <th>
-                    <?= Yii::t('cart', 'Articulus'); ?>
+                    <?= Yii::t('cart', 'SKU'); ?>
                 </th>
                 <th>
                     <?= Yii::t('cart', 'Product title'); ?>
@@ -89,7 +89,7 @@ $this->title = Yii::t('cart', 'Order details');
             <tr>
                 <td><?=++$i; ?></td>
                 <td>
-                    <?= $orderProduct->product->articulus; ?>
+                    <?= $orderProduct->product->sku; ?>
                 </td>
                 <td>
                     <?= $orderProduct->product->translation->title; ?>
