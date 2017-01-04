@@ -80,7 +80,7 @@ class CartController extends Controller
                     foreach ($items as $key => $item) {
 
                         if ($item['id'] == $product->id) {
-                            if (\Yii::$app->cart->enableGetPricesFromCombinations) {
+                            if (\Yii::$app->getModule('shop')->enableCombinations) {
                                 $product->combinationIds[] = $item['combinationId'];
                                 $product->count = $item['count'];
                             }
