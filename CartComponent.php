@@ -22,14 +22,6 @@ class CartComponent extends Component
 {
 
     /**
-     * If enabled, prices will be gotten from shop_product_combination table.
-     * Else from shop_product_price.
-     *
-     * @var bool
-     */
-    public $enableGetPricesFromCombinations = false;
-
-    /**
      * @var bool
      * Enabling sending e-mails
      */
@@ -114,7 +106,7 @@ class CartComponent extends Component
 
             $order = $this->getIncompleteOrderFromDB();
 
-            if ($this->enableGetPricesFromCombinations && !empty($attributesAndValues)) {
+            if (\Yii::$app->getModule('shop')->enableCombinations && !empty($attributesAndValues)) {
                 $combination = $this->getCombination($attributesAndValues, $productId);
                 if (!empty($combination)) {
                     $orderProduct = $this->getOrderProductByCombinationId($order->id, $productId, $combination->id);
@@ -209,7 +201,7 @@ class CartComponent extends Component
 
         if (!empty($productId) && (!empty($count))) {
 
-            if ($this->enableGetPricesFromCombinations) {
+            if (\Yii::$app->getModule('shop')->enableCombinations) {
                 if (!empty($attributesAndValues)) {
                     $combination = $this->getCombination($attributesAndValues, $productId);
                     if (!empty($combination)) {
@@ -229,7 +221,7 @@ class CartComponent extends Component
             if (!empty($productsFromSession)) {
                 foreach ($productsFromSession as $key => $product) {
                     if ($product['id'] == $productId && (!empty($combination)) &&
-                        ($this->enableGetPricesFromCombinations && $product['combinationId'] == $combination->id)
+                        (\Yii::$app->getModule('shop')->enableCombinations && $product['combinationId'] == $combination->id)
                     ) {
                         $productsFromSession[$key]['count'] += $count;
                         if (!empty($additionalProducts)) {
@@ -390,7 +382,7 @@ class CartComponent extends Component
                 foreach ($products as $key => $product) {
                     if ($product['id'] == $id) {
 
-                        if ($this->enableGetPricesFromCombinations) {
+                        if (\Yii::$app->getModule('shop')->enableCombinations) {
                             if (!empty($session[self::SESSION_KEY][$key]['combinationId'])) {
                                 $combination = Combination::findOne($session[self::SESSION_KEY][$key]['combinationId']);
                                 $price = $combination->price->discountPrice;
@@ -580,7 +572,7 @@ class CartComponent extends Component
                 $products = $session[self::SESSION_KEY];
 
                 foreach ($products as $product) {
-                    if (\Yii::$app->cart->enableGetPricesFromCombinations && !empty($product['combinationId'])) {
+                    if (\Yii::$app->getModule('shop')->enableCombinations && !empty($product['combinationId'])) {
                         $orderProduct = $this->getOrderProductByCombinationId($order->id, $product['id'], $product['combinationId']);
                     }
 
@@ -631,7 +623,7 @@ class CartComponent extends Component
 
                 if (!empty($orderProducts)) {
                     foreach ($orderProducts as $product) {
-                        if (\Yii::$app->cart->enableGetPricesFromCombinations && !empty($product->combination)) {
+                        if (\Yii::$app->getModule('shop')->enableCombinations && !empty($product->combination)) {
                             $totalCost += $product->count * $product->combination->price->discountPrice;
                         } else {
                             $totalCost += $product->count * $product->price;
