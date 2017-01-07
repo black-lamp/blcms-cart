@@ -9,7 +9,7 @@ class m161213_125305_add_combination_id_to_shop_order_product_table extends Migr
         $this->addColumn('shop_order_product', 'combination_id', $this->integer());
 
         $this->addForeignKey('combination_id:shop_product_combination_id',
-            'shop_order_product', 'combination_id', 'shop_product_combination', 'id');
+            'shop_order_product', 'combination_id', 'shop_combination', 'id');
     }
 
     public function safeDown()

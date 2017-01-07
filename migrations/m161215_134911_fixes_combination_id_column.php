@@ -14,7 +14,7 @@ class m161215_134911_fixes_combination_id_column extends Migration
         $this->addColumn('shop_order_product', 'combination_id', $this->integer());
 
         $this->addForeignKey('combination_id:shop_product_combination_id',
-            'shop_order_product', 'combination_id', 'shop_product_combination', 'id', 'cascade', 'cascade');
+            'shop_order_product', 'combination_id', 'shop_combination', 'id', 'cascade', 'cascade');
 
 
     }
@@ -29,7 +29,7 @@ class m161215_134911_fixes_combination_id_column extends Migration
         $this->addColumn('shop_order_product', 'combination_id', $this->integer());
 
         $this->addForeignKey('combination_id:shop_product_combination_id',
-            'shop_order_product', 'combination_id', 'shop_product_combination', 'id');
+            'shop_order_product', 'combination_id', 'shop_combination', 'id');
 
     }
 }

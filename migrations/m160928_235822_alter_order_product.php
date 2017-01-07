@@ -17,7 +17,7 @@ class m160928_235822_alter_order_product extends Migration
             'price_id', $this->integer(11)
         );
 
-        $this->addForeignKey('order_product_price_id_product_price_id', 'shop_order_product', 'price_id', 'shop_product_price', 'id', 'cascade', 'cascade');
+        $this->addForeignKey('order_product_price_id_product_price_id', 'shop_order_product', 'price_id', 'shop_price', 'id', 'cascade', 'cascade');
 
         $this->dropForeignKey('order_product_order_id_order_id', 'shop_order_product');
         $this->addForeignKey('order_product_order_id_order_id', 'shop_order_product', 'order_id', 'shop_order', 'id', 'cascade', 'cascade');
@@ -33,4 +33,3 @@ class m160928_235822_alter_order_product extends Migration
     }
 
 }
-
