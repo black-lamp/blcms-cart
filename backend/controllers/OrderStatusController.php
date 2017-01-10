@@ -88,9 +88,9 @@ class OrderStatusController extends Controller
                 $modelTranslation->order_status_id = $model->id;
                 if ($modelTranslation->validate()) {
                     $modelTranslation->save();
-                    \Yii::$app->session->setFlash('success', \Yii::t('shop', 'The record was successfully saved.'));
+                    \Yii::$app->session->setFlash('success', \Yii::t('cart', 'The record was successfully saved.'));
                 } else {
-                    \Yii::$app->session->setFlash('error', \Yii::t('shop', 'An error occurred when saving the record.'));
+                    \Yii::$app->session->setFlash('error', \Yii::t('cart', 'An error occurred when saving the record.'));
                 }
                 return $this->redirect(['save',
                     'id' => $model->id,
@@ -122,11 +122,11 @@ class OrderStatusController extends Controller
             if ($id != OrderStatus::STATUS_INCOMPLETE && $id != OrderStatus::STATUS_CONFIRMED) {
                 $status = $this->findModel($id);
                 if (!empty($status)) {
-                    \Yii::$app->session->setFlash('success', Yii::t('shop', 'The status was successfully deleted.'));
+                    \Yii::$app->session->setFlash('success', Yii::t('cart', 'The status was successfully deleted.'));
                     $status->delete();
                 }
             } else {
-                \Yii::$app->session->setFlash('success', Yii::t('shop', 'Removing this status will break cart functionality.'));
+                \Yii::$app->session->setFlash('success', Yii::t('cart', 'Removing this status will break cart functionality.'));
             }
             return $this->redirect(['index']);
         }

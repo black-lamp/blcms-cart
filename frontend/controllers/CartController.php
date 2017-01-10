@@ -39,12 +39,12 @@ class CartController extends Controller
                     json_encode($model->attribute_value_id), $model->additional_products
                 );
                 Yii::$app->getSession()->setFlash('success',
-                    Yii::t('shop', 'You have successfully added this product to cart')
+                    Yii::t('cart', 'You have successfully added this product to cart')
                 );
             } else {
                 Yii::$app->log->logger->log($model->errors, Logger::LEVEL_ERROR, 'application.shop.product');
                 Yii::$app->session->setFlash('error',
-                    Yii::t('shop', 'An error occurred while adding a product, please try again later')
+                    Yii::t('cart', 'An error occurred while adding a product, please try again later')
                 );
             }
         }
@@ -144,12 +144,12 @@ class CartController extends Controller
         if (Yii::$app->request->isPost) {
 
             if(\Yii::$app->cart->makeOrder()) {
-                \Yii::$app->session->setFlash('success', \Yii::t('shop', 'Your order is accepted. Thank you.'));
+                \Yii::$app->session->setFlash('success', \Yii::t('cart', 'Your order is accepted. Thank you.'));
 
                 return $this->render('order-success');
             }
             else {
-                \Yii::$app->session->setFlash('error', \Yii::t('shop', 'Making order error'));
+                \Yii::$app->session->setFlash('error', \Yii::t('cart', 'Making order error'));
                 return $this->render('order-error');
             }
         }
@@ -192,18 +192,18 @@ class CartController extends Controller
 
             if (Yii::$app->user->isGuest) {
                 if (Yii::$app->cart->changeOrderProductCountInSession($id)) {
-                    \Yii::$app->getSession()->setFlash('success', Yii::t('shop', 'You have successfully changed count of products.'));
+                    \Yii::$app->getSession()->setFlash('success', Yii::t('cart', 'You have successfully changed count of products.'));
                 }
                 else {
-                    \Yii::$app->getSession()->setFlash('error', Yii::t('shop', 'Changing count of products error'));
+                    \Yii::$app->getSession()->setFlash('error', Yii::t('cart', 'Changing count of products error'));
                 }
             }
             else {
                 if (Yii::$app->cart->changeOrderProductCountInDB($id)) {
-                    \Yii::$app->getSession()->setFlash('success', Yii::t('shop', 'You have successfully changed count of products.'));
+                    \Yii::$app->getSession()->setFlash('success', Yii::t('cart', 'You have successfully changed count of products.'));
                 }
                 else {
-                    \Yii::$app->getSession()->setFlash('error', Yii::t('shop', 'Changing count of products error'));
+                    \Yii::$app->getSession()->setFlash('error', Yii::t('cart', 'Changing count of products error'));
                 }
             }
             return $this->redirect(Yii::$app->request->referrer);

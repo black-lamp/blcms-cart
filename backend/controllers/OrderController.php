@@ -97,10 +97,10 @@ class OrderController extends Controller
                             'model' => $model
                         ]));
 
-                        \Yii::$app->session->setFlash('success', \Yii::t('shop', 'The record was successfully saved.'));
+                        \Yii::$app->session->setFlash('success', \Yii::t('cart', 'The record was successfully saved.'));
 
                     } else {
-                        \Yii::$app->session->setFlash('error', \Yii::t('shop', 'An error occurred when saving the record.'));
+                        \Yii::$app->session->setFlash('error', \Yii::t('cart', 'An error occurred when saving the record.'));
                     }
                     return $this->redirect(['view', 'id' => $id]);
                 } else {
