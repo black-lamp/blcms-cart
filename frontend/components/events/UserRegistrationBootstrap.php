@@ -28,7 +28,6 @@ class UserRegistrationBootstrap implements BootstrapInterface
      * Records log
      */
     public function addLogRecord($event) {
-
         /**
          * If logging is enabled
          */

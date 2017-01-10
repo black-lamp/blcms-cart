@@ -221,7 +221,9 @@ class RegistrationController extends Controller
 
         $user->attemptConfirmation($code);
 
-        $this->trigger(self::EVENT_AFTER_CONFIRM, $event);
+        $this->trigger(self::EVENT_AFTER_CONFIRM, new UserRegistrationEvent([
+            'id' => $user->id
+        ]));
 
         return $this->render('/message', [
             'title'  => \Yii::t('user', 'Account confirmation'),
