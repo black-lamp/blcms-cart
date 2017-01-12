@@ -4,15 +4,23 @@ namespace bl\cms\cart;
 use Yii;
 use yii\helpers\Json;
 use yii\web\ForbiddenHttpException;
-use yii\base\{Component, Exception};
-use yii\db\{ActiveRecord, Expression};
+use yii\base\{
+    Component, Exception
+};
+use yii\db\{
+    ActiveRecord, Expression
+};
 use bl\cms\cart\frontend\events\OrderInfoEvent;
 use bl\cms\cart\models\{
     Order, OrderProductAdditionalProduct, OrderStatus, OrderProduct
 };
 use bl\cms\shop\common\components\user\models\User;
-use bl\cms\cart\common\components\user\models\{Profile, UserAddress};
-use bl\cms\shop\common\entities\{Product, Combination, CombinationAttribute, Price};
+use bl\cms\cart\common\components\user\models\{
+    Profile, UserAddress
+};
+use bl\cms\shop\common\entities\{
+    Product, Combination, CombinationAttribute, Price
+};
 
 /**
  * This is the component class CartComponent for "Blcms-shop" module.
@@ -65,8 +73,6 @@ class CartComponent extends Component
 
     /*Session key of order*/
     const SESSION_KEY = 'shop_order';
-    /*Session key of total cost*/
-    const TOTAL_COST_KEY = 'shop_order_total_cost';
 
     const EVENT_BEFORE_GET_ORDER = 'before-get-order';
     const EVENT_BEFORE_GET_ORDER_FROM_DB = 'before-get-order-from-db';
@@ -109,10 +115,9 @@ class CartComponent extends Component
             if (\Yii::$app->getModule('shop')->enableCombinations && !empty($attributesAndValues)) {
                 $combination = $this->getCombination($attributesAndValues, $productId);
                 if (!empty($combination)) {
-                    $orderProduct = $this->getOrderProductByCombinationId($order->id, $productId, $combination->id);
+                    $orderProduct = $this->getOrderProduct($order->id, $productId, $combination->id);
                 } else throw new Exception(\Yii::t('cart', 'Such attributes combination does not exist'));
-            }
-            else {
+            } else {
                 $orderProduct = new OrderProduct();
                 $orderProduct->product_id = $productId;
                 $orderProduct->order_id = $order->id;
@@ -144,10 +149,13 @@ class CartComponent extends Component
      * @param int $combinationId
      * @return OrderProduct
      */
-    private function getOrderProductByCombinationId(int $orderId, int $productId, $combinationId)
+    private function getOrderProduct(int $orderId, int $productId, $combinationId)
     {
-        $orderProduct = OrderProduct::findOne(['combination_id' => $combinationId,
-            'order_id' => $orderId]);
+        $orderProduct = OrderProduct::findOne([
+            'product_id' => $productId,
+            'combination_id' => $combinationId,
+            'order_id' => $orderId
+        ]);
         if (empty($orderProduct)) {
             $orderProduct = new OrderProduct();
             $orderProduct->product_id = $productId;
@@ -189,39 +197,21 @@ class CartComponent extends Component
      * @param array|null $additionalProducts
      * @return boolean
      */
-    private function saveProductToSession($productId, $count, $attributesAndValues = null, $additionalProducts = null)
+    private function saveProductToSession(int $productId, int $count, $attributesAndValues = null, $additionalProducts = null)
     {
-        $additionalProductsTotalPrice = 0;
-        if (!empty($additionalProducts)) {
-            foreach ($additionalProducts as $additionalProduct) {
-                $product = Product::findOne($additionalProduct);
-                if (!empty($product)) $additionalProductsTotalPrice += $product->discountPrice;
-            }
-        }
-
         if (!empty($productId) && (!empty($count))) {
 
-            if (\Yii::$app->getModule('shop')->enableCombinations) {
-                if (!empty($attributesAndValues)) {
-                    $combination = $this->getCombination($attributesAndValues, $productId);
-                    if (!empty($combination)) {
-                        $price = $combination->price->DiscountPrice;
-                    } else return false;
-                }
-                else {
-                    $price = Product::findOne($productId)->discountPrice;
-                }
-            } else {
-                $price = Product::findOne($productId)->discountPrice;
-            }
+            if (\Yii::$app->getModule('shop')->enableCombinations && !empty($attributesAndValues))
+                $combination = $this->getCombination($attributesAndValues, $productId);
 
             $session = Yii::$app->session;
 
             $productsFromSession = $session[self::SESSION_KEY];
             if (!empty($productsFromSession)) {
                 foreach ($productsFromSession as $key => $product) {
-                    if ($product['id'] == $productId && (!empty($combination)) &&
-                        (\Yii::$app->getModule('shop')->enableCombinations && $product['combinationId'] == $combination->id)
+                    if (
+                        $product['id'] == $productId &&
+                        (!empty($combination)) && (\Yii::$app->getModule('shop')->enableCombinations && $product['combinationId'] == $combination->id)
                     ) {
                         $productsFromSession[$key]['count'] += $count;
                         if (!empty($additionalProducts)) {
@@ -229,33 +219,29 @@ class CartComponent extends Component
                                 array_merge($productsFromSession[$key]['additionalProducts'], $additionalProducts);
                         }
                         break;
-                    } else {
-                        if (count($productsFromSession) - 1 == $key) {
-                            $productsFromSession[] = [
-                                'id' => $productId, 'count' => $count,
+                    } else if (count($productsFromSession) - 1 == $key) {
+                        $productsFromSession[] =
+                            [
+                                'id' => $productId,
+                                'count' => $count,
                                 'combinationId' => (!empty($combination)) ? $combination->id : null,
                                 'additionalProducts' => $additionalProducts
                             ];
-                        }
                     }
                 }
                 $session[self::SESSION_KEY] = $productsFromSession;
             } else {
                 $_SESSION[self::SESSION_KEY][] =
-                    ['id' => $productId, 'count' => $count,
+                    [
+                        'id' => $productId,
+                        'count' => $count,
                         'combinationId' => (!empty($combination)) ? $combination->id : null,
                         'additionalProducts' => $additionalProducts
                     ];
             }
-            if (!$session->has(self::TOTAL_COST_KEY)) {
-                $session[self::TOTAL_COST_KEY] = 0;
-            }
-            $session[self::TOTAL_COST_KEY] += $price * $count;
-            $session[self::TOTAL_COST_KEY] += $additionalProductsTotalPrice;
             return true;
-
-        } else return false;
-
+        }
+        return false;
     }
 
     /**
@@ -310,16 +296,11 @@ class CartComponent extends Component
             $session = \Yii::$app->session;
             $products = $session[self::SESSION_KEY];
         } else {
-
             $order = Order::find()->where(['user_id' => \Yii::$app->user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])->one();
-            if (!empty($order)) {
+            if (!empty($order))
                 $products = OrderProduct::find()->asArray()->where(['order_id' => $order->id])->all();
-
-            } else return false;
-
         }
-        return $products;
-
+        return $products ?? false;
     }
 
     /**
@@ -341,7 +322,6 @@ class CartComponent extends Component
 
         }
         return $count;
-
     }
 
     /**
@@ -361,15 +341,21 @@ class CartComponent extends Component
 
     /**
      * Removes item from order.
-     * @param $id
+     * @param $productId integer
+     * @param $combinationId integer
      */
-    public function removeItem($id)
+    public function removeItem(int $productId, int $combinationId = null)
     {
         if (!\Yii::$app->user->isGuest) {
-            $order = Order::find()->where(['user_id' => \Yii::$app->user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])->one();
+            $order = Order::find()->where([
+                'user_id' => \Yii::$app->user->id,
+                'status' => OrderStatus::STATUS_INCOMPLETE
+            ])->one();
             if (!empty($order)) {
                 $orderProduct = OrderProduct::find()->where([
-                    'product_id' => $id, 'order_id' => $order->id
+                    'product_id' => $productId,
+                    'combination_id' => $combinationId,
+                    'order_id' => $order->id
                 ])->one();
                 if (!empty($orderProduct)) {
                     $orderProduct->delete();
@@ -380,20 +366,8 @@ class CartComponent extends Component
             if ($session->has(self::SESSION_KEY)) {
                 $products = $session[self::SESSION_KEY];
                 foreach ($products as $key => $product) {
-                    if ($product['id'] == $id) {
-
-                        if (\Yii::$app->getModule('shop')->enableCombinations) {
-                            if (!empty($session[self::SESSION_KEY][$key]['combinationId'])) {
-                                $combination = Combination::findOne($session[self::SESSION_KEY][$key]['combinationId']);
-                                $price = $combination->price->discountPrice;
-                            }
-                        } else {
-                            $price = Product::findOne($id)->discountPrice;
-                        }
-                        $session[self::TOTAL_COST_KEY] -= $price * $session[self::SESSION_KEY][$key]['count'];
-
+                    if ($product['id'] == $productId && $product['combinationId'] == $combinationId)
                         unset($_SESSION[self::SESSION_KEY][$key]);
-                    }
                 }
             }
         }
@@ -553,7 +527,6 @@ class CartComponent extends Component
         } else {
             $session = \Yii::$app->session;
             $session->remove(self::SESSION_KEY);
-            $session->remove(self::TOTAL_COST_KEY);
         }
     }
 
@@ -572,30 +545,26 @@ class CartComponent extends Component
                 $products = $session[self::SESSION_KEY];
 
                 foreach ($products as $product) {
-                    if (\Yii::$app->getModule('shop')->enableCombinations && !empty($product['combinationId'])) {
-                        $orderProduct = $this->getOrderProductByCombinationId($order->id, $product['id'], $product['combinationId']);
-                    }
+                    $orderProduct = $this->getOrderProduct($order->id, $product['id'], $product['combinationId']);
+                    $orderProduct->count += $product['count'];
+                    if ($orderProduct->validate()) {
+                        $orderProduct->save();
 
-                    if (!empty($orderProduct)) {
-                        $orderProduct->count += $product['count'];
-                        if ($orderProduct->validate()) {
-                            $orderProduct->save();
-
-                            if (!empty($product['additionalProducts'])) {
-                                foreach ($product['additionalProducts'] as $productAdditionalProduct) {
-                                    $additionalProduct = OrderProductAdditionalProduct::find()
-                                        ->where(['order_product_id' => $orderProduct->id, 'additional_product_id' => $productAdditionalProduct])->one();
-
-                                    if (empty($additionalProduct)) {
-                                        $additionalProduct = new OrderProductAdditionalProduct();
-                                        $additionalProduct->order_product_id = $orderProduct->id;
-                                        $additionalProduct->additional_product_id = $productAdditionalProduct;
-                                        if ($additionalProduct->validate()) $additionalProduct->save();
-                                    }
+                        if (!empty($product['additionalProducts'])) {
+                            foreach ($product['additionalProducts'] as $productAdditionalProduct) {
+                                $additionalProduct = OrderProductAdditionalProduct::find()
+                                    ->where([
+                                        'order_product_id' => $orderProduct->id,
+                                        'additional_product_id' => $productAdditionalProduct
+                                    ])->one();
+                                if (empty($additionalProduct)) {
+                                    $additionalProduct = new OrderProductAdditionalProduct();
+                                    $additionalProduct->order_product_id = $orderProduct->id;
+                                    $additionalProduct->additional_product_id = $productAdditionalProduct;
+                                    if ($additionalProduct->validate()) $additionalProduct->save();
                                 }
                             }
-
-                        } else throw new Exception($orderProduct->errors);
+                        }
                     }
                 }
             }
@@ -609,10 +578,22 @@ class CartComponent extends Component
     {
         if (Yii::$app->user->isGuest) {
             $session = Yii::$app->session;
-            if ($session->has(self::TOTAL_COST_KEY)) {
-                $totalCost = $session[self::TOTAL_COST_KEY];
-                return $totalCost;
-            } else return false;
+            $products = $session[self::SESSION_KEY];
+            $totalCost = 0;
+
+            if (!empty($products)) {
+                foreach ($products as $product) {
+                    if (!empty($product['combinationId'])) {
+                        $combination = Combination::findOne($product['combinationId']);
+                        if (!empty($combination)) $totalCost += $combination->price->discountPrice * $product['count'];
+                    }
+                    else {
+                        $productFromDb = Product::findOne($product['id']);
+                        if (!empty($productFromDb)) $totalCost += $productFromDb->discountPrice * $product['count'];
+                    }
+                }
+            }
+            return $totalCost;
         } else {
             $totalCost = 0;
             $order = Order::find()

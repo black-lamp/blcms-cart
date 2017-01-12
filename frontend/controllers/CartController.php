@@ -6,11 +6,17 @@ use Yii;
 use yii\helpers\ArrayHelper;
 use bl\imagable\helpers\FileHelper;
 use yii\log\Logger;
-use yii\web\{Controller, NotFoundHttpException};
+use yii\web\{
+    Controller, NotFoundHttpException
+};
 use bl\cms\shop\common\entities\Product;
 use bl\cms\shop\common\components\user\models\User;
-use bl\cms\cart\common\components\user\models\{Profile, UserAddress};
-use bl\cms\cart\models\{CartForm, DeliveryMethod, Order, OrderProduct, OrderStatus};
+use bl\cms\cart\common\components\user\models\{
+    Profile, UserAddress
+};
+use bl\cms\cart\models\{
+    CartForm, DeliveryMethod, Order, OrderProduct, OrderStatus
+};
 
 /**
  * @author Albert Gainutdinov
@@ -18,6 +24,9 @@ use bl\cms\cart\models\{CartForm, DeliveryMethod, Order, OrderProduct, OrderStat
 class CartController extends Controller
 {
 
+    /**
+     * @inheritdoc
+     */
     public function behaviors()
     {
         return [
@@ -30,6 +39,10 @@ class CartController extends Controller
 
     public $defaultAction = 'show';
 
+    /**
+     * Adds product to cart
+     * @return \yii\web\Response
+     */
     public function actionAdd()
     {
         $model = new CartForm();
@@ -52,112 +65,114 @@ class CartController extends Controller
         return $this->redirect(Yii::$app->request->referrer);
     }
 
+    /**
+     * Renders cart view with all order products.
+     * @return mixed
+     */
     public function actionShow()
     {
+        $this->registerStaticSeoData();
         $cart = \Yii::$app->cart;
         $items = $cart->getOrderItems();
-
-        $this->registerStaticSeoData();
 
         /*EMPTY CART*/
         if (empty($items)) {
             return $this->render('empty-cart');
         }
-
         /*CART IS NOT EMPTY*/
         else {
             /*FOR GUEST*/
             if (\Yii::$app->user->isGuest) {
-
-                $order = new Order();
                 $user = new User();
                 $profile = new Profile();
                 $address = new UserAddress();
+                $order = new Order();
 
-                $products = Product::find()->where(['in', 'id', ArrayHelper::getColumn($items, 'id')])->all();
-
-                foreach ($products as $product) {
-                    foreach ($items as $key => $item) {
-
-                        if ($item['id'] == $product->id) {
-                            if (\Yii::$app->getModule('shop')->enableCombinations) {
-                                $product->combinationIds[] = $item['combinationId'];
-                                $product->count = $item['count'];
-                            }
-                            else {
-                                $product->count = $item['count'];
-                            }
-
-                            if (!empty($item['additionalProducts'])) {
-                                foreach ($item['additionalProducts'] as $additionalProduct) {
-                                    $product->additionalProducts[] = Product::findOne($additionalProduct);
-                                }
+                $products = [];
+                foreach ($items as $item) {
+                    $product = Product::findOne($item['id']);
+                    if (!empty($product)) {
+                        $product->count = $item['count'];
+                        $product->combinationId = $item['combinationId'];
+                        if (!empty($item['additionalProducts'])) {
+                            foreach ($item['additionalProducts'] as $additionalProduct) {
+                                $product->additionalProducts[] = Product::findOne($additionalProduct);
                             }
                         }
+                        $products[] = $product;
                     }
                 }
-
-                return $this->render('show-for-guest', [
-                    'products' => $products,
-                    'order' => $order,
-                    'profile' => $profile,
-                    'user' => $user,
-                    'address' => $address,
-                ]);
+                $view = 'show-for-guest';
             }
             /*FOR USER*/
             else {
+                $user = User::findOne(\Yii::$app->user->id) ?? new User();
+                $profile = Profile::find()->where(['user_id' => \Yii::$app->user->id])->one() ?? new Profile();
+                $address = new UserAddress();
                 $order = Order::find()
-                    ->where(['user_id' => \Yii::$app->user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])
-                    ->one();
-                if (!empty($order)) {
-                    $orderProducts = OrderProduct::find()->where(['order_id' => $order->id])->all();
+                        ->where(['user_id' => \Yii::$app->user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])
+                        ->one() ?? new Order();
+                $products = OrderProduct::find()->where(['order_id' => $order->id])->all();
 
-                    $profile = Profile::find()->where(['user_id' => \Yii::$app->user->id])->one();
-
-                    return $this->render('show', [
-                        'order' => new Order(),
-                        'profile' => $profile,
-                        'user' => new User,
-                        'address' => new UserAddress(),
-                        'productsFromDB' => $orderProducts,
-                    ]);
-                }
+                $view = 'show';
             }
+            return $this->render($view, [
+                'products' => $products,
+                'order' => $order,
+                'profile' => $profile,
+                'user' => $user,
+                'address' => $address,
+            ]);
         }
     }
 
-    public function actionRemove($id)
+    /**
+     * Removes product from cart
+     * @param int $productId
+     * @param int $combinationId
+     * @return \yii\web\Response
+     */
+    public function actionRemove(int $productId, int $combinationId)
     {
-        \Yii::$app->cart->removeItem($id);
+        \Yii::$app->cart->removeItem($productId, $combinationId);
         return $this->redirect(\Yii::$app->request->referrer);
     }
 
+    /**
+     * Removes all products from cart
+     * @return \yii\web\Response
+     */
     public function actionClear()
     {
         \Yii::$app->cart->clearCart();
         return $this->redirect(\Yii::$app->request->referrer);
     }
 
+    /**
+     * @return string
+     * @throws NotFoundHttpException
+     */
     public function actionMakeOrder()
     {
         if (Yii::$app->request->isPost) {
 
-            if(\Yii::$app->cart->makeOrder()) {
+            if (\Yii::$app->cart->makeOrder()) {
                 \Yii::$app->session->setFlash('success', \Yii::t('cart', 'Your order is accepted. Thank you.'));
-
                 return $this->render('order-success');
-            }
-            else {
+            } else {
                 \Yii::$app->session->setFlash('error', \Yii::t('cart', 'Making order error'));
                 return $this->render('order-error');
             }
-        }
-        else {
+        } else {
             throw new NotFoundHttpException();
         }
     }
 
+    /**
+     * @param $id
+     * @return string
+     * @throws NotFoundHttpException
+     */
     public function actionGetDeliveryMethod($id)
     {
         if (\Yii::$app->request->isAjax) {
@@ -175,8 +190,7 @@ class CartController extends Controller
                 'method' => $method,
                 'field' => '<input type="text" id="useraddress-zipcode" class="form-control" name="UserAddress[zipcode]">'
             ]);
-        }
-        else throw new NotFoundHttpException();
+        } else throw new NotFoundHttpException();
     }
 
     /**
@@ -186,23 +200,21 @@ class CartController extends Controller
      *
      * Changes number of products in incomplete order.
      */
-    public function actionChangeItemsNumber($id) {
+    public function actionChangeItemsNumber($id)
+    {
 
         if (Yii::$app->request->isPost) {
 
             if (Yii::$app->user->isGuest) {
                 if (Yii::$app->cart->changeOrderProductCountInSession($id)) {
                     \Yii::$app->getSession()->setFlash('success', Yii::t('cart', 'You have successfully changed count of products.'));
-                }
-                else {
+                } else {
                     \Yii::$app->getSession()->setFlash('error', Yii::t('cart', 'Changing count of products error'));
                 }
-            }
-            else {
+            } else {
                 if (Yii::$app->cart->changeOrderProductCountInDB($id)) {
                     \Yii::$app->getSession()->setFlash('success', Yii::t('cart', 'You have successfully changed count of products.'));
-                }
-                else {
+                } else {
                     \Yii::$app->getSession()->setFlash('error', Yii::t('cart', 'Changing count of products error'));
                 }
             }

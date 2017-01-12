@@ -6,8 +6,7 @@
  * @var $profile \bl\cms\cart\common\components\user\models\Profile
  * @var $user \bl\cms\shop\common\components\user\models\User
  * @var $address \bl\cms\cart\common\components\user\models\UserAddress
- * @var $productsFromDB \bl\cms\cart\models\OrderProduct
- * @var $productsFromSession \bl\cms\shop\common\entities\Product
+ * @var $products \bl\cms\cart\models\OrderProduct[]
  */
 
 use bl\cms\cart\widgets\Delivery;
@@ -32,7 +31,7 @@ CartAsset::register($this);
     </div>
 
     <!--EMPTY CART-->
-    <?php if (empty($productsFromDB) && empty($productsFromSession)) : ?>
+    <?php if (empty($products)) : ?>
         <p><?= \Yii::t('cart', 'Your cart is empty.'); ?></p>
         <?= Html::a(\Yii::t('cart', 'Go to shop'), Url::toRoute('/shop'), ['class' => 'btn btn-primary']); ?>
 
@@ -51,8 +50,8 @@ CartAsset::register($this);
             </tr>
 
             <!--PRODUCT LIST FROM DATABASE-->
-            <?php if (!empty($productsFromDB)) : ?>
-                <?php foreach ($productsFromDB as $orderProduct) : ?>
+            <?php if (!empty($products)) : ?>
+                <?php foreach ($products as $orderProduct) : ?>
                     <tr>
                         <td class="text-center">
                             <?= Html::a($orderProduct->product->translation->title, Url::to(['/shop/product/show', 'id' => $orderProduct->product->id])); ?>
@@ -70,32 +69,14 @@ CartAsset::register($this);
                         </td>
                         <td class="text-center">
                             <?= Html::a(Html::tag('span', '', ['class' => 'glyphicon glyphicon-remove']),
-                                Url::to(['/cart/cart/remove', 'id' => $orderProduct->id]),
+                                Url::to([
+                                    '/cart/cart/remove',
+                                    'productId' => $orderProduct->id,
+                                    'combinationId' => $orderProduct->combination_id]),
                                 [
                                     'class' => 'btn btn-danger btn-xs',
                                     'title' => \Yii::t('cart', 'Remove')
                                 ]); ?>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-
-            <!--PRODUCT LIST FROM SESSION-->
-            <?php elseif (!empty($productsFromSession)) : ?>
-                <?php foreach ($productsFromSession as $product) : ?>
-                    <tr>
-                        <td class="text-center">
-                            <?= $product->id; ?>
-                        </td>
-                        <td class="text-center">
-                            <?= Html::a($product->translation->title, Url::to(['/shop/product/show', 'id' => $product->id])); ?>
-                        </td>
-                        <td class="text-center">
-                            <?php if (!empty($product->price)) : ?>
-                                <?= $product->price; ?>
-                            <?php endif; ?>
-                        </td>
-                        <td class="text-center">
-                            <?= $product->count; ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>
