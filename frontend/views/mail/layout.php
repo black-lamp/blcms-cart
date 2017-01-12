@@ -12,7 +12,7 @@
         <?php $this->head() ?>
     </head>
     <body>
-    <div style="width: 100%; background: #48b2ff; padding: 10px 0;">
+    <div style="width: 100%; background: #ececec; padding: 10px 0;">
         <?php $this->beginBody() ?>
         <div style="width: 700px; margin: 0 auto; background: #fff; padding: 15px;">
             <?= $content ?>
