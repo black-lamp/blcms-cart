@@ -469,22 +469,20 @@ class CartComponent extends Component
     {
         if (Yii::$app->user->isGuest) {
             $session = \Yii::$app->session;
-            $productsArray = $session[self::SESSION_KEY];
+            $sessionProducts = $session[self::SESSION_KEY];
 
-            $ids = [];
-            foreach ($productsArray as $item) {
-                $ids[] = $item['id'];
-            }
-
-            $products = Product::find()->where(['in', 'id', $ids])->all();
-
-            foreach ($products as $product) {
-                foreach ($productsArray as $item) {
-                    if ($item['id'] == $product->id) {
-                        $product->count = $item['count'];
-                        if (!empty($item['combination_id'])) $product->price =
-                            Combination::findOne($item['combination_id'])->price->discountPrice;
+            $products = [];
+            foreach ($sessionProducts as $sessionProduct) {
+                $product = Product::findOne($sessionProduct['id']);
+                if (!empty($product)) {
+                    $product->count = $sessionProduct['count'];
+                    $product->combinationId = $sessionProduct['combinationId'];
+                    if (!empty($sessionProduct['additionalProducts'])) {
+                        foreach ($sessionProduct['additionalProducts'] as $additionalProduct) {
+                            $product->additionalProducts[] = Product::findOne($additionalProduct);
+                        }
                     }
+                    $products[] = $product;
                 }
             }
         } else {
