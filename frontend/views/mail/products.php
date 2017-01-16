@@ -4,7 +4,6 @@
  *
  * @var $products \bl\cms\shop\common\entities\Product | \bl\cms\cart\models\OrderProduct
  */
-
 use yii\bootstrap\Html;
 use yii\helpers\Url;
 
@@ -39,7 +38,7 @@ use yii\helpers\Url;
                 <td class="product-title">
                     <!--PRODUCT TITLE-->
                     <?php if (!empty($product->translation)): ?>
-                        <?php $url = Url::toRoute(['/shop/product/show', 'id' => $product->id]);
+                        <?php $url = \Yii::$app->urlManager->createAbsoluteUrl(['/shop/product/show', 'id' => $product->id]);
                         echo Html::a($product->translation->title, $url);
                         ?>
                     <?php endif; ?>
@@ -88,7 +87,7 @@ use yii\helpers\Url;
                 <td>
                     <!--PRODUCT TITLE-->
                     <?php if (!empty($orderProduct->product->translation)): ?>
-                        <?php $url = Url::toRoute(['/shop/product/show', 'id' => $orderProduct->product_id]);
+                        <?php $url = \Yii::$app->urlManager->createAbsoluteUrl(['/shop/product/show', 'id' => $orderProduct->product->id]);
                         echo Html::a($orderProduct->product->translation->title, $url);
                         ?>
                     <?php endif; ?>
