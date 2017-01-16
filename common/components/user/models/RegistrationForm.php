@@ -75,8 +75,6 @@ class RegistrationForm extends Model
             // password rules
             'passwordRequired' => ['password', 'required', 'skipOnEmpty' => $this->module->enableGeneratingPassword],
             'passwordLength'   => ['password', 'string', 'min' => 6, 'max' => 72],
-            // profile
-            'profile' => [['name', 'surname', 'phone'], 'required', 'message' => \Yii::t('user', 'These fields are required')]
         ];
     }
 
