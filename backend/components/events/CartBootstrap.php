@@ -65,12 +65,12 @@ class CartBootstrap implements BootstrapInterface
                 $mailTemplate->parseSubject([
                     '{order_id}' => $event->model->id,
                     '{created_at}' => $event->model->creation_time,
-                    '{status}' => $event->model->status->translation->title,
+                    '{status}' => $event->model->orderStatus->translation->title,
                 ]);
                 $mailTemplate->parseBody([
                     '{order_id}' => $event->model->id,
                     '{created_at}' => $event->model->creation_time,
-                    '{status}' => $event->model->status->translation->title,
+                    '{status}' => $event->model->orderStatus->translation->title,
                 ]);
 
                 Yii::$app->shopMailer->compose('change-order-status',
