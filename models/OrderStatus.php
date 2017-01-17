@@ -1,6 +1,7 @@
 <?php
 namespace bl\cms\cart\models;
 
+use bl\emailTemplates\entities\EmailTemplate;
 use bl\multilang\behaviors\TranslationBehavior;
 use Yii;
 use yii\db\ActiveRecord;
@@ -10,8 +11,12 @@ use yii\db\ActiveRecord;
  * @author Albert Gainutdinov <xalbert.einsteinx@gmail.com>
  *
  * @property integer $id
+ * @property string $color
+ * @property integer $mail_id
  *
  * @property Order[] $orders
+ * @property EmailTemplate $mail
+ * @property OrderStatusTranslation[] $shopOrderStatusTranslations
  */
 class OrderStatus extends ActiveRecord
 {
@@ -57,7 +62,9 @@ class OrderStatus extends ActiveRecord
     public function rules()
     {
         return [
-            [['color'], 'string'],
+            [['mail_id'], 'integer'],
+            [['color'], 'string', 'max' => 36],
+            [['mail_id'], 'exist', 'skipOnError' => true, 'targetClass' => EmailTemplate::className(), 'targetAttribute' => ['mail_id' => 'id']],
         ];
     }
 
@@ -67,7 +74,9 @@ class OrderStatus extends ActiveRecord
     public function attributeLabels()
     {
         return [
-            'product_id' => Yii::t('shop', 'Product ID'),
+            'id' => Yii::t('cart', 'ID'),
+            'color' => Yii::t('cart', 'Color'),
+            'mail_id' => Yii::t('cart', 'Mail'),
         ];
     }
 
@@ -77,5 +86,21 @@ class OrderStatus extends ActiveRecord
     public function getOrders()
     {
         return $this->hasMany(Order::className(), ['status' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getMail()
+    {
+        return $this->hasOne(EmailTemplate::className(), ['id' => 'mail_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTranslations()
+    {
+        return $this->hasMany(OrderStatusTranslation::className(), ['order_status_id' => 'id']);
     }
 }
