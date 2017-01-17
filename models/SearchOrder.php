@@ -45,7 +45,7 @@ class SearchOrder extends Order
     {
         $query = Order::find()->where(['not in','status', [OrderStatus::STATUS_INCOMPLETE]]);
 
-        $query->orderBy(['id' => SORT_DESC]);
+        $query->orderBy(['status' => SORT_ASC, 'id' => SORT_DESC]);
 
         // add conditions that should always apply here
 
