@@ -2,6 +2,8 @@
 namespace bl\cms\cart\backend\components\events;
 
 use bl\cms\cart\backend\controllers\OrderController;
+use bl\emailTemplates\data\Template;
+use bl\multilang\entities\Language;
 use Yii;
 use yii\base\BootstrapInterface;
 use yii\base\Event;
@@ -51,17 +53,34 @@ class CartBootstrap implements BootstrapInterface
      */
     public function send($event)
     {
-        try {
-            Yii::$app->shopMailer->compose('change-order-status',
-                ['model' => $event->model])
-                ->setFrom(Yii::$app->cart->sender)
-                ->setTo($event->model->user->email)
-                ->setSubject(Yii::t('cart', 'Your order') . ' #' . $event->model->uid . Yii::t('cart', ' is ') .
-                    mb_strtolower($event->model->orderStatus->translation->title))
-                ->send();
+        $mail = $event->model->orderStatus->mail;
 
-        } catch (Exception $ex) {
-            throw new Exception($ex);
+        if (!empty($mail)) {
+            try {
+
+                /**
+                 * @var $mailTemplate Template
+                 */
+                $mailTemplate = Yii::$app->get('emailTemplates')->getTemplate($mail->key, Language::getCurrent()->id);
+                $mailTemplate->parseSubject([
+                    '{order_id}' => $event->model->id
+                ]);
+                $mailTemplate->parseBody([
+                    '{order_id}' => $event->model->id,
+                    '{created_at}' => $event->model->creation_time
+                ]);
+
+                Yii::$app->shopMailer->compose('change-order-status',
+                    ['model' => $event->model])
+                    ->setFrom(Yii::$app->cart->sender)
+                    ->setTo($event->model->user->email)
+                    ->setSubject($mailTemplate->getSubject())
+                    ->setHtmlBody($mailTemplate->getBody())
+                    ->send();
+
+            } catch (Exception $ex) {
+                throw new Exception($ex);
+            }
         }
     }
 
