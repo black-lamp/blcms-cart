@@ -82,9 +82,9 @@ use yii\helpers\Url;
         <?php foreach ($products as $orderProduct): ?>
             <?php $combination = (\Yii::$app->getModule('shop')->enableCombinations && !empty($orderProduct->combination_id)) ?
                 $orderProduct->combination : NULL; ?>
-            <tr>
+            <tr style="padding: 5px 0; background-color: #ececec;">
                 <!--TITLE, COMBINATION ATTRIBUTES AND ADDITIONAL PRODUCTS-->
-                <td>
+                <td style="padding: 5px 5px 0;">
                     <!--PRODUCT TITLE-->
                     <?php if (!empty($orderProduct->product->translation)): ?>
                         <?php $url = \Yii::$app->urlManager->createAbsoluteUrl(['/shop/product/show', 'id' => $orderProduct->product->id]);
@@ -116,7 +116,7 @@ use yii\helpers\Url;
                 </td>
 
                 <!--PRICE-->
-                <td>
+                <td style="text-align: center;">
                     <?php $price = (!empty($combination)) ? $combination->price->discountPrice : $orderProduct->product->getDiscountPrice(); ?>
                     <?= Yii::$app->formatter->asCurrency($price ?? 0) ?>
                 </td>
