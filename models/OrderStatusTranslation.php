@@ -35,7 +35,7 @@ class OrderStatusTranslation extends ActiveRecord
     {
         return [
             [['order_status_id', 'language_id'], 'integer'],
-            [['title', 'description', 'mail'], 'string', 'max' => 255],
+            [['title', 'description'], 'string', 'max' => 255],
             [['language_id'], 'exist', 'skipOnError' => true, 'targetClass' => Language::className(), 'targetAttribute' => ['language_id' => 'id']],
             [['order_status_id'], 'exist', 'skipOnError' => true, 'targetClass' => OrderStatus::className(), 'targetAttribute' => ['order_status_id' => 'id']],
         ];
@@ -48,9 +48,10 @@ class OrderStatusTranslation extends ActiveRecord
     {
         return [
             'id' => Yii::t('cart', 'ID'),
+            'order_status_id' => Yii::t('cart', 'Order Status'),
+            'language_id' => Yii::t('cart', 'Language'),
             'title' => Yii::t('cart', 'Title'),
             'description' => Yii::t('cart', 'Description'),
-            'mail' => Yii::t('cart', 'Mail text')
         ];
     }
 
