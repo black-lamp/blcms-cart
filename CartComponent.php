@@ -403,37 +403,41 @@ class CartComponent extends Component
         );
         $user = User::findOne(\Yii::$app->user->id);
         $order = Order::find()->where(['user_id' => $user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])->one();
-        $profile = $order->userProfile;
 
-        if ($profile->load(Yii::$app->request->post())) {
-            if ($profile->validate()) {
-                $profile->save();
+        if (!empty($order)) {
+            $profile = $order->userProfile;
+
+            if ($profile->load(Yii::$app->request->post())) {
+                if ($profile->validate()) {
+                    $profile->save();
+                }
             }
-        }
-        if ($order->load(Yii::$app->request->post())) {
-            if (empty($order->address_id)) {
-                $address = new UserAddress();
-                if ($address->load(Yii::$app->request->post())) {
-                    $address->user_profile_id = $user->id;
-                    if ($address->validate()) {
-                        if (!empty($address->city) && !empty($address->street) && !empty($address->house)) {
-                            $address->save();
-                            $order->address_id = $address->id;
+            if ($order->load(Yii::$app->request->post())) {
+                if (empty($order->address_id)) {
+                    $address = new UserAddress();
+                    if ($address->load(Yii::$app->request->post())) {
+                        $address->user_profile_id = $user->id;
+                        if ($address->validate()) {
+                            if (!empty($address->city) && !empty($address->street) && !empty($address->house)) {
+                                $address->save();
+                                $order->address_id = $address->id;
+                            }
                         }
                     }
-                }
-            } else $address = null;
-            $order->user_id = $user->id;
-            $order->status = OrderStatus::STATUS_CONFIRMED;
-            $order->confirmation_time = new Expression('NOW()');
-            $order->total_cost = $this->getTotalCost();
+                } else $address = null;
+                $order->user_id = $user->id;
+                $order->status = OrderStatus::STATUS_CONFIRMED;
+                $order->confirmation_time = new Expression('NOW()');
+                $order->total_cost = $this->getTotalCost();
 
-            if ($order->validate()) {
-                $order->save();
-                $this->sendMail($profile, $user, $order, $address, $order->address_id);
-                return true;
-            } else die(var_dump($order->errors));
-        } else throw new Exception();
+                if ($order->validate()) {
+                    $order->save();
+                    $this->sendMail($profile, $user, $order, $address, $order->address_id);
+                    return true;
+                }
+            }
+        }
+        throw new Exception();
     }
 
     /**
