@@ -374,6 +374,22 @@ class CartComponent extends Component
     }
 
     /**
+     * Gets registered user's incomplete order
+     * @return array|bool|null|ActiveRecord
+     */
+    public function getIncompleteOrder()
+    {
+        if (!\Yii::$app->user->isGuest) {
+            $user = User::findOne(\Yii::$app->user->id);
+            $order = Order::find()
+                ->where(['user_id' => $user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])
+                ->one();
+            if(!empty($order)) return $order;
+        }
+        return false;
+    }
+
+    /**
      * @return bool
      * @throws Exception
      */
@@ -401,9 +417,8 @@ class CartComponent extends Component
                 'user_id' => \Yii::$app->user->id,
                 'email' => \Yii::$app->user->identity->email])
         );
-        $user = User::findOne(\Yii::$app->user->id);
-        $order = Order::find()->where(['user_id' => $user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])->one();
 
+        $order = $this->getIncompleteOrder();
         if (!empty($order)) {
             $profile = $order->userProfile;
 
