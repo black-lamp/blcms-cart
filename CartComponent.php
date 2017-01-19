@@ -437,7 +437,7 @@ class CartComponent extends Component
                 }
             }
         }
-        throw new Exception();
+        return false;
     }
 
     /**
