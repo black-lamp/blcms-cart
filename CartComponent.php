@@ -515,7 +515,7 @@ class CartComponent extends Component
                 foreach ($this->sendTo as $admin) {
                     Yii::$app->shopMailer->compose('new-order',
                         ['products' => $products, 'user' => $user, 'profile' => $profile, 'order' => $order, 'address' => $address])
-                        ->setFrom($this->sender)
+                        ->setFrom([$this->sender => \Yii::$app->name ?? ''])
                         ->setTo($admin)
                         ->setSubject(Yii::t('cart', 'New order'))
                         ->send();
