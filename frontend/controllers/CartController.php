@@ -5,9 +5,10 @@ use bl\cms\seo\StaticPageBehavior;
 use Yii;
 use yii\helpers\ArrayHelper;
 use bl\imagable\helpers\FileHelper;
+use yii\helpers\Json;
 use yii\log\Logger;
 use yii\web\{
-    Controller, NotFoundHttpException
+    Controller, NotFoundHttpException, Response
 };
 use bl\cms\shop\common\entities\Product;
 use bl\cms\shop\common\components\user\models\User;
@@ -41,7 +42,7 @@ class CartController extends Controller
 
     /**
      * Adds product to cart
-     * @return \yii\web\Response
+     * @return array|bool|\yii\web\Response
      */
     public function actionAdd()
     {
@@ -51,6 +52,16 @@ class CartController extends Controller
                 Yii::$app->cart->add($model->productId, $model->count,
                     json_encode($model->attribute_value_id), $model->additional_products
                 );
+
+                if (\Yii::$app->request->isAjax) {
+                    $data = [
+                        'orderCounterValue' => \Yii::$app->cart->getOrderItemsCount(),
+                        'totalCost' => \Yii::$app->formatter->asCurrency(\Yii::$app->cart->getTotalCost())
+                    ];
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    return Json::encode($data);
+                }
+
                 Yii::$app->getSession()->setFlash('success',
                     Yii::t('cart', 'You have successfully added this product to cart')
                 );
@@ -61,7 +72,9 @@ class CartController extends Controller
                 );
             }
         }
-
+        if (\Yii::$app->request->isAjax) {
+            return false;
+        }
         return $this->redirect(Yii::$app->request->referrer);
     }
 
