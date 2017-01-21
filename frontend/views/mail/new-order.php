@@ -8,15 +8,24 @@
  * @var $order \bl\cms\cart\models\Order
  * @var $address \bl\cms\cart\common\components\user\models\UserAddress
  */
-
-use yii\bootstrap\Html;
+use yii\helpers\Html;
 
 ?>
 
 <h1 style="text-align: center;"><?= Yii::t('cart', 'New order'); ?></h1>
+
+<?php if (!empty($profile->name)): ?>
 <p><?= Html::tag('strong', Yii::t('cart', 'Name')) . ': ' . $profile->name; ?></p>
+<?php endif; ?>
+
+<?php if (!empty($profile->surname)): ?>
 <p><?= Html::tag('strong', Yii::t('cart', 'Surname')) . ': ' . $profile->surname; ?></p>
+<?php endif; ?>
+
+<?php if (!empty($profile->patronymic)): ?>
 <p><?= Html::tag('strong', Yii::t('cart', 'Patronymic')) . ': ' . $profile->patronymic; ?></p>
+<?php endif; ?>
+
 <br>
 <p><?= Html::tag('strong', Yii::t('cart', 'Phone number')) . ': ' . $profile->phone; ?></p>
 <p><?= Html::tag('strong', Yii::t('cart', 'E-mail')) . ': ' . $user->email; ?></p>
