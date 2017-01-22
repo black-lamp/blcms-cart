@@ -92,10 +92,13 @@ class OrderProduct extends ActiveRecord
         $product = $this->product;
 
         if (!empty($this->combination_id)) {
-            $product->price = Combination::findOne($this->combination_id)->price->discountPrice;
+            $price = Combination::findOne($this->combination_id)->price->discountPrice;
+        }
+        else if (!empty($product->price)) {
+            $price = $product->price;
         }
 
-        return $product->price;
+        return $price ?? 0;
     }
 
     public function getSmallPhoto() {
