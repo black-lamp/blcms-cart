@@ -145,7 +145,7 @@ class CartController extends Controller
      * @param int $combinationId
      * @return \yii\web\Response
      */
-    public function actionRemove(int $productId, int $combinationId)
+    public function actionRemove(int $productId, int $combinationId = null)
     {
         \Yii::$app->cart->removeItem($productId, $combinationId);
         return $this->redirect(\Yii::$app->request->referrer);
