@@ -18,7 +18,7 @@ use bl\cms\shop\common\entities\Product;
 $this->title = $this->context->staticPage->translation->title ?? Yii::t('cart', 'Cart');
 $this->params['breadcrumbs'][] = $this->title;
 
-\frontend\assets\CartAsset::register($this);
+bl\cms\cart\frontend\assets\CartAsset::register($this);
 ?>
 
 <div class="cart">

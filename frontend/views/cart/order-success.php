@@ -6,7 +6,7 @@
 $this->title = Yii::t('cart', 'Your order is accepted.');
 $this->params['breadcrumbs'][] = $this->title;
 
-\frontend\assets\CartAsset::register($this);
+bl\cms\cart\frontend\assets\CartAsset::register($this);
 ?>
 
 <div class="cart">

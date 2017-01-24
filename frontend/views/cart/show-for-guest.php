@@ -17,7 +17,7 @@ $this->title = $this->context->staticPage->translation->title ?? Yii::t('cart', 
 $this->params['breadcrumbs'][] = $this->title;
 
 $defaultImage = Url::to('default.jpg');
-\frontend\assets\CartAsset::register($this);
+bl\cms\cart\frontend\assets\CartAsset::register($this);
 ?>
 
 <div class="cart">

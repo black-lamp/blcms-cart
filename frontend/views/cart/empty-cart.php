@@ -1,4 +1,5 @@
 <?php
+use bl\cms\cart\frontend\assets\CartAsset;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
@@ -13,7 +14,7 @@ use bl\cms\shop\widgets\LastViewedProducts;
 $this->title = $this->context->staticPage->translation->title ?? Yii::t('cart', 'Cart');
 $this->params['breadcrumbs'][] = $this->title;
 
-\frontend\assets\CartAsset::register($this);
+CartAsset::register($this);
 ?>
 
 <div class="cart">

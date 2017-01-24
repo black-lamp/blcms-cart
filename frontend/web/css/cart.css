@@ -1,0 +1,103 @@
+div.cart {
+    display: flex;
+    flex-direction: row;
+    padding: 10px;
+}
+
+div.cart article label {
+    display: block;
+}
+div.cart article button.button {
+    background-color: #FFB300;
+    color: #F0F0F0;
+    font-size: 21px;
+    font-weight: bold;
+    text-decoration: none;
+    text-align: center;
+    padding: 5px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+}
+
+div.cart div#widget-menu {
+    width: 250px;
+    flex: 1;
+}
+div.cart article {
+    flex: 5;
+    padding-left: 20px;
+}
+div.cart article p {
+    text-align: center;
+}
+div.cart article h2 {
+    width: 100%;
+}
+div.cart article p.total {
+    text-align: right;
+}
+div.cart article a.go-to-shop {
+    display: block;
+    width: 300px;
+    margin: 20px auto;
+    background-color: #FFB300;
+    font-size: 21px;
+    text-align: center;
+    padding: 5px;
+    border-radius: 5px;
+    text-decoration: none;
+    color: #fff;
+}
+div.cart article div.controls {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+div.cart article div.controls a.button {
+    width: 200px;
+    margin: 0 20px;
+}
+div.cart article div.controls a.button.danger {
+    background-color: #ab0000;
+}
+div.cart article table.products-in-cart {
+    width: 100%;
+    padding: 20px 0;
+}
+div.cart article table.products-in-cart thead {
+    background-color: #f1f1f1;
+}
+div.cart article table.products-in-cart th,
+div.cart article table.products-in-cart td {
+    padding: 10px;
+}
+div.cart article table.products-in-cart tbody {
+    background-color: #f7f7f7;
+}
+
+/*PERSONAL DATA, DELIVERY*/
+div.cart article .personal-data,
+div.cart article #delivery-methods,
+div.cart article #payment-selector,
+div.cart article .address {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+div.cart article div.form-group {
+    width: 250px;
+}
+div.cart article #delivery-methods .list,
+div.cart article #delivery-methods .info {
+    width: 25%;
+}
+div.cart article #delivery-methods .list .form-group {
+    display: flex;
+}
+div.cart article #delivery-methods .list .form-group input,
+div.cart article #delivery-methods .list .form-group label {
+    margin: 10px;
+}
