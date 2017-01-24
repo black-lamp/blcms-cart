@@ -261,12 +261,15 @@ class CartComponent extends Component
             }
 
             $query->where(['c.product_id' => $productId]);
+
             for($i = 0; $i < count($attributes); $i++) {
-                $attribute = Json::decode($attributes[$i]);
-                $query->andWhere(['sca' . $i . '.attribute_id' => $attribute['attributeId'], 'sca' . $i . '.attribute_value_id' => $attribute['valueId']]);
+                $attribute = Json::decode($attributes[key($attributes)]);
+                $query->andWhere([
+                    'sca' . $i . '.attribute_id' => $attribute['attributeId'],
+                    'sca' . $i . '.attribute_value_id' => $attribute['valueId']
+                ]);
             }
             $result = $query->one();
-
             if(!empty($result)) {
                 $combinationId = $result['id'];
                 $combination = Combination::findOne($combinationId);
