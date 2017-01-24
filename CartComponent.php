@@ -251,37 +251,32 @@ class CartComponent extends Component
      */
     public function getCombination($attributes, $productId)
     {
-        $combinationIds = [];
+        if(!empty($attributes)) {
+            $query = (new \yii\db\Query())
+                ->select(['c.id'])
+                ->from(['shop_combination c']);
 
-        foreach ($attributes as $attribute) {
-            $attribute = Json::decode($attribute);
-
-            $productCombinationAttribute = CombinationAttribute::find()->asArray()
-                ->select('combination_id')
-                ->where(['attribute_id' => $attribute['attributeId'],
-                    'attribute_value_id' => $attribute['valueId']])->all();
-
-            if (empty($productCombinationAttribute)) return false;
-
-            foreach ($productCombinationAttribute as $itemKey => $item) {
-                $productCombinationAttribute[$itemKey] = $productCombinationAttribute[$itemKey]['combination_id'];
+            for($i = 0; $i < count($attributes); $i++) {
+                $query->leftJoin('shop_combination_attribute sca' . $i, 'c.id = sca' . $i . '.combination_id');
             }
-            $combinationIds[] = $productCombinationAttribute;
-        }
 
-        if (count($combinationIds) > 1) {
-            for ($i = 0; $i < count($combinationIds) - 1; $i++) {
-                $combinationId = array_intersect($combinationIds[$i], $combinationIds[$i + 1]);
+            $query->where(['c.product_id' => $productId]);
+            for($i = 0; $i < count($attributes); $i++) {
+                $attribute = Json::decode($attributes[$i]);
+                $query->andWhere(['sca' . $i . '.attribute_id' => $attribute['attributeId'], 'sca' . $i . '.attribute_value_id' => $attribute['valueId']]);
             }
-        } else $combinationId = $combinationIds[0];
-        if (!empty($combinationId)) {
-            foreach ($combinationId as $item) {
-                $combination = Combination::find()->where(['id' => $item, 'product_id' => $productId])->one();
-                if (!empty($combination)) {
+            $result = $query->one();
+
+            if(!empty($result)) {
+                $combinationId = $result['id'];
+                $combination = Combination::findOne($combinationId);
+
+                if($combination != null) {
                     return $combination;
                 }
             }
         }
+
         return false;
     }
 
