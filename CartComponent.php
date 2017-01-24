@@ -251,27 +251,29 @@ class CartComponent extends Component
      */
     public function getCombination($attributes, $productId)
     {
-        $query = (new \yii\db\Query())
-            ->select(['c.id'])
-            ->from(['shop_combination c']);
+        if(!empty($attributes)) {
+            $query = (new \yii\db\Query())
+                ->select(['c.id'])
+                ->from(['shop_combination c']);
 
-        for($i = 0; $i < count($attributes); $i++) {
-            $query->leftJoin('shop_combination_attribute sca' . $i, 'c.id = sca' . $i . '.combination_id');
-        }
+            for($i = 0; $i < count($attributes); $i++) {
+                $query->leftJoin('shop_combination_attribute sca' . $i, 'c.id = sca' . $i . '.combination_id');
+            }
 
-        $query->where(['c.product_id' => $productId]);
-        for($i = 0; $i < count($attributes); $i++) {
-            $attribute = Json::decode($attributes[$i]);
-            $query->andWhere(['sca' . $i . '.attribute_id' => $attribute['attributeId'], 'sca' . $i . '.attribute_value_id' => $attribute['valueId']]);
-        }
-        $result = $query->one();
+            $query->where(['c.product_id' => $productId]);
+            for($i = 0; $i < count($attributes); $i++) {
+                $attribute = Json::decode($attributes[$i]);
+                $query->andWhere(['sca' . $i . '.attribute_id' => $attribute['attributeId'], 'sca' . $i . '.attribute_value_id' => $attribute['valueId']]);
+            }
+            $result = $query->one();
 
-        if(!empty($result)) {
-            $combinationId = $result['id'];
-            $combination = Combination::findOne($combinationId);
+            if(!empty($result)) {
+                $combinationId = $result['id'];
+                $combination = Combination::findOne($combinationId);
 
-            if($combination != null) {
-                return $combination;
+                if($combination != null) {
+                    return $combination;
+                }
             }
         }
 
