@@ -1,10 +1,7 @@
 <?php
-use bl\cms\shop\common\entities\Category;
-use bl\cms\shop\widgets\TreeWidget;
 use yii\bootstrap\ActiveForm;
 use yii\helpers\Url;
 use yii\helpers\Html;
-use yii\widgets\Breadcrumbs;
 
 use bl\cms\cart\models\OrderProduct;
 use bl\cms\shop\common\entities\Product;
@@ -25,11 +22,6 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 
 <div class="cart">
-    <?= TreeWidget::widget([
-        'className' => Category::className(),
-        'upIconClass' => 'fa fa-angle-up',
-        'downIconClass' => 'fa fa-angle-down'
-    ]) ?>
 
     <article>
         <h1 class="title">

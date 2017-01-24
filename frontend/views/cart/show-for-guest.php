@@ -1,6 +1,4 @@
 <?php
-use bl\cms\shop\common\entities\Category;
-use bl\cms\shop\widgets\TreeWidget;
 use yii\bootstrap\ActiveForm;
 use yii\helpers\Url;
 use yii\helpers\Html;
@@ -23,11 +21,6 @@ $defaultImage = Url::to('default.jpg');
 ?>
 
 <div class="cart">
-    <?= TreeWidget::widget([
-        'className' => Category::className(),
-        'upIconClass' => 'fa fa-angle-up',
-        'downIconClass' => 'fa fa-angle-down'
-    ]) ?>
 
     <article>
         <h1 class="title">

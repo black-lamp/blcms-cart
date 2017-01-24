@@ -2,8 +2,6 @@
 /**
  * @author Albert Gainutdinov <xalbert.einsteinx@gmail.com>
  */
-use bl\cms\shop\common\entities\Category;
-use bl\cms\shop\widgets\TreeWidget;
 
 $this->title = Yii::t('cart', 'Your order is accepted.');
 $this->params['breadcrumbs'][] = $this->title;
@@ -12,12 +10,6 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 
 <div class="cart">
-
-    <?= TreeWidget::widget([
-        'className' => Category::className(),
-        'upIconClass' => 'fa fa-angle-up',
-        'downIconClass' => 'fa fa-angle-down'
-    ]) ?>
 
     <article>
         <h1><?= $this->title; ?></h1>

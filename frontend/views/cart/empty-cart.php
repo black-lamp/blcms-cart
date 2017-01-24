@@ -1,14 +1,11 @@
 <?php
-use bl\cms\shop\common\entities\Category;
-use bl\cms\shop\widgets\TreeWidget;
 use yii\helpers\Html;
 use yii\helpers\Url;
-use yii\widgets\Breadcrumbs;
 
 use bl\cms\shop\widgets\LastViewedProducts;
 
 /**
- * @author Vladimir Kuprienko <vldmr.kuprienko@gmail.com>
+ * @author Albert Gainutdinov <xalbert.einsteinx@gmail.com>
  *
  * @var \yii\web\View $this
  */
@@ -20,13 +17,6 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 
 <div class="cart">
-
-    <?= TreeWidget::widget([
-        'className' => Category::className(),
-        'upIconClass' => 'fa fa-angle-up',
-        'downIconClass' => 'fa fa-angle-down'
-    ]) ?>
-
     <article>
         <h1 class="title">
             <?= $this->title ?>
