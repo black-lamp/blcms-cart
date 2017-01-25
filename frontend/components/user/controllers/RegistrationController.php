@@ -3,6 +3,7 @@ namespace bl\cms\cart\frontend\components\user\controllers;
 
 use bl\cms\cart\common\components\user\models\Profile;
 use bl\cms\cart\common\components\user\models\RegistrationForm;
+use bl\cms\seo\StaticPageBehavior;
 use bl\cms\shop\common\components\user\models\User;
 use bl\cms\cart\frontend\components\events\UserRegistrationEvent;
 use dektrium\user\Finder;
@@ -19,6 +20,7 @@ use yii\web\NotFoundHttpException;
  * resending confirmation tokens, email confirmation and registration via social networks.
  *
  * @property \dektrium\user\Module $module
+ * @method StaticPageBehavior registerStaticSeoData
  *
  * @author Dmitry Erofeev <dmeroff@gmail.com>
  */
@@ -101,6 +103,10 @@ class RegistrationController extends Controller
                     ['allow' => true, 'actions' => ['confirm', 'resend'], 'roles' => ['?', '@']],
                 ],
             ],
+            'staticPage' => [
+                'class' => StaticPageBehavior::className(),
+                'key' => 'registration'
+            ]
         ];
     }
 
@@ -146,6 +152,8 @@ class RegistrationController extends Controller
                 }
             }
         }
+
+        $this->registerStaticSeoData();
 
         return $this->render('register', [
             'model'  => $user,
