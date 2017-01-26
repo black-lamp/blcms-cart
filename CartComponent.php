@@ -263,11 +263,12 @@ class CartComponent extends Component
             $query->where(['c.product_id' => $productId]);
 
             for($i = 0; $i < count($attributes); $i++) {
-                $attribute = Json::decode($attributes[key($attributes)]);
+                $attribute = Json::decode(current($attributes));
                 $query->andWhere([
                     'sca' . $i . '.attribute_id' => $attribute['attributeId'],
                     'sca' . $i . '.attribute_value_id' => $attribute['valueId']
                 ]);
+                next($attributes);
             }
             $result = $query->one();
             if(!empty($result)) {
