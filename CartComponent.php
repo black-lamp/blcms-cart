@@ -623,7 +623,7 @@ class CartComponent extends Component
                         if (\Yii::$app->getModule('shop')->enableCombinations && !empty($product->combination)) {
                             $totalCost += $product->count * $product->combination->price->discountPrice;
                         } else {
-                            $totalCost += $product->count * $product->price;
+                            $totalCost += $product->count * $product->price->discountPrice;
                         }
                         if (!empty($product->orderProductAdditionalProduct)) {
                             foreach ($product->orderProductAdditionalProduct as $orderProductAdditionalProduct) {
