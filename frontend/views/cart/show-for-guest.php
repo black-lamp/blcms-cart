@@ -116,7 +116,7 @@ bl\cms\cart\frontend\assets\CartAsset::register($this);
                     <!--NUMBER-->
                     <td class="col-md-1">
                         <?php $form = ActiveForm::begin([
-                            'action' => ['/cart/cart/change-items-number', 'id' => $product->id],
+                            'action' => ['/cart/cart/change-items-number', 'productId' => $product->id, 'combinationId' => $combination->id],
                             'options' => [
                                 'class' => 'order-form'
                             ]

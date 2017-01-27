@@ -207,25 +207,24 @@ class CartController extends Controller
     }
 
     /**
-     * @param $id
-     * @return \yii\web\Response
+     * @param int $productId
+     * @param int|NULL $combinationId
+     * @return Response
      * @throws NotFoundHttpException
-     *
-     * Changes number of products in incomplete order.
      */
-    public function actionChangeItemsNumber($id)
+    public function actionChangeItemsNumber(int $productId, int $combinationId = NULL)
     {
 
         if (Yii::$app->request->isPost) {
 
             if (Yii::$app->user->isGuest) {
-                if (Yii::$app->cart->changeOrderProductCountInSession($id)) {
+                if (Yii::$app->cart->changeOrderProductCountInSession($productId, $combinationId)) {
                     \Yii::$app->getSession()->setFlash('success', Yii::t('cart', 'You have successfully changed count of products.'));
                 } else {
                     \Yii::$app->getSession()->setFlash('error', Yii::t('cart', 'Changing count of products error'));
                 }
             } else {
-                if (Yii::$app->cart->changeOrderProductCountInDB($id)) {
+                if (Yii::$app->cart->changeOrderProductCountInDB($productId, $combinationId)) {
                     \Yii::$app->getSession()->setFlash('success', Yii::t('cart', 'You have successfully changed count of products.'));
                 } else {
                     \Yii::$app->getSession()->setFlash('error', Yii::t('cart', 'Changing count of products error'));

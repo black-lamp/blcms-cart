@@ -251,12 +251,12 @@ class CartComponent extends Component
      */
     public function getCombination($attributes, $productId)
     {
-        if(!empty($attributes)) {
+        if (!empty($attributes)) {
             $query = (new \yii\db\Query())
                 ->select(['c.id'])
                 ->from(['shop_combination c']);
 
-            for($i = 0; $i < count($attributes); $i++) {
+            for ($i = 0; $i < count($attributes); $i++) {
                 $query->leftJoin('shop_combination_attribute sca' . $i, 'c.id = sca' . $i . '.combination_id');
             }
 
@@ -271,11 +271,11 @@ class CartComponent extends Component
                 next($attributes);
             }
             $result = $query->one();
-            if(!empty($result)) {
+            if (!empty($result)) {
                 $combinationId = $result['id'];
                 $combination = Combination::findOne($combinationId);
 
-                if($combination != null) {
+                if ($combination != null) {
                     return $combination;
                 }
             }
@@ -652,21 +652,27 @@ class CartComponent extends Component
         } else $this->generateUniqueId($prefix, $min, $max);
     }
 
-
     /**
-     * @param $id
-     * @return boolean
-     * Changes count of products in incomplete order in database.
+     * @param int $productId
+     * @param int|NULL $combinationId
+     * @return bool
      */
-    public function changeOrderProductCountInDB($id)
+    public function changeOrderProductCountInDB(int $productId, int $combinationId = NULL)
     {
-        if (!empty($id)) {
+        if (!empty($productId)) {
             if (!Yii::$app->user->isGuest) {
                 $order = Order::find()
                     ->where(['user_id' => Yii::$app->user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])->one();
+
                 if (!empty($order)) {
                     $orderProduct = OrderProduct::find()
-                        ->where(['product_id' => $id, 'order_id' => $order->id])->one();
+                        ->where(['product_id' => $productId, 'order_id' => $order->id]);
+                    $orderProduct = (!empty($combinationId)) ?
+                        OrderProduct::find()
+                            ->where(['product_id' => $productId, 'order_id' => $order->id, 'combination_id' => $combinationId])
+                            ->one() :
+                        OrderProduct::find()
+                            ->where(['product_id' => $productId, 'order_id' => $order->id])->one();
 
                     if (!empty($orderProduct)) {
                         $orderProduct->count = Yii::$app->request->post('count');
@@ -680,22 +686,27 @@ class CartComponent extends Component
     }
 
     /**
-     * @param $id
+     * @param int $productId
+     * @param int|NULL $combinationId
      * @return bool
-     * Changes count of products in order in session.
      */
-    public function changeOrderProductCountInSession($id)
+    public function changeOrderProductCountInSession(int $productId, int $combinationId = NULL)
     {
-        if (!empty($id)) {
+        if (!empty($productId)) {
             if (Yii::$app->user->isGuest) {
                 $session = Yii::$app->session;
                 if ($session->has(self::SESSION_KEY)) {
                     $products = $session[self::SESSION_KEY];
                     foreach ($products as $key => $product) {
-                        if ($product['id'] == $id) {
-
-                            if (!empty($session[self::SESSION_KEY][$key]['count'])) {
-                                $_SESSION[self::SESSION_KEY][$key]['count'] = Yii::$app->request->post('count');
+                        if (!empty($combinationId)) {
+                            if ($product['id'] == $productId && $product['combinationId'] == $combinationId) {
+                                $_SESSION[self::SESSION_KEY][$key]['count'] = (int)Yii::$app->request->post('count');
+                                return true;
+                            }
+                        }
+                        else {
+                            if ($product['id'] == $productId) {
+                                $_SESSION[self::SESSION_KEY][$key]['count']  = Yii::$app->request->post('count');
                                 return true;
                             }
                         }
