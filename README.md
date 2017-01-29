@@ -206,3 +206,13 @@ In backend configuration of your module add
 ```
 'enableLog' => true,
 ```
+
+
+###Email templates
+After you will apply migrations, there will be able two records for emails - 'new-order' and 'order-success'.
+You can find its in admin panel: /admin/email-templates/default/list
+In mail subject and object you can use next variables:
+{name}, {surname}, {patronymic}, {email}, {phone}, {orderUid}, {zip}, {country}, {region}, 
+{city}, {street}, {house}, {apartment}, {products}, {totalCost}.
+Variable {products} renders view @bl\cms\cart\frontend\views\mail\products
+You can setup mail layout in frontend config for shopMailer component. Now it use @bl\cms\cart\frontend\views\mail\layout
