@@ -176,8 +176,6 @@ class CartController extends Controller
                 $mailer = new Mailer();
                 $mailer->sendMakeOrderMessage($orderResult);
 
-                $this->trigger(self::EVENT_AFTER_MAKE_ORDER);
-
                 return $this->render('order-success');
             } else {
                 \Yii::$app->session->setFlash('error', \Yii::t('cart', 'Making order error'));
