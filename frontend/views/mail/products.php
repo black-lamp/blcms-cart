@@ -5,26 +5,18 @@
  * @var $products \bl\cms\shop\common\entities\Product | \bl\cms\cart\models\OrderProduct
  */
 use yii\bootstrap\Html;
-use yii\helpers\Url;
-
 ?>
 
 <h3 style="text-align: center;">
     <?= Yii::t('cart', 'Products list'); ?>
 </h3>
 
-<table style="width: 500px; margin: 0 auto;">
+<table style="width: 100%; margin: 0 auto;">
     <thead>
-    <tr>
-        <th>
-            <?= Yii::t('cart', 'Title') ?>
-        </th>
-        <th>
-            <?= Yii::t('cart', 'Price') ?>
-        </th>
-        <th>
-            <?= Yii::t('cart', 'Count') ?>
-        </th>
+    <tr style="background-color: #ececec; font-size: 16px; text-align: center;">
+        <th style="margin: 0; padding: 5px; line-height: 30px; height: 30px;"><?= Yii::t('cart', 'Title') ?></th>
+        <th style="margin: 0; padding: 5px; line-height: 30px; height: 30px;"><?= Yii::t('cart', 'Price') ?></th>
+        <th style="margin: 0; padding: 5px; line-height: 30px; height: 30px;"><?= Yii::t('cart', 'Count') ?></th>
     </tr>
     </thead>
     <tbody>
@@ -33,7 +25,7 @@ use yii\helpers\Url;
         <?php foreach ($products as $product): ?>
             <?php $combination = (\Yii::$app->getModule('shop')->enableCombinations && !empty($product->combinationId)) ?
                 $product->getCombination($product->combinationId) : NULL; ?>
-            <tr>
+            <tr style="padding: 5px 0; background-color: #f7f7f7;">
                 <!--TITLE, COMBINATION ATTRIBUTES AND ADDITIONAL PRODUCTS-->
                 <td class="product-title">
                     <!--PRODUCT TITLE-->
@@ -67,14 +59,11 @@ use yii\helpers\Url;
                 </td>
 
                 <!--PRICE-->
-                <td>
-                    <?php $price = (!empty($combination)) ? $combination->price->discountPrice : $product->getDiscountPrice(); ?>
-                    <?= Yii::$app->formatter->asCurrency($price ?? 0) ?>
-                </td>
+                <td><?= Yii::$app->formatter->asCurrency(
+                        (!empty($combination)) ? $combination->price->discountPrice :
+                            $product->getDiscountPrice()); ?></td>
                 <!--NUMBER-->
-                <td style="text-align: center">
-                    <?= $product->count; ?>
-                </td>
+                <td style="text-align: center"><?= $product->count; ?></td>
             </tr>
         <?php endforeach; ?>
 
@@ -82,7 +71,7 @@ use yii\helpers\Url;
         <?php foreach ($products as $orderProduct): ?>
             <?php $combination = (\Yii::$app->getModule('shop')->enableCombinations && !empty($orderProduct->combination_id)) ?
                 $orderProduct->combination : NULL; ?>
-            <tr style="padding: 5px 0; background-color: #ececec;">
+            <tr style="padding: 5px 0; background-color: #f7f7f7;">
                 <!--TITLE, COMBINATION ATTRIBUTES AND ADDITIONAL PRODUCTS-->
                 <td style="padding: 5px 5px 0;">
                     <!--PRODUCT TITLE-->
@@ -116,14 +105,11 @@ use yii\helpers\Url;
                 </td>
 
                 <!--PRICE-->
-                <td style="text-align: center;">
-                    <?php $price = (!empty($combination)) ? $combination->price->discountPrice : $orderProduct->product->getDiscountPrice(); ?>
-                    <?= Yii::$app->formatter->asCurrency($price ?? 0) ?>
-                </td>
+                <td style="text-align: center;"><?= Yii::$app->formatter->asCurrency((!empty($combination)) ?
+                        $combination->price->discountPrice :
+                        $orderProduct->product->getDiscountPrice()); ?></td>
                 <!--NUMBER-->
-                <td style="text-align: center">
-                    <?= $orderProduct->count; ?>
-                </td>
+                <td style="text-align: center"><?= $orderProduct->count; ?></td>
             </tr>
         <?php endforeach; ?>
 
