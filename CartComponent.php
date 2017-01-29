@@ -406,8 +406,7 @@ class CartComponent extends Component
     }
 
     /**
-     * @return bool
-     * @throws Exception
+     * @return array|bool
      */
     private function makeOrderFromDB()
     {
@@ -430,7 +429,7 @@ class CartComponent extends Component
                 if (empty($order->address_id)) {
                     $address = new UserAddress();
                     if ($address->load(Yii::$app->request->post())) {
-                        $address->user_profile_id = $user->id;
+                        $address->user_profile_id = $profile->id;
                         if ($address->validate()) {
                             if (!empty($address->city) && !empty($address->street) && !empty($address->house)) {
                                 $address->save();
@@ -439,24 +438,26 @@ class CartComponent extends Component
                         }
                     }
                 } else $address = null;
-                $order->user_id = $user->id;
+                $order->user_id = \Yii::$app->user->id;
                 $order->status = OrderStatus::STATUS_CONFIRMED;
                 $order->confirmation_time = new Expression('NOW()');
                 $order->total_cost = $this->getTotalCost();
 
                 if ($order->validate()) {
                     $order->save();
-                    $this->sendMail($profile, $user, $order, $address, $order->address_id);
-                    return true;
+                    return [
+                        'user' => \Yii::$app->user,
+                        'profile' => $profile,
+                        'order' => $order,
+                        'address' => $address
+                    ];
                 }
             }
         }
         return false;
     }
 
-    /**
-     * @return bool
-     */
+
     private function makeOrderFromSession()
     {
         $profile = new Profile();
@@ -469,67 +470,14 @@ class CartComponent extends Component
         ) {
             $order->load(Yii::$app->request->post());
             $address->load(Yii::$app->request->post());
-            $this->sendMail($profile, $user, $order, $address);
             $this->clearCart();
-            return true;
+            return [
+                'user' => $user,
+                'profile' => $profile,
+                'order' => $order,
+                'address' => $address
+            ];
         } else return false;
-    }
-
-    /**
-     * @param $profile
-     * @param $user
-     * @param $order
-     * @param null $address
-     * @param null $addressId
-     * @throws Exception
-     */
-    private function sendMail($profile, $user, $order, $address = null, $addressId = null)
-    {
-        if (Yii::$app->user->isGuest) {
-            $session = \Yii::$app->session;
-            $sessionProducts = $session[self::SESSION_KEY];
-
-            $products = [];
-            foreach ($sessionProducts as $sessionProduct) {
-                $product = Product::findOne($sessionProduct['id']);
-                if (!empty($product)) {
-                    $product->count = $sessionProduct['count'];
-                    $product->combinationId = $sessionProduct['combinationId'];
-                    if (!empty($sessionProduct['additionalProducts'])) {
-                        foreach ($sessionProduct['additionalProducts'] as $additionalProduct) {
-                            $product->additionalProducts[] = Product::findOne($additionalProduct);
-                        }
-                    }
-                    $products[] = $product;
-                }
-            }
-        } else {
-            $products = OrderProduct::find()->where(['order_id' => $order->id])->all();
-            if (!empty($addressId)) {
-                $address = UserAddress::findOne($addressId);
-            }
-        }
-        if (!empty($this->sender) && !empty($order)) {
-            try {
-                foreach ($this->sendTo as $admin) {
-                    Yii::$app->shopMailer->compose('new-order',
-                        ['products' => $products, 'user' => $user, 'profile' => $profile, 'order' => $order, 'address' => $address])
-                        ->setFrom([$this->sender => \Yii::$app->name ?? ''])
-                        ->setTo($admin)
-                        ->setSubject(Yii::t('cart', 'New order'))
-                        ->send();
-                }
-
-                Yii::$app->shopMailer->compose('order-success',
-                    ['products' => $products, 'user' => $user, 'profile' => $profile, 'order' => $order, 'address' => $address])
-                    ->setFrom($this->sender)
-                    ->setTo($user->email)
-                    ->setSubject(Yii::t('cart', 'Success order'))
-                    ->send();
-            } catch (Exception $ex) {
-                throw new Exception($ex);
-            }
-        }
     }
 
     /**
