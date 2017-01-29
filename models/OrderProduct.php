@@ -95,7 +95,7 @@ class OrderProduct extends ActiveRecord
             $price = Combination::findOne($this->combination_id)->price->discountPrice;
         }
         else if (!empty($product->price)) {
-            $price = $product->price;
+            $price = $product->price->discountPrice;
         }
 
         return $price ?? 0;
