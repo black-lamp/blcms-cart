@@ -216,3 +216,8 @@ In mail subject and object you can use next variables:
 {city}, {street}, {house}, {apartment}, {products}, {totalCost}.
 Variable {products} renders view @bl\cms\cart\frontend\views\mail\products
 You can setup mail layout in frontend config for shopMailer component. Now it use @bl\cms\cart\frontend\views\mail\layout
+
+**Welcome email**
+You can create templates here: /admin/email-templates/default/list (use 'welcome' key for it)
+Use next variables:
+{token} => confirmation token
