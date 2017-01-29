@@ -1,7 +1,7 @@
 <?php
 namespace bl\cms\cart\models;
 
-use bl\emailTemplates\entities\EmailTemplate;
+use bl\emailTemplates\models\entities\EmailTemplate;
 use bl\multilang\behaviors\TranslationBehavior;
 use Yii;
 use yii\db\ActiveRecord;
