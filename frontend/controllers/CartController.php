@@ -1,6 +1,7 @@
 <?php
 namespace bl\cms\cart\frontend\controllers;
 
+use bl\cms\cart\Mailer;
 use bl\cms\seo\StaticPageBehavior;
 use Yii;
 use yii\helpers\ArrayHelper;
@@ -169,8 +170,14 @@ class CartController extends Controller
     {
         if (Yii::$app->request->isPost) {
 
-            if (\Yii::$app->cart->makeOrder()) {
+            if ($orderResult = \Yii::$app->cart->makeOrder()) {
                 \Yii::$app->session->setFlash('success', \Yii::t('cart', 'Your order is accepted. Thank you.'));
+
+                $mailer = new Mailer();
+                $mailer->sendMakeOrderMessage($orderResult);
+
+                $this->trigger(self::EVENT_AFTER_MAKE_ORDER);
+
                 return $this->render('order-success');
             } else {
                 \Yii::$app->session->setFlash('error', \Yii::t('cart', 'Making order error'));
