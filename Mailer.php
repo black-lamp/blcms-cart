@@ -23,15 +23,15 @@ class Mailer extends Component
             '{email}' => $orderResult['user']->identity->email,
             '{phone}' => $orderResult['profile']->phone,
             '{orderUid}' => $orderResult['order']->uid,
-            '{zip}' => $orderResult['address']->zipcode,
-            '{country}' => $orderResult['address']->country,
-            '{region}' => $orderResult['address']->region,
-            '{city}' => $orderResult['address']->city,
-            '{street}' => $orderResult['address']->street,
-            '{house}' => $orderResult['address']->house,
-            '{apartment}' => $orderResult['address']->apartment,
             '{products}' => \Yii::$app->view->render('@bl/cms/cart/frontend/views/mail/products', [
                 'products' => $orderResult['order']->orderProducts
+            ]),
+            '{delivery}' => \Yii::$app->view->render('@bl/cms/cart/frontend/views/mail/delivery', [
+                'order' => $orderResult['order'],
+                'address' => $orderResult['address'],
+            ]),
+            '{payment}' => \Yii::$app->view->render('@bl/cms/cart/frontend/views/mail/payment', [
+                'order' => $orderResult['order'],
             ]),
             '{totalCost}' => \Yii::$app->formatter->asCurrency($orderResult['order']->total_cost)
         ];
