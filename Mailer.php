@@ -4,6 +4,7 @@ namespace bl\cms\cart;
 use bl\multilang\entities\Language;
 use Exception;
 use yii\base\Component;
+use yii\helpers\Url;
 
 
 /**
@@ -84,7 +85,7 @@ class Mailer extends Component
             try {
 
                 \Yii::$app->shopMailer->compose('mail-body', $bodyParams)
-                    ->setFrom(\Yii::$app->cart->sender)
+                    ->setFrom([\Yii::$app->cart->sender => \Yii::$app->name ?? Url::to(['/'], true)])
                     ->setTo($sendTo)
                     ->setSubject($bodySubject)
                     ->send();

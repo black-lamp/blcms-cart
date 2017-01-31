@@ -8,6 +8,7 @@ use Yii;
 use yii\base\BootstrapInterface;
 use yii\base\Event;
 use yii\db\Exception;
+use yii\helpers\Url;
 
 /**
  * @author Albert Gainutdinov <xalbert.einsteinx@gmail.com>
@@ -75,7 +76,7 @@ class CartBootstrap implements BootstrapInterface
 
                 Yii::$app->shopMailer->compose('change-order-status',
                     ['model' => $event->model])
-                    ->setFrom(Yii::$app->cart->sender)
+                    ->setFrom([\Yii::$app->cart->sender => \Yii::$app->name ?? Url::to(['/'], true)])
                     ->setTo($event->model->user->email)
                     ->setSubject($mailTemplate->getSubject())
                     ->setHtmlBody($mailTemplate->getBody())

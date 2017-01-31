@@ -7,6 +7,7 @@ use bl\multilang\entities\Language;
 use dektrium\user\models\Token;
 use Yii;
 use yii\base\Component;
+use yii\helpers\Url;
 
 /**
  * Overrides dektrium/User Mailer component
@@ -206,7 +207,7 @@ class UserMailer extends Component
 
         return $mailer->compose(['html' => $view, 'text' => 'text/' . $view], $params)
             ->setTo($to)
-            ->setFrom($this->sender)
+            ->setFrom([$this->sender => \Yii::$app->name ?? Url::to(['/'], true)])
             ->setSubject($subject)
             ->send();
     }
@@ -240,7 +241,7 @@ class UserMailer extends Component
         }
 
         return \Yii::$app->shopMailer->compose('mail-body', ['bodyContent' => $mailTemplate->getBody()])
-            ->setFrom($this->sender)
+            ->setFrom([$this->sender => \Yii::$app->name ?? Url::to(['/'], true)])
             ->setTo($user->email)
             ->setSubject($mailTemplate->getSubject())
             ->send();
