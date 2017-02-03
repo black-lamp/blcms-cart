@@ -209,6 +209,14 @@ In backend configuration of your module add
 
 
 ###Email templates
+Configure frontend component:
+```
+components => [
+    'emailTemplates' => [
+        'class' => bl\emailTemplates\components\TemplateManager::class
+    ],
+]
+```
 After you will apply migrations, there will be able two records for emails - 'new-order' and 'order-success'.
 You can find its in admin panel: /admin/email-templates/default/list
 In mail subject and object you can use next variables:
