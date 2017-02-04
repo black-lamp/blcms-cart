@@ -21,7 +21,7 @@ class Mailer extends Component
             '{name}' => $orderResult['profile']->name,
             '{surname}' => $orderResult['profile']->surname,
             '{patronymic}' => $orderResult['profile']->patronymic,
-            '{email}' => $orderResult['user']->identity->email,
+            '{email}' => $orderResult['user']->email,
             '{phone}' => $orderResult['profile']->phone,
             '{orderUid}' => $orderResult['order']->uid,
             '{products}' => \Yii::$app->view->render('@bl/cms/cart/frontend/views/mail/products', [
@@ -55,7 +55,7 @@ class Mailer extends Component
         $mailTemplate = $this->createMailTemplate('order-success', $mailVars);
         $subject = $mailTemplate->getSubject();
         $bodyParams = ['bodyContent' => $mailTemplate->getBody()];
-        $this->sendMessage($orderResult['user']->identity->email, $subject, $bodyParams);
+        $this->sendMessage($orderResult['user']->email, $subject, $bodyParams);
     }
 
     /**
