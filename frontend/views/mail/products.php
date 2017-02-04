@@ -5,6 +5,7 @@
  * @var $products \bl\cms\shop\common\entities\Product | \bl\cms\cart\models\OrderProduct
  */
 use yii\bootstrap\Html;
+
 ?>
 
 <h3 style="text-align: center;">
@@ -21,98 +22,50 @@ use yii\bootstrap\Html;
     </thead>
     <tbody>
 
-    <?php if (Yii::$app->cart->saveToDataBase === false) : ?>
-        <?php foreach ($products as $product): ?>
-            <?php $combination = (\Yii::$app->getModule('shop')->enableCombinations && !empty($product->combinationId)) ?
-                $product->getCombination($product->combinationId) : NULL; ?>
-            <tr style="padding: 5px 0; background-color: #f7f7f7;">
-                <!--TITLE, COMBINATION ATTRIBUTES AND ADDITIONAL PRODUCTS-->
-                <td class="product-title">
-                    <!--PRODUCT TITLE-->
-                    <?php if (!empty($product->translation)): ?>
-                        <?php $url = \Yii::$app->urlManager->createAbsoluteUrl(['/shop/product/show', 'id' => $product->id]);
-                        echo Html::a($product->translation->title, $url);
-                        ?>
-                    <?php endif; ?>
-                    <!--COMBINATION-->
-                    <?php if (!empty($combination)) : ?>
-                        <?php foreach ($combination->combinationAttributes as $attribute) : ?>
-                            <p>
-                                <?= $attribute->productAttribute->translation->title; ?>:
-                                <?= $attribute->productAttributeValue->translation->value; ?>
-                            </p>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                    <!--ADDITIONAL PRODUCTS-->
-                    <?php if (!empty($product->additionalProducts)): ?>
+    <?php foreach ($products as $orderProduct): ?>
+        <?php $combination = (\Yii::$app->getModule('shop')->enableCombinations && !empty($orderProduct->combination_id)) ?
+            $orderProduct->combination : NULL; ?>
+        <tr style="padding: 5px 0; background-color: #f7f7f7;">
+            <!--TITLE, COMBINATION ATTRIBUTES AND ADDITIONAL PRODUCTS-->
+            <td style="padding: 5px 5px 0;">
+                <!--PRODUCT TITLE-->
+                <?php if (!empty($orderProduct->product->translation)): ?>
+                    <?php $url = \Yii::$app->urlManager->createAbsoluteUrl(['/shop/product/show', 'id' => $orderProduct->product->id]);
+                    echo Html::a($orderProduct->product->translation->title, $url);
+                    ?>
+                <?php endif; ?>
+                <!--COMBINATION-->
+                <?php if (!empty($combination)) : ?>
+                    <?php foreach ($combination->combinationAttributes as $attribute) : ?>
                         <p>
-                            <b><?= \Yii::t('shop', 'Additional products'); ?></b>
+                            <?= $attribute->productAttribute->translation->title; ?>:
+                            <?= $attribute->productAttributeValue->translation->value; ?>
                         </p>
-                        <ul>
-                            <?php foreach ($product->additionalProducts as $additionalProduct): ?>
-                                <li>
-                                    <?= $additionalProduct->translation->title; ?>
-                                </li>
-                            <?php endforeach; ?>
-                        </ul>
-                    <?php endif; ?>
-                </td>
-
-                <!--PRICE-->
-                <td><?= Yii::$app->formatter->asCurrency(
-                        (!empty($combination)) ? $combination->price->discountPrice :
-                            $product->getDiscountPrice()); ?></td>
-                <!--NUMBER-->
-                <td style="text-align: center"><?= $product->count; ?></td>
-            </tr>
-        <?php endforeach; ?>
-
-    <?php else : ?>
-        <?php foreach ($products as $orderProduct): ?>
-            <?php $combination = (\Yii::$app->getModule('shop')->enableCombinations && !empty($orderProduct->combination_id)) ?
-                $orderProduct->combination : NULL; ?>
-            <tr style="padding: 5px 0; background-color: #f7f7f7;">
-                <!--TITLE, COMBINATION ATTRIBUTES AND ADDITIONAL PRODUCTS-->
-                <td style="padding: 5px 5px 0;">
-                    <!--PRODUCT TITLE-->
-                    <?php if (!empty($orderProduct->product->translation)): ?>
-                        <?php $url = \Yii::$app->urlManager->createAbsoluteUrl(['/shop/product/show', 'id' => $orderProduct->product->id]);
-                        echo Html::a($orderProduct->product->translation->title, $url);
-                        ?>
-                    <?php endif; ?>
-                    <!--COMBINATION-->
-                    <?php if (!empty($combination)) : ?>
-                        <?php foreach ($combination->combinationAttributes as $attribute) : ?>
-                            <p>
-                                <?= $attribute->productAttribute->translation->title; ?>:
-                                <?= $attribute->productAttributeValue->translation->value; ?>
-                            </p>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+                <!--ADDITIONAL PRODUCTS-->
+                <?php if (!empty($orderProduct->additionalProduct)): ?>
+                    <p>
+                        <b><?= \Yii::t('shop', 'Additional products'); ?></b>
+                    </p>
+                    <ul>
+                        <?php foreach ($orderProduct->additionalProduct as $additionalProduct): ?>
+                            <li>
+                                <?= $additionalProduct->translation->title; ?>
+                            </li>
                         <?php endforeach; ?>
-                    <?php endif; ?>
-                    <!--ADDITIONAL PRODUCTS-->
-                    <?php if (!empty($orderProduct->additionalProduct)): ?>
-                        <p>
-                            <b><?= \Yii::t('shop', 'Additional products'); ?></b>
-                        </p>
-                        <ul>
-                            <?php foreach ($orderProduct->additionalProduct as $additionalProduct): ?>
-                                <li>
-                                    <?= $additionalProduct->translation->title; ?>
-                                </li>
-                            <?php endforeach; ?>
-                        </ul>
-                    <?php endif; ?>
-                </td>
+                    </ul>
+                <?php endif; ?>
+            </td>
 
-                <!--PRICE-->
-                <td style="text-align: center;"><?= Yii::$app->formatter->asCurrency((!empty($combination)) ?
-                        $combination->price->discountPrice :
-                        $orderProduct->product->getDiscountPrice()); ?></td>
-                <!--NUMBER-->
-                <td style="text-align: center"><?= $orderProduct->count; ?></td>
-            </tr>
-        <?php endforeach; ?>
+            <!--PRICE-->
+            <td style="text-align: center;"><?= Yii::$app->formatter->asCurrency((!empty($combination)) ?
+                    $combination->price->discountPrice :
+                    $orderProduct->product->getDiscountPrice()); ?></td>
+            <!--NUMBER-->
+            <td style="text-align: center"><?= $orderProduct->count; ?></td>
+        </tr>
+    <?php endforeach; ?>
 
-    <?php endif; ?>
     </tbody>
 </table>
