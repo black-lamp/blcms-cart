@@ -19,7 +19,7 @@ use bl\cms\cart\common\components\user\models\{
     Profile, UserAddress
 };
 use bl\cms\shop\common\entities\{
-    Product, Combination, CombinationAttribute, Price
+    Product, Combination
 };
 
 /**
@@ -108,39 +108,37 @@ class CartComponent extends Component
      */
     private function saveProductToDataBase($productId, $count, $attributesAndValues = null, $additionalProducts = null)
     {
-        if ($this->saveToDataBase && !\Yii::$app->user->isGuest) {
 
-            $order = $this->getIncompleteOrderFromDB();
+        $order = $this->getIncompleteOrderFromDB();
 
-            if (\Yii::$app->getModule('shop')->enableCombinations && !empty($attributesAndValues)) {
-                $combination = $this->getCombination($attributesAndValues, $productId);
-                if (!empty($combination)) {
-                    $orderProduct = $this->getOrderProduct($order->id, $productId, $combination->id);
-                } else throw new Exception(\Yii::t('cart', 'Such attributes combination does not exist'));
-            } else {
-                $orderProduct = new OrderProduct();
-                $orderProduct->product_id = $productId;
-                $orderProduct->order_id = $order->id;
-            }
+        if (\Yii::$app->getModule('shop')->enableCombinations && !empty($attributesAndValues)) {
+            $combination = $this->getCombination($attributesAndValues, $productId);
+            if (!empty($combination)) {
+                $orderProduct = $this->getOrderProduct($order->id, $productId, $combination->id);
+            } else throw new Exception(\Yii::t('cart', 'Such attributes combination does not exist'));
+        } else {
+            $orderProduct = new OrderProduct();
+            $orderProduct->product_id = $productId;
+            $orderProduct->order_id = $order->id;
+        }
 
-            $orderProduct->count += $count;
-            if ($orderProduct->validate()) {
-                $orderProduct->save();
+        $orderProduct->count += $count;
+        if ($orderProduct->validate()) {
+            $orderProduct->save();
 
-                if (!empty($additionalProducts)) {
-                    foreach ($additionalProducts as $additionalProduct) {
-                        $orderProductAdditionalProduct = OrderProductAdditionalProduct::find()
-                            ->where(['order_product_id' => $orderProduct->id, 'additional_product_id' => $additionalProduct])->one();
-                        if (empty($orderProductAdditionalProduct)) {
-                            $orderProductAdditionalProduct = new OrderProductAdditionalProduct();
-                            $orderProductAdditionalProduct->order_product_id = $orderProduct->id;
-                            $orderProductAdditionalProduct->additional_product_id = $additionalProduct;
-                            if ($orderProductAdditionalProduct->validate()) $orderProductAdditionalProduct->save();
-                        }
+            if (!empty($additionalProducts)) {
+                foreach ($additionalProducts as $additionalProduct) {
+                    $orderProductAdditionalProduct = OrderProductAdditionalProduct::find()
+                        ->where(['order_product_id' => $orderProduct->id, 'additional_product_id' => $additionalProduct])->one();
+                    if (empty($orderProductAdditionalProduct)) {
+                        $orderProductAdditionalProduct = new OrderProductAdditionalProduct();
+                        $orderProductAdditionalProduct->order_product_id = $orderProduct->id;
+                        $orderProductAdditionalProduct->additional_product_id = $additionalProduct;
+                        if ($orderProductAdditionalProduct->validate()) $orderProductAdditionalProduct->save();
                     }
                 }
-            } else die(var_dump($orderProduct->errors));
-        } else throw new ForbiddenHttpException();
+            }
+        } else die(var_dump($orderProduct->errors));
     }
 
     /**
@@ -262,7 +260,7 @@ class CartComponent extends Component
 
             $query->where(['c.product_id' => $productId]);
 
-            for($i = 0; $i < count($attributes); $i++) {
+            for ($i = 0; $i < count($attributes); $i++) {
                 $attribute = Json::decode(current($attributes));
                 $query->andWhere([
                     'sca' . $i . '.attribute_id' => $attribute['attributeId'],
@@ -383,7 +381,7 @@ class CartComponent extends Component
             $order = Order::find()
                 ->where(['user_id' => $user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])
                 ->one();
-            if(!empty($order)) return $order;
+            if (!empty($order)) return $order;
         }
         return false;
     }
@@ -413,7 +411,7 @@ class CartComponent extends Component
         $this->trigger(self::EVENT_BEFORE_GET_ORDER_FROM_DB,
             new OrderInfoEvent([
                 'user_id' => \Yii::$app->user->id,
-                'email' => \Yii::$app->user->identity->email])
+                'email' => \Yii::$app->user->email])
         );
 
         $order = $this->getIncompleteOrder();
@@ -461,15 +459,64 @@ class CartComponent extends Component
     private function makeOrderFromSession()
     {
         $profile = new Profile();
-        $user = new User();
+        $userModel = new User();
         $order = new Order();
         $address = new UserAddress();
 
-        if ($profile->load(Yii::$app->request->post()) &&
-            $user->load(Yii::$app->request->post())
-        ) {
-            $order->load(Yii::$app->request->post());
+        if ($profile->load(Yii::$app->request->post()) && $userModel->load(Yii::$app->request->post())) {
+
+            $user = $userModel->finder->findUserByEmail($userModel->email);
+            if (empty($user)) {
+                $user = $userModel;
+                $user->username = $userModel->email;
+                if (!\Yii::$app->getModule('user')->enableGeneratingPassword) {
+                    $user->password = uniqid();
+                }
+                if ($user->validate()) {
+                    $user->save();
+                }
+
+                $profile->user_id = $user->id;
+
+            }
+
+            if ($profile->validate()) $profile->save();
+
             $address->load(Yii::$app->request->post());
+            $address->user_profile_id = $profile->id;
+            if ($address->validate()) $address->save();
+
+            $order->load(Yii::$app->request->post());
+            $order->user_id = $user->id;
+            $order->status = OrderStatus::STATUS_CONFIRMED;
+            $order->confirmation_time = new Expression('NOW()');
+            $order->total_cost = $this->getTotalCost();
+            $order->address_id = $address->id;
+            $order->uid = $this->generateUniqueId($this->uidPrefix, $this->minOrderUid, $this->maxOrderUid);
+            if ($order->validate()) $order->save();
+
+            //saving products
+            $session = \Yii::$app->session;
+            $sessionProducts = $session[self::SESSION_KEY];
+            foreach ($sessionProducts as $sessionProduct) {
+                $orderProduct = new OrderProduct();
+                $orderProduct->product_id = $sessionProduct['id'];
+                $orderProduct->order_id = $order->id;
+                $orderProduct->count = $sessionProduct['count'];
+                $orderProduct->combination_id = $sessionProduct['combinationId'];
+                if ($orderProduct->validate()) $orderProduct->save();
+
+                //saving additional products
+                if (!empty($sessionProduct['additionalProducts'])) {
+                    foreach ($sessionProduct['additionalProducts'] as $additionalProduct) {
+                        $newAdditionalProduct = new OrderProductAdditionalProduct();
+                        $newAdditionalProduct->additional_product_id = $additionalProduct;
+                        $newAdditionalProduct->order_product_id = $orderProduct->id;
+                        if ($newAdditionalProduct->validate()) $newAdditionalProduct->save();
+                    }
+                }
+            }
+
             $this->clearCart();
             return [
                 'user' => $user,
@@ -550,8 +597,7 @@ class CartComponent extends Component
                     if (!empty($product['combinationId'])) {
                         $combination = Combination::findOne($product['combinationId']);
                         if (!empty($combination)) $totalCost += $combination->price->discountPrice * $product['count'];
-                    }
-                    else {
+                    } else {
                         $productFromDb = Product::findOne($product['id']);
                         if (!empty($productFromDb)) $totalCost += $productFromDb->discountPrice * $product['count'];
                     }
@@ -613,8 +659,6 @@ class CartComponent extends Component
                     ->where(['user_id' => Yii::$app->user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])->one();
 
                 if (!empty($order)) {
-                    $orderProduct = OrderProduct::find()
-                        ->where(['product_id' => $productId, 'order_id' => $order->id]);
                     $orderProduct = (!empty($combinationId)) ?
                         OrderProduct::find()
                             ->where(['product_id' => $productId, 'order_id' => $order->id, 'combination_id' => $combinationId])
@@ -651,10 +695,9 @@ class CartComponent extends Component
                                 $_SESSION[self::SESSION_KEY][$key]['count'] = (int)Yii::$app->request->post('count');
                                 return true;
                             }
-                        }
-                        else {
+                        } else {
                             if ($product['id'] == $productId) {
-                                $_SESSION[self::SESSION_KEY][$key]['count']  = Yii::$app->request->post('count');
+                                $_SESSION[self::SESSION_KEY][$key]['count'] = Yii::$app->request->post('count');
                                 return true;
                             }
                         }
