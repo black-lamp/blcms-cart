@@ -21,7 +21,7 @@ class Mailer extends Component
             '{name}' => $orderResult['profile']->name,
             '{surname}' => $orderResult['profile']->surname,
             '{patronymic}' => $orderResult['profile']->patronymic,
-            '{email}' => $orderResult['user']->email,
+            '{email}' => (!empty($orderResult['user'])) ? $orderResult['user']->identity->email : $orderResult['user']->email,
             '{phone}' => $orderResult['profile']->phone,
             '{orderUid}' => $orderResult['order']->uid,
             '{products}' => \Yii::$app->view->render('@bl/cms/cart/frontend/views/mail/products', [
