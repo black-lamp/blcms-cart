@@ -229,3 +229,8 @@ You can setup mail layout in frontend config for shopMailer component. Now it us
 You can create templates here: /admin/email-templates/default/list (use 'welcome' key for it)
 Use next variables:
 {token} => confirmation token
+
+**Recovery email**
+Create 'recovery' template.
+Use next variables:
+{token} => confirmation token
