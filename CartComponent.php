@@ -498,6 +498,9 @@ class CartComponent extends Component
             //saving products
             $session = \Yii::$app->session;
             $sessionProducts = $session[self::SESSION_KEY];
+
+            if (empty($sessionProducts)) return false;
+
             foreach ($sessionProducts as $sessionProduct) {
                 $orderProduct = new OrderProduct();
                 $orderProduct->product_id = $sessionProduct['id'];
