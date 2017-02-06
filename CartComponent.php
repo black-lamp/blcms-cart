@@ -411,7 +411,7 @@ class CartComponent extends Component
         $this->trigger(self::EVENT_BEFORE_GET_ORDER_FROM_DB,
             new OrderInfoEvent([
                 'user_id' => \Yii::$app->user->id,
-                'email' => \Yii::$app->user->email])
+                'email' => \Yii::$app->user->identity->email])
         );
 
         $order = $this->getIncompleteOrder();
