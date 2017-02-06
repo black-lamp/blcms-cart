@@ -123,14 +123,21 @@ class RecoveryForm extends Model
             if (!$this->mailer->sendRecoveryMessage($user, $token)) {
                 return false;
             }
+
+            \Yii::$app->session->setFlash(
+                'info',
+                \Yii::t('user', 'An email has been sent with instructions for resetting your password')
+            );
+            return true;
         }
 
-        \Yii::$app->session->setFlash(
-            'info',
-            \Yii::t('user', 'An email has been sent with instructions for resetting your password')
-        );
-
-        return true;
+        else {
+            \Yii::$app->session->setFlash(
+                'info',
+                \Yii::t('user', 'Such email does not exist.')
+            );
+            return false;
+        }
     }
 
     /**
