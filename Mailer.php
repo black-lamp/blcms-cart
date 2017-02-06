@@ -55,7 +55,9 @@ class Mailer extends Component
         $mailTemplate = $this->createMailTemplate('order-success', $mailVars);
         $subject = $mailTemplate->getSubject();
         $bodyParams = ['bodyContent' => $mailTemplate->getBody()];
-        $this->sendMessage($orderResult['user']->email, $subject, $bodyParams);
+        $this->sendMessage(
+            (!empty($orderResult['user']->identity)) ? $orderResult['user']->identity->email : $orderResult['user']->email,
+            $subject, $bodyParams);
     }
 
     /**
