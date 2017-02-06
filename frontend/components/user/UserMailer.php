@@ -23,9 +23,6 @@ class UserMailer extends Component
     public $sender;
 
     /** @var string */
-    protected $welcomeSubject;
-
-    /** @var string */
     protected $confirmationSubject;
 
     /** @var string */
@@ -36,26 +33,6 @@ class UserMailer extends Component
 
     /** @var \dektrium\user\Module */
     protected $module;
-
-    /**
-     * @return string
-     */
-    public function getWelcomeSubject()
-    {
-        if ($this->welcomeSubject == null) {
-            $this->setWelcomeSubject(Yii::t('user', 'Welcome to {0}', Yii::$app->name));
-        }
-
-        return $this->welcomeSubject;
-    }
-
-    /**
-     * @param string $welcomeSubject
-     */
-    public function setWelcomeSubject($welcomeSubject)
-    {
-        $this->welcomeSubject = $welcomeSubject;
-    }
 
     /**
      * @return string
@@ -167,24 +144,6 @@ class UserMailer extends Component
     }
 
     /**
-     * Sends an email to a user with recovery link.
-     *
-     * @param User  $user
-     * @param Token $token
-     *
-     * @return bool
-     */
-    public function sendRecoveryMessage(User $user, Token $token)
-    {
-        return $this->sendMessage(
-            $user->email,
-            $this->getRecoverySubject(),
-            'recovery',
-            ['user' => $user, 'token' => $token]
-        );
-    }
-
-    /**
      * @param string $to
      * @param string $subject
      * @param string $view
@@ -231,6 +190,41 @@ class UserMailer extends Component
          */
         $mailTemplate = \Yii::$app->get('emailTemplates')
             ->getTemplate('welcome', Language::getCurrent()->id);
+        $mailTemplate->parseSubject($mailVars);
+        $mailTemplate->parseBody($mailVars);
+
+        if ($this->sender === null) {
+            $this->sender = isset(\Yii::$app->params['adminEmail']) ?
+                \Yii::$app->params['adminEmail']
+                : 'no-reply@example.com';
+        }
+
+        return \Yii::$app->shopMailer->compose('mail-body', ['bodyContent' => $mailTemplate->getBody()])
+            ->setFrom([$this->sender => \Yii::$app->name ?? Url::to(['/'], true)])
+            ->setTo($user->email)
+            ->setSubject($mailTemplate->getSubject())
+            ->send();
+    }
+
+    /**
+     * Sends an email to a user with recovery link.
+     *
+     * @param User  $user
+     * @param Token $token
+     *
+     * @return bool
+     */
+    public function sendRecoveryMessage(User $user, Token $token)
+    {
+        $mailVars = [
+            '{token}' => $token->url
+        ];
+
+        /**
+         * @var $mailTemplate Template
+         */
+        $mailTemplate = \Yii::$app->get('emailTemplates')
+            ->getTemplate('recovery', Language::getCurrent()->id);
         $mailTemplate->parseSubject($mailVars);
         $mailTemplate->parseBody($mailVars);
 
