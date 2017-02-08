@@ -184,7 +184,6 @@ class RegistrationController extends Controller
         $user = \Yii::createObject([
             'class'    => User::className(),
             'scenario' => 'connect',
-            'username' => $account->username,
             'email'    => $account->email,
         ]);
 

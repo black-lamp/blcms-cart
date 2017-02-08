@@ -25,7 +25,6 @@ use yii\widgets\ActiveForm;
         <div class="col-md-12">
             <div class="panel-body">
                 <?= $form->field($model, 'email') ?>
-                <?= $form->field($model, 'username') ?>
                 <?= $form->field($model, 'password')->passwordInput() ?>
                 <?= $form->field($profile, 'name') ?>
                 <?= $form->field($profile, 'surname') ?>
