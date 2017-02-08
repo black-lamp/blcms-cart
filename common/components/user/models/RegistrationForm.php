@@ -29,10 +29,10 @@ class RegistrationForm extends Model
      */
     public $email;
 
-    /**
-     * @var string Username
-     */
-    public $username;
+//    /**
+//     * @var string Username
+//     */
+//    public $username;
 
     /**
      * @var string Password
@@ -52,16 +52,16 @@ class RegistrationForm extends Model
 
         return [
             // username rules
-            'usernameLength'   => ['username', 'string', 'min' => 3, 'max' => 255],
-            'usernameTrim'     => ['username', 'filter', 'filter' => 'trim'],
-            'usernamePattern'  => ['username', 'match', 'pattern' => $user::$usernameRegexp],
-            'usernameRequired' => ['username', 'required'],
-            'usernameUnique'   => [
-                'username',
-                'unique',
-                'targetClass' => $user,
-                'message' => Yii::t('user', 'This username has already been taken')
-            ],
+//            'usernameLength'   => ['username', 'string', 'min' => 3, 'max' => 255],
+//            'usernameTrim'     => ['username', 'filter', 'filter' => 'trim'],
+//            'usernamePattern'  => ['username', 'match', 'pattern' => $user::$usernameRegexp],
+//            'usernameRequired' => ['username', 'required'],
+//            'usernameUnique'   => [
+//                'username',
+//                'unique',
+//                'targetClass' => $user,
+//                'message' => Yii::t('user', 'This username has already been taken')
+//            ],
             // email rules
             'emailTrim'     => ['email', 'filter', 'filter' => 'trim'],
             'emailRequired' => ['email', 'required'],
@@ -85,7 +85,7 @@ class RegistrationForm extends Model
     {
         return [
             'email'    => Yii::t('user', 'Email'),
-            'username' => Yii::t('user', 'Username'),
+//            'username' => Yii::t('user', 'Username'),
             'password' => Yii::t('user', 'Password'),
         ];
     }

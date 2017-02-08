@@ -1,7 +1,7 @@
 <?php
 namespace bl\cms\cart\frontend\components\user\controllers;
 use dektrium\user\controllers\SecurityController as MainController;
-use dektrium\user\models\LoginForm;
+use bl\cms\cart\common\components\user\models\LoginForm;
 use yii\helpers\Url;
 use yii\web\Response;
 
