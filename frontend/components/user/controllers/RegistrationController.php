@@ -133,6 +133,7 @@ class RegistrationController extends Controller
         if (\Yii::$app->request->isPost) {
             $post = \Yii::$app->request->post();
             if ($user->load($post)) {
+                $user->username = $user->email;
                 if ($profile->load($post)) {
                     if ($profile->user_id = $user->register()) {
 
