@@ -245,7 +245,7 @@ class CartComponent extends Component
     /**
      * @param $attributes
      * @param $productId
-     * @return array|bool|null|ActiveRecord
+     * @return array|bool|null|ActiveRecord|Combination
      */
     public function getCombination($attributes, $productId)
     {
