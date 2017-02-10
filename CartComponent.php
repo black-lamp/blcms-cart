@@ -199,25 +199,36 @@ class CartComponent extends Component
     {
         if (!empty($productId) && (!empty($count))) {
 
-            if (\Yii::$app->getModule('shop')->enableCombinations && !empty($attributesAndValues))
-                $combination = $this->getCombination($attributesAndValues, $productId);
-
             $session = Yii::$app->session;
-
             $productsFromSession = $session[self::SESSION_KEY];
+
             if (!empty($productsFromSession)) {
                 foreach ($productsFromSession as $key => $product) {
-                    if (
-                        $product['id'] == $productId &&
-                        (!empty($combination)) && (\Yii::$app->getModule('shop')->enableCombinations && $product['combinationId'] == $combination->id)
-                    ) {
-                        $productsFromSession[$key]['count'] += $count;
-                        if (!empty($additionalProducts)) {
-                            $productsFromSession[$key]['additionalProducts'] =
-                                array_merge($productsFromSession[$key]['additionalProducts'], $additionalProducts);
+
+                    if ($product['id'] == $productId) {
+
+                        if (\Yii::$app->getModule('shop')->enableCombinations && !empty($attributesAndValues)) {
+                            $combination = $this->getCombination($attributesAndValues, $productId);
+
+                            if ($product['combinationId'] == $combination->id) {
+                                $productsFromSession[$key]['count'] += $count;
+                                if (!empty($additionalProducts)) {
+                                    $productsFromSession[$key]['additionalProducts'] =
+                                        array_merge($productsFromSession[$key]['additionalProducts'], $additionalProducts);
+                                }
+                                break;
+                            }
                         }
-                        break;
-                    } else if (count($productsFromSession) - 1 == $key) {
+                        else {
+                            $productsFromSession[$key]['count'] += $count;
+                            if (!empty($additionalProducts)) {
+                                $productsFromSession[$key]['additionalProducts'] =
+                                    array_merge($productsFromSession[$key]['additionalProducts'], $additionalProducts);
+                            }
+                            break;
+                        }
+                    }
+                    if (count($productsFromSession) - 1 == $key) {
                         $productsFromSession[] =
                             [
                                 'id' => $productId,
@@ -226,6 +237,7 @@ class CartComponent extends Component
                                 'additionalProducts' => $additionalProducts
                             ];
                     }
+
                 }
                 $session[self::SESSION_KEY] = $productsFromSession;
             } else {
