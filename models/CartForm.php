@@ -25,4 +25,11 @@ class CartForm extends Model
             [['productId', 'count'], 'required'],
         ];
     }
+
+    public function attributeLabels()
+    {
+        return [
+            'additional_products' => \Yii::t('cart', 'Additional')
+        ];
+    }
 }
