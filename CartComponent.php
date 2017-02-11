@@ -201,16 +201,23 @@ class CartComponent extends Component
 
             $session = Yii::$app->session;
             $productsFromSession = $session[self::SESSION_KEY];
+            if (\Yii::$app->getModule('shop')->enableCombinations) {
+                if (!empty($attributesAndValues)) {
+                    $combination = $this->getCombination($attributesAndValues, $productId);
+                    if (!empty($combination)) $combinationId = $combination->id;
+                    else $combinationId = null;
+                }
+                else $combinationId = null;
+            }
 
             if (!empty($productsFromSession)) {
                 foreach ($productsFromSession as $key => $product) {
 
                     if ($product['id'] == $productId) {
 
-                        if (\Yii::$app->getModule('shop')->enableCombinations && !empty($attributesAndValues)) {
-                            $combination = $this->getCombination($attributesAndValues, $productId);
+                        if (\Yii::$app->getModule('shop')->enableCombinations && !empty($combinationId)) {
 
-                            if ($product['combinationId'] == $combination->id) {
+                            if ($product['combinationId'] == $combinationId) {
                                 $productsFromSession[$key]['count'] += $count;
                                 if (!empty($additionalProducts)) {
                                     $productsFromSession[$key]['additionalProducts'] =
@@ -233,7 +240,7 @@ class CartComponent extends Component
                             [
                                 'id' => $productId,
                                 'count' => $count,
-                                'combinationId' => (!empty($combination)) ? $combination->id : null,
+                                'combinationId' => $combinationId,
                                 'additionalProducts' => $additionalProducts
                             ];
                     }
@@ -245,7 +252,7 @@ class CartComponent extends Component
                     [
                         'id' => $productId,
                         'count' => $count,
-                        'combinationId' => (!empty($combination)) ? $combination->id : null,
+                        'combinationId' => $combinationId,
                         'additionalProducts' => $additionalProducts
                     ];
             }
