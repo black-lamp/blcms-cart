@@ -227,12 +227,14 @@ class CartComponent extends Component
                             }
                         }
                         else {
-                            $productsFromSession[$key]['count'] += $count;
-                            if (!empty($additionalProducts)) {
-                                $productsFromSession[$key]['additionalProducts'] =
-                                    array_merge($productsFromSession[$key]['additionalProducts'], $additionalProducts);
+                            if (empty($product['combinationId'])) {
+                                $productsFromSession[$key]['count'] += $count;
+                                if (!empty($additionalProducts)) {
+                                    $productsFromSession[$key]['additionalProducts'] =
+                                        array_merge($productsFromSession[$key]['additionalProducts'], $additionalProducts);
+                                }
+                                break;
                             }
-                            break;
                         }
                     }
                     if (count($productsFromSession) - 1 == $key) {
