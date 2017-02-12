@@ -33,6 +33,11 @@ class LoginForm extends Model
     /** @var string Whether to remember the user */
     public $rememberMe = false;
 
+    /**
+     * @var string
+     */
+    public $returnUrl;
+
     /** @var \dektrium\user\models\User */
     protected $user;
 
@@ -90,6 +95,7 @@ class LoginForm extends Model
                 }
             ],
             'rememberMe' => ['rememberMe', 'boolean'],
+            ['returnUrl', 'string']
         ];
     }
 

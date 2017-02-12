@@ -32,7 +32,22 @@ class SecurityController extends MainController
         if ($model->load(\Yii::$app->getRequest()->post()) && $model->login()) {
             $this->trigger(self::EVENT_AFTER_LOGIN, $event);
 
-            return \Yii::$app->getResponse()->redirect(Url::to([\Yii::$app->user->returnUrl]));
+            //Checking return url
+            if (!empty($model->returnUrl)) {
+                $host = \Yii::$app->request->hostInfo;
+                $returnUrlHost = substr($model->returnUrl, 0, strlen($host));
+                if ($returnUrlHost == $host) {
+                    $returnUrl = $model->returnUrl;
+                }
+                else {
+                    $returnUrl = \Yii::$app->user->returnUrl;
+                }
+            }
+            else {
+                $returnUrl = \Yii::$app->user->returnUrl;
+            }
+
+            return \Yii::$app->getResponse()->redirect($returnUrl);
         }
 
         return $this->render('login', [

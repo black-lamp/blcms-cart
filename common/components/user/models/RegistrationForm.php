@@ -44,6 +44,12 @@ class RegistrationForm extends Model
     public $phone;
 
     /**
+     * @var string
+     * Return url
+     */
+    public $return;
+
+    /**
      * @inheritdoc
      */
     public function rules()
@@ -75,6 +81,7 @@ class RegistrationForm extends Model
             // password rules
             'passwordRequired' => ['password', 'required', 'skipOnEmpty' => $this->module->enableGeneratingPassword],
             'passwordLength'   => ['password', 'string', 'min' => 6, 'max' => 72],
+            [['return'], 'string']
         ];
     }
 
@@ -114,7 +121,7 @@ class RegistrationForm extends Model
         $user->setScenario('register');
         $this->loadAttributes($user);
 
-        $id = $user->register();
+        $id = $user->register($this->return);
         if (!$id) {
             return false;
         }

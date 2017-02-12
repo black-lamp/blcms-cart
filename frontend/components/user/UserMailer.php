@@ -1,10 +1,10 @@
 <?php
 namespace bl\cms\cart\frontend\components\user;
 
+use bl\cms\cart\common\components\user\models\Token;
 use bl\cms\shop\common\components\user\models\User;
 use bl\emailTemplates\data\Template;
 use bl\multilang\entities\Language;
-use dektrium\user\models\Token;
 use Yii;
 use yii\base\Component;
 use yii\helpers\Url;

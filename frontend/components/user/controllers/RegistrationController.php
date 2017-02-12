@@ -215,7 +215,7 @@ class RegistrationController extends Controller
      * @return string
      * @throws \yii\web\HttpException
      */
-    public function actionConfirm($id, $code)
+    public function actionConfirm($id, $code, $return)
     {
         $user = $this->finder->findUserById($id);
 
@@ -232,6 +232,10 @@ class RegistrationController extends Controller
         $this->trigger(self::EVENT_AFTER_CONFIRM, new UserRegistrationEvent([
             'id' => $user->id
         ]));
+
+        if (!empty($return)) {
+            return $this->redirect($return);
+        }
 
         return $this->render('/message', [
             'title'  => \Yii::t('user', 'Account confirmation'),
