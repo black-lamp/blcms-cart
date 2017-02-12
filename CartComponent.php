@@ -763,7 +763,7 @@ class CartComponent extends Component
      * @param $additionalProductId
      * @return bool
      */
-    public function removeAdditionalProductFromSession($productId, $combinationId = null, $additionalProductId)
+    public function removeAdditionalProductFromSession($productId, $additionalProductId, $combinationId = null)
     {
         $session = Yii::$app->session;
 
@@ -824,7 +824,7 @@ class CartComponent extends Component
         return false;
     }
 
-    public function addAdditionalProductToSession($productId, $combinationId = null, $additionalProductId)
+    public function addAdditionalProductToSession($productId, $additionalProductId, $combinationId = null)
     {
         $session = Yii::$app->session;
 
