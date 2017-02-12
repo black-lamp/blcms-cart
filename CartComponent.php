@@ -80,11 +80,12 @@ class CartComponent extends Component
     /**
      * Adds product to cart.
      *
-     * @param integer $productId
-     * @param integer $count
-     * @param array|null $attributesAndValues
+     * @param $productId
+     * @param $count
+     * @param null $attributesAndValues
+     * @param array $additionalProducts
      */
-    public function add($productId, $count, $attributesAndValues = null, $additionalProducts = null)
+    public function add($productId, $count, $attributesAndValues = null, $additionalProducts = [])
     {
         if (!empty($attributesAndValues)) {
             $attributesAndValues = Json::decode($attributesAndValues);
@@ -205,10 +206,10 @@ class CartComponent extends Component
      * @param integer $productId
      * @param integer $count
      * @param array|null $attributesAndValues
-     * @param array|null $additionalProducts
+     * @param array $additionalProducts
      * @return boolean
      */
-    private function saveProductToSession(int $productId, int $count, $attributesAndValues = null, $additionalProducts = null)
+    private function saveProductToSession(int $productId, int $count, $attributesAndValues = null, $additionalProducts = [])
     {
         if (!empty($productId) && (!empty($count))) {
 
@@ -232,8 +233,12 @@ class CartComponent extends Component
                             if ($product['combinationId'] == $combinationId) {
                                 $productsFromSession[$key]['count'] += $count;
                                 if (!empty($additionalProducts)) {
-                                    $productsFromSession[$key]['additionalProducts'] =
-                                        array_merge($productsFromSession[$key]['additionalProducts'], $additionalProducts);
+                                    if (empty($productsFromSession[$key]['additionalProducts'])) {
+                                        $productsFromSession[$key]['additionalProducts'] = $additionalProducts;
+                                    } else {
+                                        $productsFromSession[$key]['additionalProducts'] =
+                                            array_merge($productsFromSession[$key]['additionalProducts'], $additionalProducts);
+                                    }
                                 }
                                 break;
                             }
@@ -241,8 +246,14 @@ class CartComponent extends Component
                             if (empty($product['combinationId'])) {
                                 $productsFromSession[$key]['count'] += $count;
                                 if (!empty($additionalProducts)) {
-                                    $productsFromSession[$key]['additionalProducts'] =
-                                        array_merge($productsFromSession[$key]['additionalProducts'], $additionalProducts);
+
+                                    if (empty($productsFromSession[$key]['additionalProducts'])) {
+                                        $productsFromSession[$key]['additionalProducts'] = $additionalProducts;
+                                    }
+                                    else {
+                                        $productsFromSession[$key]['additionalProducts'] =
+                                            array_merge($productsFromSession[$key]['additionalProducts'], $additionalProducts);
+                                    }
                                 }
                                 break;
                             }
@@ -634,6 +645,13 @@ class CartComponent extends Component
                         $productFromDb = Product::findOne($product['id']);
                         if (!empty($productFromDb)) $totalCost += $productFromDb->discountPrice * $product['count'];
                     }
+
+                    if (!empty($product['additionalProducts'])) {
+                        foreach ($product['additionalProducts'] as $additionalProductId) {
+                            $additionalProduct = Product::findOne($additionalProductId);
+                            if (!empty($additionalProductId)) $totalCost += $additionalProduct->discountPrice;
+                        }
+                    }
                 }
             }
             return $totalCost;
@@ -652,8 +670,8 @@ class CartComponent extends Component
                         } else {
                             $totalCost += $product->count * $product->price;
                         }
-                        if (!empty($product->orderProductAdditionalProduct)) {
-                            foreach ($product->orderProductAdditionalProduct as $orderProductAdditionalProduct) {
+                        if (!empty($product->orderProductAdditionalProducts)) {
+                            foreach ($product->orderProductAdditionalProducts as $orderProductAdditionalProduct) {
                                 $totalCost += $orderProductAdditionalProduct->additionalProduct->discountPrice;
                             }
                         }
@@ -800,6 +818,62 @@ class CartComponent extends Component
                     return OrderProductAdditionalProduct::deleteAll([
                         'order_product_id' => $orderProduct->id, 'additional_product_id' => $additionalProductId
                     ]);
+                }
+            }
+        }
+        return false;
+    }
+
+    public function addAdditionalProductToSession($productId, $combinationId = null, $additionalProductId)
+    {
+        $session = Yii::$app->session;
+
+        if (!empty($productId) && !empty($additionalProductId) && $session->has(self::SESSION_KEY)) {
+            $products = $session[self::SESSION_KEY];
+            foreach ($products as $key => $product) {
+                if ($product['id'] == $productId) {
+
+                    if (!empty($combinationId) && ($product['combinationId'] != $combinationId))
+                        continue;
+
+                    $_SESSION[self::SESSION_KEY][$key]['additionalProducts'][] = $additionalProductId;
+                    return true;
+                }
+
+            }
+        }
+        return false;
+    }
+
+    public function addAdditionalProductToDb($productId, $additionalProductId, $combinationId = null)
+    {
+        if (!empty($productId) && !empty($additionalProductId)) {
+            $order = $this->getIncompleteOrder();
+            if (!empty($order)) {
+
+                if (!empty($combinationId)) {
+                    $orderProduct = OrderProduct::find()->where([
+                        'product_id' => $productId,
+                        'combinationId' => $combinationId,
+                        'order_id' => $order->id
+                    ])->one();
+                }
+                else {
+                    $orderProduct = OrderProduct::find()->where([
+                        'product_id' => $productId,
+                        'order_id' => $order->id
+                    ])->one();
+                }
+
+                if (!empty($orderProduct)) {
+                    $additionalProduct = new OrderProductAdditionalProduct();
+                    $additionalProduct->order_product_id = $orderProduct->id;
+                    $additionalProduct->additional_product_id = $additionalProductId;
+
+                    if ($additionalProduct->validate()) {
+                        $additionalProduct->save();
+                        return true;
+                    }
                 }
             }
         }

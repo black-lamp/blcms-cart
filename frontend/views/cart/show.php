@@ -91,13 +91,13 @@ bl\cms\cart\frontend\assets\CartAsset::register($this);
                                 $url = Url::toRoute(['/shop/product/show', 'id' => $orderProduct->product->id]);
                                 echo Html::a($orderProduct->product->translation->title, $url);
                                 ?>
-                                <?php if (!empty($orderProduct->orderProductAdditionalProduct)): ?>
+                                <?php if (!empty($orderProduct->orderProductAdditionalProducts)): ?>
                                     <p>
                                         <b><?= \Yii::t('shop', 'Additional products'); ?>:</b>
                                     </p>
                                     <div class="additional-products">
                                         <ul>
-                                            <?php foreach ($orderProduct->orderProductAdditionalProduct as $additionalProduct): ?>
+                                            <?php foreach ($orderProduct->orderProductAdditionalProducts as $additionalProduct): ?>
                                                 <li>
                                                     <a href="<?= Url::to(['/shop/product', 'id' => $additionalProduct->additionalProduct->id]); ?>">
                                                         <?= $additionalProduct->additionalProduct->translation->title; ?>

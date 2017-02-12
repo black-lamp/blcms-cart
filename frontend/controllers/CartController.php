@@ -53,7 +53,6 @@ class CartController extends Controller
                 Yii::$app->cart->add($model->productId, $model->count,
                     json_encode($model->attribute_value_id), $model->additional_products
                 );
-
                 if (\Yii::$app->request->isAjax) {
                     $data = [
                         'orderCounterValue' => \Yii::$app->cart->getOrderItemsCount(),
@@ -244,7 +243,32 @@ class CartController extends Controller
      * @param $productId
      * @param $additionalProductId
      * @param null $combinationId
-     * @return Response
+     * @return string|Response
+     */
+    public function actionAddAdditionalProduct($productId, $additionalProductId, $combinationId = null) {
+        if (\Yii::$app->user->isGuest) {
+            Yii::$app->cart->addAdditionalProductToSession($productId, $additionalProductId, $combinationId);
+        }
+        else {
+            Yii::$app->cart->addAdditionalProductToDb($productId, $additionalProductId, $combinationId);
+        }
+
+        if (\Yii::$app->request->isAjax) {
+            $data = [
+                'totalCost' => \Yii::$app->formatter->asCurrency(\Yii::$app->cart->getTotalCost())
+            ];
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return Json::encode($data);
+        }
+
+        return $this->redirect(\Yii::$app->request->referrer);
+    }
+
+    /**
+     * @param $productId
+     * @param $additionalProductId
+     * @param null $combinationId
+     * @return string|Response
      */
     public function actionRemoveAdditionalProduct($productId, $additionalProductId, $combinationId = null) {
         if (\Yii::$app->user->isGuest) {
@@ -252,6 +276,14 @@ class CartController extends Controller
         }
         else {
             Yii::$app->cart->removeAdditionalProductFromDb($productId, $additionalProductId, $combinationId);
+        }
+
+        if (\Yii::$app->request->isAjax) {
+            $data = [
+                'totalCost' => \Yii::$app->formatter->asCurrency(\Yii::$app->cart->getTotalCost())
+            ];
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return Json::encode($data);
         }
 
         return $this->redirect(\Yii::$app->request->referrer);

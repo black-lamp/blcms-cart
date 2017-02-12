@@ -24,6 +24,7 @@ use yii\db\ActiveRecord;
  * @property Order $order
  * @property Product $product
  * @property Price $productPrice
+ * @property OrderProductAdditionalProduct $orderProductAdditionalProduct
  */
 class OrderProduct extends ActiveRecord
 {
@@ -124,7 +125,8 @@ class OrderProduct extends ActiveRecord
         else return false;
     }
 
-    public function getOrderProductAdditionalProduct() {
+    public function getOrderProductAdditionalProducts() {
+
         return $this->hasMany(OrderProductAdditionalProduct::className(), ['order_product_id' => 'id']);
     }
 }
