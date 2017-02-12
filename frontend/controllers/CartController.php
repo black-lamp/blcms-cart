@@ -239,4 +239,21 @@ class CartController extends Controller
         }
         throw new NotFoundHttpException();
     }
+
+    /**
+     * @param $productId
+     * @param $additionalProductId
+     * @param null $combinationId
+     * @return Response
+     */
+    public function actionRemoveAdditionalProduct($productId, $additionalProductId, $combinationId = null) {
+        if (\Yii::$app->user->isGuest) {
+            Yii::$app->cart->removeAdditionalProductFromSession($productId, $additionalProductId, $combinationId);
+        }
+        else {
+            Yii::$app->cart->removeAdditionalProductFromDb($productId, $additionalProductId, $combinationId);
+        }
+
+        return $this->redirect(\Yii::$app->request->referrer);
+    }
 }

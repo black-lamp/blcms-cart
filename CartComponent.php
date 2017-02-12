@@ -111,11 +111,16 @@ class CartComponent extends Component
 
         $order = $this->getIncompleteOrderFromDB();
 
-        if (\Yii::$app->getModule('shop')->enableCombinations && !empty($attributesAndValues)) {
-            $combination = $this->getCombination($attributesAndValues, $productId);
-            if (!empty($combination)) {
-                $orderProduct = $this->getOrderProduct($order->id, $productId, $combination->id);
-            } else throw new Exception(\Yii::t('cart', 'Such attributes combination does not exist'));
+        if (\Yii::$app->getModule('shop')->enableCombinations) {
+            if (!empty($attributesAndValues)) {
+                $combination = $this->getCombination($attributesAndValues, $productId);
+                if (!empty($combination)) {
+                    $orderProduct = $this->getOrderProduct($order->id, $productId, $combination->id);
+                } else throw new Exception(\Yii::t('cart', 'Such attributes combination does not exist'));
+            }
+            else {
+                $orderProduct = $this->getOrderProduct($order->id, $productId, null);
+            }
         } else {
             $orderProduct = new OrderProduct();
             $orderProduct->product_id = $productId;
@@ -149,11 +154,19 @@ class CartComponent extends Component
      */
     private function getOrderProduct(int $orderId, int $productId, $combinationId)
     {
-        $orderProduct = OrderProduct::findOne([
-            'product_id' => $productId,
-            'combination_id' => $combinationId,
-            'order_id' => $orderId
-        ]);
+        if (empty($combinationId)) {
+            $orderProduct = OrderProduct::findOne([
+                'product_id' => $productId,
+                'order_id' => $orderId
+            ]);
+        }
+        else {
+            $orderProduct = OrderProduct::findOne([
+                'product_id' => $productId,
+                'combination_id' => $combinationId,
+                'order_id' => $orderId
+            ]);
+        }
         if (empty($orderProduct)) {
             $orderProduct = new OrderProduct();
             $orderProduct->product_id = $productId;
@@ -206,8 +219,7 @@ class CartComponent extends Component
                     $combination = $this->getCombination($attributesAndValues, $productId);
                     if (!empty($combination)) $combinationId = $combination->id;
                     else $combinationId = null;
-                }
-                else $combinationId = null;
+                } else $combinationId = null;
             }
 
             if (!empty($productsFromSession)) {
@@ -225,8 +237,7 @@ class CartComponent extends Component
                                 }
                                 break;
                             }
-                        }
-                        else {
+                        } else {
                             if (empty($product['combinationId'])) {
                                 $productsFromSession[$key]['count'] += $count;
                                 if (!empty($additionalProducts)) {
@@ -708,23 +719,88 @@ class CartComponent extends Component
     public function changeOrderProductCountInSession(int $productId, int $combinationId = NULL)
     {
         if (!empty($productId)) {
-            if (Yii::$app->user->isGuest) {
-                $session = Yii::$app->session;
-                if ($session->has(self::SESSION_KEY)) {
-                    $products = $session[self::SESSION_KEY];
-                    foreach ($products as $key => $product) {
-                        if (!empty($combinationId)) {
-                            if ($product['id'] == $productId && $product['combinationId'] == $combinationId) {
-                                $_SESSION[self::SESSION_KEY][$key]['count'] = (int)Yii::$app->request->post('count');
-                                return true;
-                            }
-                        } else {
-                            if ($product['id'] == $productId) {
-                                $_SESSION[self::SESSION_KEY][$key]['count'] = Yii::$app->request->post('count');
-                                return true;
-                            }
+            $session = Yii::$app->session;
+            if ($session->has(self::SESSION_KEY)) {
+                $products = $session[self::SESSION_KEY];
+                foreach ($products as $key => $product) {
+                    if (!empty($combinationId)) {
+                        if ($product['id'] == $productId && $product['combinationId'] == $combinationId) {
+                            $_SESSION[self::SESSION_KEY][$key]['count'] = (int)Yii::$app->request->post('count');
+                            return true;
+                        }
+                    } else {
+                        if ($product['id'] == $productId) {
+                            $_SESSION[self::SESSION_KEY][$key]['count'] = Yii::$app->request->post('count');
+                            return true;
                         }
                     }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param $productId
+     * @param null $combinationId
+     * @param $additionalProductId
+     * @return bool
+     */
+    public function removeAdditionalProductFromSession($productId, $combinationId = null, $additionalProductId)
+    {
+        $session = Yii::$app->session;
+
+        if (!empty($productId) && !empty($additionalProductId) && $session->has(self::SESSION_KEY)) {
+            $products = $session[self::SESSION_KEY];
+            foreach ($products as $key => $product) {
+                if ($product['id'] == $productId) {
+
+                    if (!empty($combinationId) && ($product['combinationId'] != $combinationId))
+                        continue;
+
+                    foreach ($product['additionalProducts'] as $k => $additionalProduct) {
+                        if ($additionalProduct == $additionalProductId) {
+                            unset($_SESSION[self::SESSION_KEY][$key]['additionalProducts'][$k]);
+                            return true;
+                        }
+                    }
+                }
+
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param $productId
+     * @param $additionalProductId
+     * @param null $combinationId
+     * @return bool|int
+     */
+    public function removeAdditionalProductFromDb($productId, $additionalProductId, $combinationId = null)
+    {
+        if (!empty($productId) && !empty($additionalProductId)) {
+            $order = $this->getIncompleteOrder();
+            if (!empty($order)) {
+
+                if (!empty($combinationId)) {
+                    $orderProduct = OrderProduct::find()->where([
+                        'product_id' => $productId,
+                        'combinationId' => $combinationId,
+                        'order_id' => $order->id
+                    ])->one();
+                }
+                else {
+                    $orderProduct = OrderProduct::find()->where([
+                        'product_id' => $productId,
+                        'order_id' => $order->id
+                    ])->one();
+                }
+
+                if (!empty($orderProduct)) {
+                    return OrderProductAdditionalProduct::deleteAll([
+                        'order_product_id' => $orderProduct->id, 'additional_product_id' => $additionalProductId
+                    ]);
                 }
             }
         }
