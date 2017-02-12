@@ -17,6 +17,7 @@ use Yii;
  * @property string $patronymic
  * @property string $avatar
  * @property integer $phone
+ * @property string $info
  *
  * @property User $user
  * @property UserAddress[] $userAddresses
@@ -51,6 +52,7 @@ class Profile extends BaseProfile
         return [
             [['user_id'], 'integer'],
             [['phone'], 'string', 'max' => 25],
+            [['info'], 'string', 'max' => 120],
             [['name', 'surname', 'phone'], 'required'],
             [['name', 'surname', 'patronymic', 'avatar'], 'string', 'max' => 255],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
@@ -68,6 +70,7 @@ class Profile extends BaseProfile
             'patronymic' => Yii::t('cart', 'Patronymic'),
             'avatar' => Yii::t('cart', 'Avatar'),
             'phone' => Yii::t('cart', 'Phone number'),
+            'info' => Yii::t('cart', 'Information'),
         ];
     }
 

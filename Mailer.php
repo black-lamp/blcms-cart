@@ -21,6 +21,7 @@ class Mailer extends Component
             '{name}' => $orderResult['profile']->name,
             '{surname}' => $orderResult['profile']->surname,
             '{patronymic}' => $orderResult['profile']->patronymic,
+            '{info}' => $orderResult['profile']->info,
             '{email}' => (!empty($orderResult['user']->identity)) ? $orderResult['user']->identity->email : $orderResult['user']->email,
             '{phone}' => $orderResult['profile']->phone,
             '{orderUid}' => $orderResult['order']->uid,
