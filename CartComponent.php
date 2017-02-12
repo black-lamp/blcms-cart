@@ -214,12 +214,12 @@ class CartComponent extends Component
 
             $session = Yii::$app->session;
             $productsFromSession = $session[self::SESSION_KEY];
+            $combinationId = null;
             if (\Yii::$app->getModule('shop')->enableCombinations) {
                 if (!empty($attributesAndValues)) {
                     $combination = $this->getCombination($attributesAndValues, $productId);
                     if (!empty($combination)) $combinationId = $combination->id;
-                    else $combinationId = null;
-                } else $combinationId = null;
+                }
             }
 
             if (!empty($productsFromSession)) {
@@ -257,7 +257,6 @@ class CartComponent extends Component
                                 'additionalProducts' => $additionalProducts
                             ];
                     }
-
                 }
                 $session[self::SESSION_KEY] = $productsFromSession;
             } else {
