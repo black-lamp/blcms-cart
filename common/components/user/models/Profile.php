@@ -4,8 +4,7 @@ namespace bl\cms\cart\common\components\user\models;
 use bl\cms\shop\common\components\user\models\User;
 use dektrium\user\traits\ModuleTrait;
 use Yii;
-use yii\db\ActiveRecord;
-
+use dektrium\user\models\Profile as BaseProfile;
 /**
  * This file overrides standart model of the Dektrium project Yii2-user.
  * @author Albert Gainutdinov <xalbert.einsteinx@gmail.com>
@@ -24,7 +23,7 @@ use yii\db\ActiveRecord;
  */
 
 
-class Profile extends ActiveRecord
+class Profile extends BaseProfile
 {
     use ModuleTrait;
     /** @var \dektrium\user\Module */
