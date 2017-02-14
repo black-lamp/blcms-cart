@@ -1,6 +1,7 @@
 <?php
 namespace bl\cms\cart\frontend\components\user\controllers;
 
+use bl\cms\cart\common\components\user\models\Profile;
 use bl\cms\cart\common\components\user\models\UserAddress;
 use dektrium\user\controllers\SettingsController as BaseController;
 use yii\base\Exception;
@@ -98,5 +99,35 @@ class SettingsController extends BaseController
             else throw new ForbiddenHttpException('Such address does not exists or it is not your address.');
         }
         else throw new ForbiddenHttpException('Id can not be empty.');
+    }
+
+    /**
+     * Shows profile settings form.
+     *
+     * @return string|\yii\web\Response
+     */
+    public function actionProfile()
+    {
+        $model = $this->finder->findProfileById(\Yii::$app->user->identity->getId());
+
+        if ($model == null) {
+            $model = \Yii::createObject(Profile::className());
+            $model->link('user', \Yii::$app->user->identity);
+        }
+
+        $event = $this->getProfileEvent($model);
+
+        $this->performAjaxValidation($model);
+
+        $this->trigger(self::EVENT_BEFORE_PROFILE_UPDATE, $event);
+        if ($model->load(\Yii::$app->request->post()) && $model->save()) {
+            \Yii::$app->getSession()->setFlash('success', \Yii::t('user', 'Your profile has been updated'));
+            $this->trigger(self::EVENT_AFTER_PROFILE_UPDATE, $event);
+            return $this->refresh();
+        }
+
+        return $this->render('profile', [
+            'model' => $model,
+        ]);
     }
 }
