@@ -156,10 +156,6 @@ class Profile extends BaseProfile
      */
     public function beforeSave($insert)
     {
-        if ($this->isAttributeChanged('gravatar_email')) {
-            $this->setAttribute('gravatar_id', md5(strtolower(trim($this->getAttribute('gravatar_email')))));
-        }
-
         return parent::beforeSave($insert);
     }
 }
