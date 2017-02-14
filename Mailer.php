@@ -88,7 +88,7 @@ class Mailer extends Component
             try {
 
                 \Yii::$app->shopMailer->compose('mail-body', $bodyParams)
-                    ->setFrom([\Yii::$app->cart->sender => \Yii::$app->name ?? Url::to(['/'], true)])
+                    ->setFrom([\Yii::$app->cart->sender ?? \Yii::$app->shopMailer->transport->getUsername() => \Yii::$app->name ?? Url::to(['/'], true)])
                     ->setTo($sendTo)
                     ->setSubject($bodySubject)
                     ->send();

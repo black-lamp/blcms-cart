@@ -76,7 +76,7 @@ class CartBootstrap implements BootstrapInterface
 
                 Yii::$app->shopMailer->compose('@bl/cms/cart/frontend/views/mail/mail-body',
                     ['bodyContent' => $mailTemplate->getBody()])
-                    ->setFrom([\Yii::$app->cart->sender => \Yii::$app->name ?? Url::to(['/'], true)])
+                    ->setFrom([\Yii::$app->cart->sender ?? \Yii::$app->shopMailer->transport->getUsername() => \Yii::$app->name ?? Url::to(['/'], true)])
                     ->setTo($event->model->user->email)
                     ->setSubject($mailTemplate->getSubject())
                     ->send();

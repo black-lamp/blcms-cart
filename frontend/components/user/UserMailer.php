@@ -158,15 +158,9 @@ class UserMailer extends Component
         $mailer->viewPath = $this->viewPath;
         $mailer->getView()->theme = Yii::$app->view->theme;
 
-        if ($this->sender === null) {
-            $this->sender = isset(Yii::$app->params['adminEmail']) ?
-                Yii::$app->params['adminEmail']
-                : 'no-reply@example.com';
-        }
-
         return $mailer->compose(['html' => $view, 'text' => 'text/' . $view], $params)
             ->setTo($to)
-            ->setFrom([$this->sender => \Yii::$app->name ?? Url::to(['/'], true)])
+            ->setFrom([$mailer->transport->getUsername() => \Yii::$app->name ?? Url::to(['/'], true)])
             ->setSubject($subject)
             ->send();
     }
@@ -193,14 +187,8 @@ class UserMailer extends Component
         $mailTemplate->parseSubject($mailVars);
         $mailTemplate->parseBody($mailVars);
 
-        if ($this->sender === null) {
-            $this->sender = isset(\Yii::$app->params['adminEmail']) ?
-                \Yii::$app->params['adminEmail']
-                : 'no-reply@example.com';
-        }
-
         return \Yii::$app->shopMailer->compose('mail-body', ['bodyContent' => $mailTemplate->getBody()])
-            ->setFrom([$this->sender => \Yii::$app->name ?? Url::to(['/'], true)])
+            ->setFrom([\Yii::$app->shopMailer->transport->getUsername() => \Yii::$app->name ?? Url::to(['/'], true)])
             ->setTo($user->email)
             ->setSubject($mailTemplate->getSubject())
             ->send();
@@ -228,14 +216,8 @@ class UserMailer extends Component
         $mailTemplate->parseSubject($mailVars);
         $mailTemplate->parseBody($mailVars);
 
-        if ($this->sender === null) {
-            $this->sender = isset(\Yii::$app->params['adminEmail']) ?
-                \Yii::$app->params['adminEmail']
-                : 'no-reply@example.com';
-        }
-
         return \Yii::$app->shopMailer->compose('mail-body', ['bodyContent' => $mailTemplate->getBody()])
-            ->setFrom([$this->sender => \Yii::$app->name ?? Url::to(['/'], true)])
+            ->setFrom([\Yii::$app->shopMailer->transport->getUsername() => \Yii::$app->name ?? Url::to(['/'], true)])
             ->setTo($user->email)
             ->setSubject($mailTemplate->getSubject())
             ->send();
