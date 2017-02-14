@@ -234,6 +234,7 @@ class RegistrationController extends Controller
         ]));
 
         if (!empty($return)) {
+            \Yii::$app->user->setReturnUrl($return);
             return $this->redirect($return);
         }
 

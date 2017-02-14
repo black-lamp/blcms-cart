@@ -47,6 +47,8 @@ class SecurityController extends MainController
                 $returnUrl = Url::to([\Yii::$app->user->returnUrl]);
             }
 
+            \Yii::$app->user->setReturnUrl($returnUrl);
+
             return \Yii::$app->getResponse()->redirect($returnUrl);
         }
 
