@@ -24,8 +24,8 @@ class Register extends Widget
     public function run()
     {
         return $this->render('register', [
-            'profile' => \Yii::createObject(Profile::className()),
-            'model' => \Yii::createObject(RegistrationForm::className()),
+            'profile' => \Yii::createObject(\Yii::$app->getModule('user')->modelMap['Profile']::className()),
+            'model' => \Yii::createObject(\Yii::$app->getModule('user')->modelMap['RegistrationForm']::className()),
         ]);
     }
 }
