@@ -803,7 +803,7 @@ class CartComponent extends Component
                 if (!empty($combinationId)) {
                     $orderProduct = OrderProduct::find()->where([
                         'product_id' => $productId,
-                        'combinationId' => $combinationId,
+                        'combination_id' => $combinationId,
                         'order_id' => $order->id
                     ])->one();
                 }
