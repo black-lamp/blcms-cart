@@ -14,7 +14,6 @@ namespace bl\cms\cart\common\components\user\models;
 use bl\cms\shop\common\components\user\models\User;
 use dektrium\user\Finder;
 use bl\cms\cart\frontend\components\user\UserMailer as Mailer;
-use dektrium\user\models\Token;
 use yii\base\Model;
 
 /**
