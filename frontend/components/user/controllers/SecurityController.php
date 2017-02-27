@@ -19,7 +19,7 @@ class SecurityController extends MainController
     public function actionLogin()
     {
         if (!\Yii::$app->user->isGuest) {
-            $this->goHome();
+            \Yii::$app->getResponse()->redirect(Url::to([\Yii::$app->getHomeUrl()]));
         }
 
         /** @var LoginForm $model */
@@ -56,5 +56,23 @@ class SecurityController extends MainController
             'model'  => $model,
             'module' => $this->module,
         ]);
+    }
+
+    /**
+     * Logs the user out and then redirects to the homepage.
+     *
+     * @return Response
+     */
+    public function actionLogout()
+    {
+        $event = $this->getUserEvent(\Yii::$app->user->identity);
+
+        $this->trigger(self::EVENT_BEFORE_LOGOUT, $event);
+
+        \Yii::$app->getUser()->logout();
+
+        $this->trigger(self::EVENT_AFTER_LOGOUT, $event);
+
+        \Yii::$app->getResponse()->redirect(Url::to([\Yii::$app->getHomeUrl()]));
     }
 }
