@@ -11,9 +11,10 @@
 
 namespace bl\cms\cart\frontend\components\user\controllers;
 
+use bl\cms\cart\frontend\components\events\ResetPasswordEvent;
 use dektrium\user\Finder;
-use dektrium\user\models\RecoveryForm;
-use dektrium\user\models\Token;
+use bl\cms\cart\common\components\user\models\RecoveryForm;
+use bl\cms\cart\common\components\user\models\Token;
 use dektrium\user\traits\AjaxValidationTrait;
 use dektrium\user\traits\EventTrait;
 use yii\filters\AccessControl;
@@ -189,5 +190,16 @@ class RecoveryController extends Controller
         return $this->render('reset', [
             'model' => $model,
         ]);
+    }
+
+    /**
+     * @param  Token        $token
+     * @param  RecoveryForm $form
+     * @return ResetPasswordEvent
+     * @throws \yii\base\InvalidConfigException
+     */
+    protected function getResetPasswordEvent(Token $token = null, RecoveryForm $form = null)
+    {
+        return \Yii::createObject(['class' => ResetPasswordEvent::className(), 'token' => $token, 'form' => $form]);
     }
 }
