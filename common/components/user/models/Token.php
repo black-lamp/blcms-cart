@@ -14,8 +14,8 @@ namespace bl\cms\cart\common\components\user\models;
 use bl\cms\shop\common\components\user\models\User;
 use dektrium\user\traits\ModuleTrait;
 use Yii;
-use yii\db\ActiveRecord;
 use yii\helpers\Url;
+use dektrium\user\models\Token as BaseToken;
 
 /**
  * Token Active Record model.
@@ -31,7 +31,7 @@ use yii\helpers\Url;
  *
  * @author Dmitry Erofeev <dmeroff@gmail.com>
  */
-class Token extends ActiveRecord
+class Token extends BaseToken
 {
     use ModuleTrait;
 
