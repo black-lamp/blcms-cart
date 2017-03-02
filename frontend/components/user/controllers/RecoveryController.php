@@ -18,6 +18,7 @@ use bl\cms\cart\common\components\user\models\Token;
 use dektrium\user\traits\AjaxValidationTrait;
 use dektrium\user\traits\EventTrait;
 use yii\filters\AccessControl;
+use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
@@ -91,7 +92,7 @@ class RecoveryController extends Controller
             'access' => [
                 'class' => AccessControl::className(),
                 'rules' => [
-                    ['allow' => true, 'actions' => ['request', 'reset'], 'roles' => ['?']],
+                    ['allow' => true, 'actions' => ['request', 'reset'], 'roles' => ['@']],
                 ],
             ],
         ];
@@ -105,6 +106,7 @@ class RecoveryController extends Controller
      */
     public function actionRequest()
     {
+        if (!\Yii::$app->user->isGuest) return $this->redirect(Url::to(['/']));
         if (!$this->module->enablePasswordRecovery) {
             throw new NotFoundHttpException();
         }
@@ -147,6 +149,7 @@ class RecoveryController extends Controller
      */
     public function actionReset($id, $code)
     {
+        if (!\Yii::$app->user->isGuest) return $this->redirect(Url::to(['/']));
         if (!$this->module->enablePasswordRecovery) {
             throw new NotFoundHttpException();
         }
