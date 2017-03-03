@@ -85,19 +85,6 @@ class RecoveryController extends Controller
         parent::__construct($id, $module, $config);
     }
 
-    /** @inheritdoc */
-    public function behaviors()
-    {
-        return [
-            'access' => [
-                'class' => AccessControl::className(),
-                'rules' => [
-                    ['allow' => true, 'actions' => ['request', 'reset'], 'roles' => ['@']],
-                ],
-            ],
-        ];
-    }
-
     /**
      * Shows page where user can request password recovery.
      *
