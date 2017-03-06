@@ -52,7 +52,6 @@ class UserAddress extends ActiveRecord
             'country' => Yii::t('shop', 'Country'),
             'region' => Yii::t('shop', 'Region'),
             'city' => Yii::t('shop', 'City'),
-            'street' => Yii::t('shop', 'Street'),
             'house' => Yii::t('shop', 'House'),
             'apartment' => Yii::t('shop', 'Apartment'),
             'zipcode' => Yii::t('shop', 'Zip-Code'),

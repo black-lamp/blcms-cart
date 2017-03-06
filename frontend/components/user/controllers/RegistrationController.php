@@ -152,7 +152,7 @@ class RegistrationController extends Controller
                         }
                     }
                 }
-                throw new Exception('Registration error');
+                throw new Exception(\Yii::t('user', 'Registration error'));
             }
         }
 
