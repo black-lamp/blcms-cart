@@ -2,6 +2,7 @@
 namespace bl\cms\cart;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 use yii\web\ForbiddenHttpException;
 use yii\base\{
@@ -878,5 +879,53 @@ class CartComponent extends Component
             }
         }
         return false;
+    }
+
+    /**
+     * Returns [[Product]] if the current user is a guest, [[OrderProduct]] if the user is authenticated.
+     *
+     * @param $id [[Product]] id
+     * @return null|ActiveRecord|Product|OrderProduct
+     */
+    public function getProduct($id)
+    {
+        $product = null;
+
+        if (Yii::$app->user->isGuest) {
+            if (!empty(Yii::$app->session[self::SESSION_KEY])) {
+                $sessionProducts = ArrayHelper::index(Yii::$app->session[self::SESSION_KEY], 'id');
+
+                if (ArrayHelper::keyExists($id, $sessionProducts)) {
+                    $product = Product::findOne($id);
+                }
+            }
+        } else {
+            /** @var Order $order */
+            $order = Order::find()
+                ->where(['user_id' => Yii::$app->user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])
+                ->one();
+
+            if (!empty($order)) {
+                $product = OrderProduct::find()
+                    ->where(['order_id' => $order->id, 'product_id' => $id])
+                    ->one();
+            }
+        }
+
+        return $product;
+    }
+
+    /**
+     * Checks if the cart contains the product.
+     *
+     * @param $productId [[Product]] id.
+     * @return bool whether the cart contains the product
+     */
+    public function isContainsProduct($productId) {
+        $product_id = ArrayHelper::getValue($this->getProduct($productId),
+            (Yii::$app->user->isGuest) ? 'id' : 'product_id'
+        );
+
+        return ($product_id === $productId);
     }
 }
