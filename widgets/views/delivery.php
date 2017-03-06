@@ -46,8 +46,15 @@ $languagePrefix = (Language::getCurrent()->lang_id != Language::getDefault()->la
                     ]); ?>
                 </div>
 
+                <!--ADDRESS-->
+                <div class="address">
+                    <h2 class="text-center"><?= Yii::t('cart', 'Адрес'); ?></h2>
+                    <?= $form->field($address, 'city')->textInput()->label(Yii::t('cart', 'City')); ?>
+                    <?= $form->field($address, 'street')->textInput()->label(Yii::t('cart', 'Street')); ?>
+                    <?= $form->field($address, 'house')->textInput()->label(Yii::t('cart', 'House')); ?>
+                    <?= $form->field($address, 'apartment')->textInput()->label(Yii::t('cart', 'Apartment')); ?>
+                </div>
             </div>
-
         </div>
     </div>
 </div>
