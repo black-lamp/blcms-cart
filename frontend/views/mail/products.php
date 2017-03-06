@@ -8,10 +8,6 @@ use yii\bootstrap\Html;
 
 ?>
 
-<h3 style="text-align: center;">
-    <?= Yii::t('cart', 'Products list'); ?>
-</h3>
-
 <table style="width: 100%; margin: 0 auto;">
     <thead>
     <tr style="background-color: #ececec; font-size: 16px; text-align: center;">

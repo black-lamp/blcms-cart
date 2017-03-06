@@ -10,16 +10,14 @@ use yii\helpers\Html;
 ?>
 <?php if (!empty($order->deliveryMethod)): ?>
     <h3><?= Yii::t('cart', 'Delivery'); ?></h3>
+    <p><?= Html::tag('strong', Yii::t('cart', 'Delivery method')) . ': ' .
+        $order->deliveryMethod->translation->title; ?>
+    </p>
+    <p><i><?= $order->deliveryMethod->translation->description; ?></i></p>
 
     <?php if (!empty($order->delivery_post_office)) : ?>
-        <p><?= Html::tag('strong', Yii::t('cart', 'Delivery method')) . ': ' .
-            $order->deliveryMethod->translation->title; ?>
-        </p>
         <p><?= Html::tag('strong', Yii::t('cart', 'Post office')) . ': ' . $order->delivery_post_office; ?></p>
     <?php else : ?>
-        <p><?= Html::tag('strong', Yii::t('cart', 'Delivery method')) . ': ' .
-            $order->deliveryMethod->translation->title; ?>
-        </p>
         <p><?= (!empty($address->country)) ?
                 Html::tag('strong', Yii::t('cart', 'Country')) . ': ' . $address->country : ''; ?></p>
         <p><?= (!empty($address->region)) ?

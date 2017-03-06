@@ -19,6 +19,7 @@ class Delivery extends Widget
 {
     public $form;
     public $model;
+    public $address;
 
     public function init()
     {
@@ -28,6 +29,7 @@ class Delivery extends Widget
     {
         $deliveryMethods = DeliveryMethod::find()->all();
         return $this->render('delivery', [
+            'address' => $this->address,
             'deliveryMethods' => $deliveryMethods,
             'form' => $this->form,
             'model' => $this->model,

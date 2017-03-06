@@ -169,24 +169,16 @@ bl\cms\cart\frontend\assets\CartAsset::register($this);
         <!--DELIVERY METHOD-->
         <?= bl\cms\cart\widgets\Delivery::widget([
             'form' => $form,
-            'model' => $order
+            'model' => $order,
+            'address' => $address
         ]); ?>
-
-        <!--ADDRESS-->
-        <div class="address">
-            <h2 class="text-center"><?= Yii::t('cart', 'Адрес'); ?></h2>
-            <?= $form->field($address, 'city')->textInput()->label(Yii::t('cart', 'City')); ?>
-            <?= $form->field($address, 'street')->textInput()->label(Yii::t('cart', 'Street')); ?>
-            <?= $form->field($address, 'house')->textInput()->label(Yii::t('cart', 'House')); ?>
-            <?= $form->field($address, 'apartment')->textInput()->label(Yii::t('cart', 'Apartment')); ?>
-        </div>
 
         <!--PAYMENT METHOD-->
         <?php if (Yii::$app->cart->enablePayment) : ?>
             <h2><?=Yii::t('cart', 'Payment method');?></h2>
             <?= \bl\cms\payment\widgets\PaymentSelector::widget([
                 'form' => $form,
-                'order' => $order
+                'order' => $order,
             ]); ?>
         <?php endif; ?>
 
