@@ -20,6 +20,6 @@ $this->registerJs(
 );
 ?>
 
-<canvas id="graph-canvas" width="450" height="350">
+<canvas id="graph-canvas" width="470" height="350">
     Unfortunately, your browser does not support the Canvas technology.
 </canvas>

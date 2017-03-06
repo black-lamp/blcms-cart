@@ -6,9 +6,9 @@ $(document).ready(function () {
     // var array = JSON.parse(graphPoints);
     var canvas = document.getElementById("graph-canvas");
 
-    var startPoint = {'x': 50, 'y': 50};
+    var startPoint = {'x': 65, 'y': 50};
     var graphHeight = canvas.height - startPoint.y;
-    var graphWidth = canvas.width - startPoint.x - 20;
+    var graphWidth = canvas.width - startPoint.x - 50;
 
 
     /*GETS GRAPH POINTS FROM WIDGET*/
