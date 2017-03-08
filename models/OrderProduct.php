@@ -125,8 +125,26 @@ class OrderProduct extends ActiveRecord
         else return false;
     }
 
+    /**
+     * @return \yii\db\ActiveQuery
+     */
     public function getOrderProductAdditionalProducts() {
 
         return $this->hasMany(OrderProductAdditionalProduct::className(), ['order_product_id' => 'id']);
+    }
+
+    /**
+     * @param $additionalProductId integer
+     * @return array|bool|null|ActiveRecord
+     */
+    public function getOrderProductAdditionalProduct($additionalProductId) {
+
+        if (!empty($additionalProductId)) {
+            $orderProductAdditionalProduct = OrderProductAdditionalProduct::find()
+                ->where(['order_product_id' => $this->id, 'additional_product_id' => $additionalProductId])->one();
+
+            return $orderProductAdditionalProduct;
+        }
+        return false;
     }
 }
