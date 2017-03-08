@@ -11,6 +11,7 @@ use Yii;
  * @property integer $id
  * @property integer $order_product_id
  * @property integer $additional_product_id
+ * @property integer $number
  *
  * @property OrderProduct $orderProduct
  * @property Product $additionalProduct
@@ -31,7 +32,7 @@ class OrderProductAdditionalProduct extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['order_product_id', 'additional_product_id'], 'integer'],
+            [['order_product_id', 'additional_product_id', 'number'], 'integer'],
             [['order_product_id'], 'exist', 'skipOnError' => true, 'targetClass' => OrderProduct::className(), 'targetAttribute' => ['order_product_id' => 'id']],
             [['additional_product_id'], 'exist', 'skipOnError' => true, 'targetClass' => Product::className(), 'targetAttribute' => ['additional_product_id' => 'id']],
         ];
