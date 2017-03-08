@@ -3,21 +3,36 @@ namespace bl\cms\cart\models;
 use yii\base\Model;
 
 /**
+ * This model is used in AdditionalProduct widget
  * @author Albert Gainutdinov <xalbert.einsteinx@gmail.com>
  */
 class AdditionalProductForm extends Model
-
 {
-    public $attribute_value_id;
+    /**
+     * @var integer
+     */
+    public $orderProductId;
 
-    public $additionalProducts;
+    /**
+     * @var integer
+     */
+    public $combinationId;
+
+    /**
+     * @var integer
+     */
+    public $additionalProductId;
+
+    /**
+     * Number of current additional product
+     * @var integer
+     */
+    public $number;
 
     public function rules()
     {
         return [
-            [['productId', 'count', 'priceId', ], 'integer'],
-            ['attribute_value_id', 'safe'],
-            [['productId', 'count'], 'required'],
+            [['orderProductId', 'combinationId', 'additionalProductId', 'number'], 'integer']
         ];
     }
 }
