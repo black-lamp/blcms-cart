@@ -40,6 +40,18 @@ use yii\bootstrap\Html;
                     <?php endforeach; ?>
                 <?php endif; ?>
                 <!--ADDITIONAL PRODUCTS-->
+                <?php if (!empty($orderProduct->orderProductAdditionalProducts)): ?>
+                    <ul>
+                        <?php foreach ($orderProduct->orderProductAdditionalProducts as $orderProductAdditionalProduct): ?>
+                            <li>
+                                <?= $orderProductAdditionalProduct->additionalProduct->translation->title .
+                                ', ' . $orderProductAdditionalProduct->number . ' ' . \Yii::t('cart', 'pieces.') .
+                                ' - ' . \Yii::$app->formatter->asCurrency($orderProductAdditionalProduct->additionalProduct->discountPrice); ?>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php endif; ?>
+
                 <?php if (!empty($orderProduct->additionalProduct)): ?>
                     <p>
                         <b><?= \Yii::t('shop', 'Additional products'); ?></b>
