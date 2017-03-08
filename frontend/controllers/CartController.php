@@ -3,7 +3,10 @@ namespace bl\cms\cart\frontend\controllers;
 
 use bl\cms\cart\Mailer;
 use bl\cms\seo\StaticPageBehavior;
+use bl\cms\shop\common\entities\ProductAdditionalProduct;
+use bl\cms\shop\frontend\widgets\models\AdditionalProductForm;
 use Yii;
+use yii\base\Model;
 use yii\helpers\ArrayHelper;
 use bl\imagable\helpers\FileHelper;
 use yii\helpers\Json;
@@ -48,10 +51,25 @@ class CartController extends Controller
     public function actionAdd()
     {
         $model = new CartForm();
+        $post = \Yii::$app->request->post();
+
         if ($model->load(Yii::$app->request->post())) {
             if ($model->validate()) {
+
+                $additionalProductForm = [];
+                $productAdditionalProducts = ProductAdditionalProduct::find()->where(['product_id' => $model->productId])
+                    ->indexBy('additional_product_id')->all();
+                foreach ($productAdditionalProducts as $key => $productAdditionalProduct) {
+                    $additionalProductForm[$key] = new AdditionalProductForm();
+                }
+
+                if (!empty($productAdditionalProducts)) {
+                    Model::loadMultiple($additionalProductForm, $post);
+                    Model::validateMultiple($additionalProductForm);
+                }
+
                 Yii::$app->cart->add($model->productId, $model->count,
-                    json_encode($model->attribute_value_id), $model->additional_products
+                    json_encode($model->attribute_value_id), $additionalProductForm
                 );
                 if (\Yii::$app->request->isAjax) {
                     $data = [
@@ -109,7 +127,10 @@ class CartController extends Controller
                         $product->combinationId = $item['combinationId'];
                         if (!empty($item['additionalProducts'])) {
                             foreach ($item['additionalProducts'] as $additionalProduct) {
-                                $product->additionalProducts[] = Product::findOne($additionalProduct);
+                                $product->additionalProducts[] = [
+                                    'product' => Product::findOne($additionalProduct['productId']),
+                                    'number' => $additionalProduct['number']
+                                ];
                             }
                         }
                         $products[] = $product;
@@ -239,43 +260,49 @@ class CartController extends Controller
         throw new NotFoundHttpException();
     }
 
-    /**
-     * @param $productId
-     * @param $additionalProductId
-     * @param null $combinationId
-     * @return string|Response
-     */
-    public function actionAddAdditionalProduct($productId, $additionalProductId, $combinationId = null) {
-        if (\Yii::$app->user->isGuest) {
-            Yii::$app->cart->addAdditionalProductToSession($productId, $additionalProductId, $combinationId);
-        }
-        else {
-            Yii::$app->cart->addAdditionalProductToDb($productId, $additionalProductId, $combinationId);
-        }
 
-        if (\Yii::$app->request->isAjax) {
-            $data = [
-                'totalCost' => \Yii::$app->formatter->asCurrency(\Yii::$app->cart->getTotalCost())
-            ];
-            Yii::$app->response->format = Response::FORMAT_JSON;
-            return Json::encode($data);
+    public function actionAddAdditionalProduct() {
+
+        if (\Yii::$app->request->isPost) {
+            $formModel = new \bl\cms\cart\models\AdditionalProductForm();
+            if ($formModel->load(\Yii::$app->request->post())) {
+                if ($formModel->validate()) {
+
+                    if (\Yii::$app->user->isGuest) {
+                        Yii::$app->get('cart')->addAdditionalProductToSession(
+                            $formModel->orderProductId, $formModel->combinationId, $formModel->additionalProductId, $formModel->number);
+                    } else {
+                        Yii::$app->get('cart')->addAdditionalProductToDb(
+                            $formModel->orderProductId, $formModel->additionalProductId, $formModel->number);
+                    }
+
+                    if (\Yii::$app->request->isAjax) {
+                        $data = [
+                            'totalCost' => \Yii::$app->formatter->asCurrency(\Yii::$app->cart->getTotalCost())
+                        ];
+                        Yii::$app->response->format = Response::FORMAT_JSON;
+                        return Json::encode($data);
+                    }
+                }
+            }
         }
 
         return $this->redirect(\Yii::$app->request->referrer);
     }
 
     /**
-     * @param $productId
+     * @param $orderProductId
+     * @param $combinationId
      * @param $additionalProductId
-     * @param null $combinationId
      * @return string|Response
      */
-    public function actionRemoveAdditionalProduct($productId, $additionalProductId, $combinationId = null) {
+    public function actionRemoveAdditionalProduct($orderProductId, $combinationId, $additionalProductId) {
+
         if (\Yii::$app->user->isGuest) {
-            Yii::$app->cart->removeAdditionalProductFromSession($productId, $additionalProductId, $combinationId);
+            Yii::$app->cart->removeAdditionalProductFromSession($orderProductId, $combinationId, $additionalProductId);
         }
         else {
-            Yii::$app->cart->removeAdditionalProductFromDb($productId, $additionalProductId, $combinationId);
+            Yii::$app->cart->removeAdditionalProductFromDb($orderProductId, $additionalProductId);
         }
 
         if (\Yii::$app->request->isAjax) {
