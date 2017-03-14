@@ -25,7 +25,7 @@ If you need to save orders to database, apply next migration:
 
 **Common configuration**
 ```
-'name' => 'Басейн.укр',
+'name' => 'ProjectName',
 'components' => [
     'cart' => [
                 'class' => bl\cms\cart\CartComponent::className(),
@@ -69,9 +69,9 @@ If you need to save orders to database, apply next migration:
                 ],
                 'transport' => [
                     'class' => 'Swift_SmtpTransport',
-                    'username' => 'info@xn--80abnquv.xn--j1amh',
-                    'password' => 'mTsOmY77',
-                    'host' => 'mail.xn--80abnquv.xn--j1amh',
+                    'username' => 'info@mail.com',
+                    'password' => '123456789',
+                    'host' => 'mail.server.com',
                     'port' => '587',
                 ],
             ],
