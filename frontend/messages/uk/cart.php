@@ -32,6 +32,7 @@ return [
     'Delivery method' => 'Спосіб доставки',
     'Delivery methods' => 'Способи доставки',
     'E-mail' => 'E-mail',
+    'Full name' => 'Повне ім\'я',
     'Go to shop' => 'Перейти в магазин',
     'House' => 'Будинок',
     'Hse.' => 'Д.',
