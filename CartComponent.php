@@ -518,6 +518,7 @@ class CartComponent extends Component
             $user = $userModel->finder->findUserByEmail($userModel->email);
             if (empty($user)) {
                 $user = $userModel;
+                $user->username = $user->email;
                 if (!\Yii::$app->getModule('user')->enableGeneratingPassword) {
                     $user->password = uniqid();
                 }
