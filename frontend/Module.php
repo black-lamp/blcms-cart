@@ -1,5 +1,7 @@
 <?php
 namespace bl\cms\cart\frontend;
+
+use bl\cms\cart\CartComponent;
 use Yii;
 
 /**
@@ -11,6 +13,11 @@ class Module extends \yii\base\Module
     public $defaultRoute = 'cart';
 
     /**
+     * @var CartComponent
+     */
+    public static $cart;
+
+    /**
      * @var bool
      * Enables logging
      */
@@ -19,6 +26,9 @@ class Module extends \yii\base\Module
     public function init()
     {
         parent::init();
+
+        self::$cart = Yii::$app->cart;
+
         $this->registerTranslations();
     }
 
