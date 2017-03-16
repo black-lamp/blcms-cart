@@ -313,23 +313,23 @@ class CartComponent extends Component
     {
         if (!empty($combination)) {
             $items = Yii::$app->session[self::SESSION_KEY_SELECTED_COMBINATIONS];
+            $itemIsExist = false;
 
-            if (!empty($items)) {
-                $itemIsNew = false;
-
-                foreach ($items as $item) {
-                    ($item['productId'] == $combination->product_id)
-                        ? $item['combinationId'] = $combination->id
-                        : $itemIsNew = true;
-                }
-
-                if ($itemIsNew) {
-                    $items[] = [
-                        'productId' => $combination->product_id,
-                        'combinationId' => $combination->id,
-                    ];
+            if(!empty($items)) {
+                foreach ($items as $key => $item) {
+                    if ($item['productId'] == $combination->product_id) {
+                        $items[$key]['combinationId'] = $combination->id;
+                        $itemIsExist = true;
+                    }
                 }
             }
+            if (!$itemIsExist) {
+                $items[] = [
+                    'productId' => $combination->product_id,
+                    'combinationId' => $combination->id,
+                ];
+            }
+
             Yii::$app->session[self::SESSION_KEY_SELECTED_COMBINATIONS] = $items;
 
             return true;
