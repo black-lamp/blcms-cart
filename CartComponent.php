@@ -29,6 +29,12 @@ use bl\cms\shop\common\entities\{
  */
 class CartComponent extends Component
 {
+    /*Session key of order*/
+    const SESSION_KEY = 'shop_order';
+    const SESSION_KEY_SELECTED_COMBINATIONS = 'shop.selected_combinations';
+
+    const EVENT_BEFORE_GET_ORDER = 'before-get-order';
+    const EVENT_BEFORE_GET_ORDER_FROM_DB = 'before-get-order-from-db';
 
     /**
      * @var bool
@@ -47,6 +53,12 @@ class CartComponent extends Component
      * Enabling saving order products to database. If false, order products will only be stored in the session.
      */
     public $saveToDataBase = true;
+
+    /**
+     * @var bool Enable saving the last selected products combinations in session
+     * after the product is added to the cart.
+     */
+    public $saveSelectedCombination = true;
 
     /**
      * @var string
@@ -72,12 +84,6 @@ class CartComponent extends Component
 
     public $enablePayment = false;
 
-    /*Session key of order*/
-    const SESSION_KEY = 'shop_order';
-
-    const EVENT_BEFORE_GET_ORDER = 'before-get-order';
-    const EVENT_BEFORE_GET_ORDER_FROM_DB = 'before-get-order-from-db';
-
     /**
      * Adds product to cart.
      *
@@ -91,6 +97,11 @@ class CartComponent extends Component
         if (!empty($attributesAndValues)) {
             $attributesAndValues = Json::decode($attributesAndValues);
         }
+
+        if ($this->saveSelectedCombination) {
+            $this->saveSelectedCombinationToSession($this->getCombination($attributesAndValues, $productId));
+        }
+
         if ($this->saveToDataBase && !\Yii::$app->user->isGuest) {
             $this->saveProductToDataBase($productId, $count, $attributesAndValues, $additionalProducts);
         } else {
@@ -290,6 +301,70 @@ class CartComponent extends Component
             return true;
         }
         return false;
+    }
+
+    /**
+     * Saves last selected product combinations to session.
+     *
+     * @param Combination $combination
+     * @return bool
+     */
+    protected function saveSelectedCombinationToSession($combination)
+    {
+        if (!empty($combination)) {
+            $items = Yii::$app->session[self::SESSION_KEY_SELECTED_COMBINATIONS];
+
+            if (!empty($items)) {
+                $itemIsNew = false;
+
+                foreach ($items as $item) {
+                    ($item['productId'] == $combination->product_id)
+                        ? $item['combinationId'] = $combination->id
+                        : $itemIsNew = true;
+                }
+
+                if ($itemIsNew) {
+                    $items[] = [
+                        'productId' => $combination->product_id,
+                        'combinationId' => $combination->id,
+                    ];
+                }
+            }
+            Yii::$app->session[self::SESSION_KEY_SELECTED_COMBINATIONS] = $items;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Gets last selected product combinations from session.
+     *
+     * @param $productId [[Product]] id
+     * @return null|Combination
+     */
+    public function getSelectedCombinationFromSession($productId)
+    {
+        $combination = null;
+
+        if (!empty($productId)) {
+            $items = Yii::$app->session[self::SESSION_KEY_SELECTED_COMBINATIONS];
+
+            if (!empty($items)) {
+                $combinationId = null;
+
+                foreach ($items as $item) {
+                    if ($item['productId'] == $productId) {
+                        $combinationId = $item['combinationId'];
+                    }
+                }
+
+                $combination = Combination::findOne($combinationId);
+            }
+        }
+
+        return $combination;
     }
 
     /**

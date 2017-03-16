@@ -1,6 +1,7 @@
 <?php
 namespace bl\cms\cart\frontend\controllers;
 
+use bl\cms\cart\frontend\Module;
 use bl\cms\cart\Mailer;
 use bl\cms\seo\StaticPageBehavior;
 use bl\cms\shop\common\entities\ProductAdditionalProduct;
@@ -68,9 +69,10 @@ class CartController extends Controller
                     Model::validateMultiple($additionalProductForm);
                 }
 
-                Yii::$app->cart->add($model->productId, $model->count,
+                Module::$cart->add($model->productId, $model->count,
                     json_encode($model->attribute_value_id), $additionalProductForm
                 );
+
                 if (\Yii::$app->request->isAjax) {
                     $data = [
                         'orderCounterValue' => \Yii::$app->cart->getOrderItemsCount(),
