@@ -309,7 +309,7 @@ class CartComponent extends Component
      * @param Combination $combination
      * @return bool
      */
-    protected function saveSelectedCombinationToSession($combination)
+    public function saveSelectedCombinationToSession($combination)
     {
         if (!empty($combination)) {
             $items = Yii::$app->session[self::SESSION_KEY_SELECTED_COMBINATIONS];
