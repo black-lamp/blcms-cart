@@ -202,7 +202,7 @@ class UserMailer extends Component
      *
      * @return bool
      */
-    public function sendRecoveryMessage(User $user, Token $token)
+    public function sendRecoveryMessage($user, $token)
     {
         $mailVars = [
             '{token}' => $token->url

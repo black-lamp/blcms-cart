@@ -107,7 +107,7 @@ class RecoveryForm extends Model
 
         $user = $this->finder->findUserByEmail($this->email);
 
-        if ($user instanceof User) {
+        if (!empty($user)) {
             /** @var Token $token */
             $token = \Yii::createObject([
                 'class' => Token::className(),
