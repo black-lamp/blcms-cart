@@ -70,15 +70,16 @@ class CartController extends Controller
                 }
 
                 Module::$cart->add($model->productId, $model->count,
-                    json_encode($model->attribute_value_id), $additionalProductForm
+                    json_encode($model->attribute_value_id), $additionalProductForm, $model->combinationId
                 );
 
                 if (\Yii::$app->request->isAjax) {
                     $data = [
-                        'orderCounterValue' => \Yii::$app->cart->getOrderItemsCount(),
-                        'totalCost' => \Yii::$app->formatter->asCurrency(\Yii::$app->cart->getTotalCost())
+                        'orderCounterValue' => Module::$cart->getOrderItemsCount(),
+                        'totalCost' => \Yii::$app->formatter->asCurrency(Module::$cart->getTotalCost())
                     ];
                     Yii::$app->response->format = Response::FORMAT_JSON;
+                    
                     return Json::encode($data);
                 }
 
@@ -92,9 +93,11 @@ class CartController extends Controller
                 );
             }
         }
+
         if (\Yii::$app->request->isAjax) {
             return false;
         }
+
         return $this->redirect(Yii::$app->request->referrer);
     }
 

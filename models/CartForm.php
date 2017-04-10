@@ -17,11 +17,19 @@ class CartForm extends Model
 
     public $additional_products;
 
+    /**
+     * @var integer
+     */
+    public $combinationId;
+
+    /**
+     * @inheritdoc
+     */
     public function rules()
     {
         return [
-            [['productId', 'count', 'priceId', ], 'integer'],
-            [['attribute_value_id', 'additional_products'], 'safe'],
+            [['productId', 'count', 'priceId', 'combinationId'], 'integer'],
+            [['attribute_value_id', 'additional_products', 'combinationId'], 'safe'],
             [['productId', 'count'], 'required'],
         ];
     }

@@ -91,21 +91,23 @@ class CartComponent extends Component
      * @param $count
      * @param null $attributesAndValues
      * @param array $additionalProducts
+     * @param null $combinationId
      */
-    public function add($productId, $count, $attributesAndValues = null, $additionalProducts = [])
+    public function add($productId, $count, $attributesAndValues = null, $additionalProducts = [], $combinationId = null)
     {
         if (!empty($attributesAndValues)) {
             $attributesAndValues = Json::decode($attributesAndValues);
         }
 
         if ($this->saveSelectedCombination) {
-            $this->saveSelectedCombinationToSession($this->getCombination($attributesAndValues, $productId));
+            $combination = Combination::findOne($combinationId) ?? $this->getCombination($attributesAndValues, $productId);
+            $this->saveSelectedCombinationToSession($combination);
         }
 
         if ($this->saveToDataBase && !\Yii::$app->user->isGuest) {
-            $this->saveProductToDataBase($productId, $count, $attributesAndValues, $additionalProducts);
+            $this->saveProductToDataBase($productId, $count, $attributesAndValues, $additionalProducts, $combinationId);
         } else {
-            $this->saveProductToSession($productId, $count, $attributesAndValues, $additionalProducts);
+            $this->saveProductToSession($productId, $count, $attributesAndValues, $additionalProducts, $combinationId);
         }
     }
 
@@ -116,12 +118,11 @@ class CartComponent extends Component
      * @param integer $count
      * @param array|null $attributesAndValues
      * @param array|null $additionalProducts
-     * @throws ForbiddenHttpException
+     * @param null $combinationId
      * @throws Exception
      */
-    private function saveProductToDataBase($productId, $count, $attributesAndValues = null, $additionalProducts = null)
+    private function saveProductToDataBase($productId, $count, $attributesAndValues = null, $additionalProducts = null, $combinationId = null)
     {
-
         $order = $this->getIncompleteOrderFromDB();
 
         if (\Yii::$app->getModule('shop')->enableCombinations) {
@@ -226,9 +227,10 @@ class CartComponent extends Component
      * @param integer $count
      * @param array|null $attributesAndValues
      * @param array $additionalProducts
-     * @return boolean
+     * @param null $combinationId
+     * @return bool
      */
-    private function saveProductToSession(int $productId, int $count, $attributesAndValues = null, $additionalProducts = [])
+    private function saveProductToSession(int $productId, int $count, $attributesAndValues = null, $additionalProducts = [], $combinationId = null)
     {
         if (!empty($productId) && (!empty($count))) {
 
@@ -245,7 +247,6 @@ class CartComponent extends Component
             $session = Yii::$app->session;
             $productsFromSession = $session[self::SESSION_KEY];
 
-            $combinationId = null;
             if (\Yii::$app->getModule('shop')->enableCombinations) {
                 if (!empty($attributesAndValues)) {
                     $combination = $this->getCombination($attributesAndValues, $productId);
