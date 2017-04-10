@@ -957,21 +957,44 @@ class CartComponent extends Component
     }
 
     /**
-     * Returns [[Product]] if the current user is a guest, [[OrderProduct]] if the user is authenticated.
+     * Returns [[Product]] if the current user is a guest.
      *
-     * @param $id [[Product]] id
-     * @return null|ActiveRecord|Product|OrderProduct
+     * @param integer $id [[Product]] id
+     * @param integer|null $combinationId [[Combination]] id.
+     * @return null|ActiveRecord|Product
      */
-    public function getProduct($id)
+    public function getProduct($id, $combinationId = null)
     {
         $product = null;
 
+        if ($this->isContainsProduct($id, $combinationId)) {
+            $product = Product::findOne($id);
+        };
+
+        return $product;
+    }
+
+    /**
+     * Checks if the cart contains the product.
+     *
+     * @param integer $productId [[Product]] id.
+     * @param null|integer $combinationId [[Combination]] id.
+     * @return bool whether the cart contains the product
+     */
+    public function isContainsProduct($productId, $combinationId = null)
+    {
         if (Yii::$app->user->isGuest) {
             if (!empty(Yii::$app->session[self::SESSION_KEY])) {
-                $sessionProducts = ArrayHelper::index(Yii::$app->session[self::SESSION_KEY], 'id');
+                $sessionProducts = Yii::$app->session[self::SESSION_KEY];
 
-                if (ArrayHelper::keyExists($id, $sessionProducts)) {
-                    $product = Product::findOne($id);
+                foreach ($sessionProducts as $item) {
+                    $condition = (empty($combinationId))
+                        ? (ArrayHelper::getValue($item, 'id') == $productId)
+                        : (ArrayHelper::getValue($item, 'id') == $productId && ArrayHelper::getValue($item, 'combinationId') == $combinationId);
+
+                    if($condition) {
+                        return $condition;
+                    }
                 }
             }
         } else {
@@ -981,26 +1004,18 @@ class CartComponent extends Component
                 ->one();
 
             if (!empty($order)) {
+                $condition = (empty($combinationId))
+                    ? ['order_id' => $order->id, 'product_id' => $productId]
+                    : ['order_id' => $order->id, 'product_id' => $productId, 'combination_id' => $combinationId];
+
                 $product = OrderProduct::find()
-                    ->where(['order_id' => $order->id, 'product_id' => $id])
+                    ->where($condition)
                     ->one();
+
+                return (!empty($product));
             }
         }
 
-        return $product;
-    }
-
-    /**
-     * Checks if the cart contains the product.
-     *
-     * @param $productId [[Product]] id.
-     * @return bool whether the cart contains the product
-     */
-    public function isContainsProduct($productId) {
-        $product_id = ArrayHelper::getValue($this->getProduct($productId),
-            (Yii::$app->user->isGuest) ? 'id' : 'product_id'
-        );
-
-        return ($product_id === $productId);
+        return false;
     }
 }
