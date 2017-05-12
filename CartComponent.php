@@ -1,6 +1,7 @@
 <?php
 namespace bl\cms\cart;
 
+use bl\cms\cart\common\classes\CartSumAdjustment;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
@@ -83,6 +84,9 @@ class CartComponent extends Component
     public $uidPrefix = '';
 
     public $enablePayment = false;
+
+
+    public $adjustments = [];
 
     /**
      * Adds product to cart.
@@ -565,6 +569,7 @@ class CartComponent extends Component
                 $order->user_id = \Yii::$app->user->id;
                 $order->status = OrderStatus::STATUS_CONFIRMED;
                 $order->confirmation_time = new Expression('NOW()');
+                $order->cost = $this->getCost();
                 $order->total_cost = $this->getTotalCost();
 
                 if ($order->validate()) {
@@ -717,12 +722,10 @@ class CartComponent extends Component
     }
 
     /**
-     * Gets total cost of user's incomplete order from session if user is guest
-     * or from DB if user is authenticated
+     * Gets cost of user's incomplete order without discounts
      * @return mixed
      */
-    public function getTotalCost(): int
-    {
+    public function getCost(): int {
         $totalCost = 0;
         if (Yii::$app->user->isGuest) {
             //Gets products from session
@@ -778,6 +781,25 @@ class CartComponent extends Component
             }
         }
         return $totalCost;
+    }
+
+    /**
+     * Gets total cost of user's incomplete order from session if user is guest
+     * or from DB if user is authenticated
+     * @return mixed
+     */
+    public function getTotalCost(): int {
+        $totalCost = $this->getCost();
+        $adjustmentTotal = 0;
+
+        foreach ($this->adjustments as $adjustment) {
+            $adjustmentObject = Yii::createObject($adjustment);
+            if($adjustmentObject instanceof CartSumAdjustment) {
+                $adjustmentTotal += $adjustmentObject->countAdjustment($totalCost);
+            }
+        }
+
+        return $totalCost + $adjustmentTotal;
     }
 
     /**
