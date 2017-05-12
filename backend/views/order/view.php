@@ -109,5 +109,10 @@ $this->title = Yii::t('cart', 'Order details');
             </tr>
             <?php endforeach; ?>
         </table>
+
+        <?= \bl\cms\cart\widgets\OrderSum::widget([
+            'cost' => $model->cost,
+            'totalCost' => $model->total_cost,
+        ]) ?>
     </div>
 </div>
