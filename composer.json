@@ -32,6 +32,12 @@
     ],
     "post-install-cmd": [
       "php yii migrate --migrationPath=@vendor/black-lamp/blcms-cart/migrations"
+    ],
+    "post-package-install": [
+      "php yii migrate --migrationPath=@vendor/black-lamp/blcms-cart/migrations"
+    ],
+    "post-package-update": [
+      "php yii migrate --migrationPath=@vendor/black-lamp/blcms-cart/migrations"
     ]
   }
 }
