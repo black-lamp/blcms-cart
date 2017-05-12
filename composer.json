@@ -25,5 +25,13 @@
     "psr-4": {
       "bl\\cms\\cart\\": ""
     }
+  },
+  "scripts": {
+    "post-update-cmd": [
+      "php yii migrate --migrationPath=@vendor/black-lamp/blcms-cart/migrations"
+    ],
+    "post-install-cmd": [
+      "php yii migrate --migrationPath=@vendor/black-lamp/blcms-cart/migrations"
+    ]
   }
 }
