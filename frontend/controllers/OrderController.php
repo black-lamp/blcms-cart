@@ -2,8 +2,11 @@
 namespace bl\cms\cart\frontend\controllers;
 
 use bl\cms\cart\models\Order;
+use bl\cms\cart\widgets\OrderSum;
+use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 /**
  * @author Albert Gainutdinov <xalbert.einsteinx@gmail.com>
@@ -42,6 +45,14 @@ class OrderController extends Controller
                 ]);
             }
         }
+        throw new NotFoundHttpException();
+    }
+
+    public function actionSum() {
+        if(\Yii::$app->request->isAjax) {
+            return OrderSum::widget();
+        }
+
         throw new NotFoundHttpException();
     }
 }
