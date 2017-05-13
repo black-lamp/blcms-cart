@@ -1,11 +1,11 @@
 <?php
 namespace bl\cms\cart\frontend\components\user\controllers;
 
-use bl\cms\cart\common\components\user\models\Profile;
 use bl\cms\cart\common\components\user\models\RegistrationForm;
 use bl\cms\seo\StaticPageBehavior;
 use bl\cms\shop\common\components\user\models\User;
 use bl\cms\cart\frontend\components\events\UserRegistrationEvent;
+use common\components\user\Profile;
 use dektrium\user\Finder;
 use dektrium\user\models\ResendForm;
 use dektrium\user\traits\AjaxValidationTrait;
@@ -175,6 +175,7 @@ class RegistrationController extends Controller
      */
     public function actionConnect($code)
     {
+
         $account = $this->finder->findAccount()->byCode($code)->one();
 
         if ($account === null || $account->getIsConnected()) {
@@ -187,21 +188,31 @@ class RegistrationController extends Controller
             'scenario' => 'connect',
             'email'    => $account->email,
         ]);
+        $profile = new Profile();
 
         $event = $this->getConnectEvent($account, $user);
 
         $this->trigger(self::EVENT_BEFORE_CONNECT, $event);
 
-        if ($user->load(\Yii::$app->request->post()) && $user->create()) {
-            $account->connect($user);
-            $this->trigger(self::EVENT_AFTER_CONNECT, $event);
-            \Yii::$app->user->login($user, $this->module->rememberFor);
-            return $this->goBack();
+        if ($user->load(\Yii::$app->request->post())) {
+            $user->username = $user->email;
+            if($profile->load(\Yii::$app->request->post()) && $profile->validate()) {
+                if($user->create()) {
+                    $profile->user_id = $user->id;
+                    $profile->save();
+
+                    $account->connect($user);
+                    $this->trigger(self::EVENT_AFTER_CONNECT, $event);
+                    \Yii::$app->user->login($user, $this->module->rememberFor);
+                    return $this->goBack();
+                }
+            }
         }
 
         return $this->render('connect', [
             'model'   => $user,
             'account' => $account,
+            'profile' => $profile,
         ]);
     }
 
