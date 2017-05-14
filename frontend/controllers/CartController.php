@@ -1,6 +1,7 @@
 <?php
 namespace bl\cms\cart\frontend\controllers;
 
+use bl\cms\cart\frontend\events\MakeOrderSuccessEvent;
 use bl\cms\cart\frontend\Module;
 use bl\cms\cart\Mailer;
 use bl\cms\seo\StaticPageBehavior;
@@ -29,6 +30,7 @@ use bl\cms\cart\models\{
  */
 class CartController extends Controller
 {
+    const EVENT_AFTER_MAKE_ORDER_SUCCESS = 'after-make-order-success';
 
     /**
      * @inheritdoc
@@ -196,6 +198,7 @@ class CartController extends Controller
         if (Yii::$app->request->isPost) {
 
             if ($orderResult = \Yii::$app->cart->makeOrder()) {
+                $this->trigger(self::EVENT_AFTER_MAKE_ORDER_SUCCESS, new MakeOrderSuccessEvent(['orderResult' => $orderResult]));
                 \Yii::$app->session->setFlash('success', \Yii::t('cart', 'Your order is accepted. Thank you.'));
 
                 $mailer = new Mailer();
