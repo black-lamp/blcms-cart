@@ -8,6 +8,7 @@ use bl\multilang\entities\Language;
 use Yii;
 use yii\base\BootstrapInterface;
 use yii\base\Event;
+use yii\bootstrap\Html;
 use yii\db\Exception;
 use yii\helpers\Url;
 
@@ -69,6 +70,23 @@ class CartBootstrap implements BootstrapInterface
                     '{created_at}' => $event->model->creation_time,
                     '{status}' => $event->model->orderStatus->translation->title,
                     '{order_invoice}' => $event->model->invoice,
+                    '{order_pay_btn}' => $event->model->invoice
+                        ? Html::tag('p', Html::a(Yii::t('order.mail', 'Pay'), $event->model->invoice, [
+                            'target' => '_blank',
+                            'style' => [
+                                'background-color' => '#f09020',
+                                'color' => '#ffffff',
+                                'font-size' => '20px',
+                                'padding' => '7px 13px',
+                                'text-decoration' => 'none',
+                                'border-radius' => '4px'
+                            ]
+                        ]), [
+                            'style' => [
+                                'text-align' => 'center'
+                            ]
+                        ])
+                        : ''
                 ];
                 $mailTemplate->parseSubject($vars);
                 $mailTemplate->parseBody($vars);
