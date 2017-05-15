@@ -24,6 +24,7 @@ use yii\db\Expression;
  * @property integer $payment_method_id
  * @property string $delivery_post_office
  * @property string $confirmation_time
+ * @property string $invoice
  * @property float $cost
  * @property float $total_cost
  *
@@ -65,7 +66,7 @@ class Order extends ActiveRecord
             [['user_id'], 'required'],
             [['user_id', 'status', 'address_id', 'uid', 'payment_method_id'], 'integer'],
             [['cost', 'total_cost'], 'double'],
-            [['delivery_post_office'], 'string', 'max' => 255],
+            [['delivery_post_office', 'invoice'], 'string', 'max' => 255],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
             [['address_id'], 'exist', 'skipOnError' => true, 'targetClass' => UserAddress::className(), 'targetAttribute' => ['address_id' => 'id']],
             [['status'], 'exist', 'skipOnError' => true, 'targetClass' => OrderStatus::className(), 'targetAttribute' => ['status' => 'id']],
@@ -82,6 +83,7 @@ class Order extends ActiveRecord
             'status' => Yii::t('cart', 'Status'),
             'delivery_post_office' => Yii::t('cart', 'Post office'),
             'uid' => Yii::t('cart', 'Order number'),
+            'invoice' => Yii::t('cart', 'Invoice'),
         ];
     }
 

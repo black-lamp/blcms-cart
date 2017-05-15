@@ -29,6 +29,7 @@ $this->title = Yii::t('cart', 'Order details');
             <?= Yii::t('shop', 'Order status'); ?>
         </h2>
         <?php $form = ActiveForm::begin(); ?>
+        <?= $form->field($model, 'invoice')->textInput() ?>
         <?= $form->field($model, 'status')->dropDownList(ArrayHelper::map($statuses, 'id', function($model) {
             return $model->translation->title;
         }), ['options' => [$model->status => ['selected' => true]]]); ?>
