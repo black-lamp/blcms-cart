@@ -13,9 +13,11 @@ use yii\db\ActiveRecord;
  * @property integer $id
  * @property string $color
  * @property integer $mail_id
+ * @property integer $sms_template_id
  *
  * @property Order[] $orders
  * @property EmailTemplate $mail
+ * @property EmailTemplate $smsTemplate
  * @property OrderStatusTranslation[] $shopOrderStatusTranslations
  * @property OrderStatusTranslation $translation
  */
@@ -63,9 +65,10 @@ class OrderStatus extends ActiveRecord
     public function rules()
     {
         return [
-            [['mail_id'], 'integer'],
+            [['mail_id', 'sms_template_id'], 'integer'],
             [['color'], 'string', 'max' => 36],
             [['mail_id'], 'exist', 'skipOnError' => true, 'targetClass' => EmailTemplate::className(), 'targetAttribute' => ['mail_id' => 'id']],
+            [['sms_template_id'], 'exist', 'skipOnError' => true, 'targetClass' => EmailTemplate::className(), 'targetAttribute' => ['sms_template_id' => 'id']],
         ];
     }
 
@@ -78,6 +81,7 @@ class OrderStatus extends ActiveRecord
             'id' => Yii::t('cart', 'ID'),
             'color' => Yii::t('cart', 'Color'),
             'mail_id' => Yii::t('cart', 'Mail'),
+            'sms_template_id' => Yii::t('cart', 'SMS Template')
         ];
     }
 
@@ -95,6 +99,14 @@ class OrderStatus extends ActiveRecord
     public function getMail()
     {
         return $this->hasOne(EmailTemplate::className(), ['id' => 'mail_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSmsTemplate()
+    {
+        return $this->hasOne(EmailTemplate::className(), ['id' => 'sms_template_id']);
     }
 
     /**
