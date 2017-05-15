@@ -2,6 +2,7 @@
 namespace bl\cms\cart\backend\components\events;
 
 use bl\cms\cart\backend\controllers\OrderController;
+use bl\cms\cart\backend\events\OrderEvent;
 use bl\emailTemplates\data\Template;
 use bl\multilang\entities\Language;
 use Yii;
@@ -47,7 +48,7 @@ class CartBootstrap implements BootstrapInterface
     }
 
     /**
-     * @param $event
+     * @param OrderEvent $event
      * @throws \yii\base\Exception
      *
      * Sends email to customer
@@ -63,18 +64,16 @@ class CartBootstrap implements BootstrapInterface
                  * @var $mailTemplate Template
                  */
                 $mailTemplate = Yii::$app->get('emailTemplates')->getTemplate($mail->key, Language::getCurrent()->id);
-                $mailTemplate->parseSubject([
+                $vars = [
                     '{order_id}' => $event->model->uid,
                     '{created_at}' => $event->model->creation_time,
                     '{status}' => $event->model->orderStatus->translation->title,
-                ]);
-                $mailTemplate->parseBody([
-                    '{order_id}' => $event->model->uid,
-                    '{created_at}' => $event->model->creation_time,
-                    '{status}' => $event->model->orderStatus->translation->title,
-                ]);
+                    '{order_invoice}' => $event->model->invoice,
+                ];
+                $mailTemplate->parseSubject($vars);
+                $mailTemplate->parseBody($vars);
 
-                Yii::$app->shopMailer->compose('@bl/cms/cart/frontend/views/mail/mail-body',
+                Yii::$app->shopMailer->compose('mail-body',
                     ['bodyContent' => $mailTemplate->getBody()])
                     ->setFrom([\Yii::$app->cart->sender ?? \Yii::$app->shopMailer->transport->getUsername() => \Yii::$app->name ?? Url::to(['/'], true)])
                     ->setTo($event->model->user->email)
