@@ -17,6 +17,7 @@ use yii\db\ActiveRecord;
  * @property Order[] $orders
  * @property EmailTemplate $mail
  * @property OrderStatusTranslation[] $shopOrderStatusTranslations
+ * @property OrderStatusTranslation $translation
  */
 class OrderStatus extends ActiveRecord
 {
