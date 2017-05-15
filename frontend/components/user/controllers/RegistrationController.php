@@ -5,13 +5,17 @@ use bl\cms\cart\common\components\user\models\RegistrationForm;
 use bl\cms\seo\StaticPageBehavior;
 use bl\cms\shop\common\components\user\models\User;
 use bl\cms\cart\frontend\components\events\UserRegistrationEvent;
+use bl\multilang\entities\Language;
 use common\components\user\Profile;
 use dektrium\user\Finder;
+use dektrium\user\helpers\Password;
 use dektrium\user\models\ResendForm;
 use dektrium\user\traits\AjaxValidationTrait;
 use dektrium\user\traits\EventTrait;
+use Yii;
 use yii\base\Exception;
 use yii\filters\AccessControl;
+use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
@@ -195,16 +199,35 @@ class RegistrationController extends Controller
         $this->trigger(self::EVENT_BEFORE_CONNECT, $event);
 
         if ($user->load(\Yii::$app->request->post())) {
-            $user->username = $user->email;
             if($profile->load(\Yii::$app->request->post()) && $profile->validate()) {
-                if($user->create()) {
-                    $profile->user_id = $user->id;
+                $user->username = $user->email;
+                $user->password = Password::generate(8);
+                if($profile->user_id = $user->register(Url::to(['/user/login', 'language' => Language::getCurrent()->lang_id], true))) {
                     $profile->save();
+
+                    $this->trigger(self::EVENT_AFTER_REGISTER, new UserRegistrationEvent([
+                        'id' => $profile->user_id
+                    ]));
 
                     $account->connect($user);
                     $this->trigger(self::EVENT_AFTER_CONNECT, $event);
-                    \Yii::$app->user->login($user, $this->module->rememberFor);
-                    return $this->goBack();
+                    /*\Yii::$app->user->login($user, $this->module->rememberFor);
+                    return $this->goBack();*/
+
+
+                    Yii::$app->session->setFlash(
+                        'info',
+                        Yii::t(
+                            'user',
+                            'Your account has been created and a message with further instructions has been sent to your email'
+                        )
+                    );
+
+                    return $this->render('/message', [
+                        'title'  => \Yii::t('user', 'Your account has been created'),
+                        'module' => $this->module,
+                        'profile' => $profile
+                    ]);
                 }
             }
         }
