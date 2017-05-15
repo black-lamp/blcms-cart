@@ -117,6 +117,7 @@ class CartBootstrap implements BootstrapInterface
             /** @var SmsMobizoneComponent $smsComponent */
             $smsComponent = Yii::$app->sms;
             $smsComponent->setSmsText(strtr($smsTemplate->translation->subject, $vars));
+            $smsComponent->setRecipientPhoneNumber($order->user->profile->phone);
             $smsComponent->send();
         }
     }
