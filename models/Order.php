@@ -22,6 +22,8 @@ use yii\db\Expression;
  * @property integer $delivery_id
  * @property integer $uid
  * @property integer $payment_method_id
+ * @property integer $creation_time
+ * @property integer $update_time
  * @property string $delivery_post_office
  * @property string $confirmation_time
  * @property string $invoice
