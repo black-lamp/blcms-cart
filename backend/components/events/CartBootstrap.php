@@ -67,6 +67,7 @@ class CartBootstrap implements BootstrapInterface
                 $mailTemplate = Yii::$app->get('emailTemplates')->getTemplate($mail->key, Language::getCurrent()->id);
                 $vars = [
                     '{order_id}' => $event->model->uid,
+                    '{order_sum}' => $event->model->total_cost,
                     '{created_at}' => $event->model->creation_time,
                     '{status}' => $event->model->orderStatus->translation->title,
                     '{order_invoice}' => $event->model->invoice,
