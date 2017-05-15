@@ -4,6 +4,7 @@ namespace bl\cms\cart\frontend\components\user;
 use bl\cms\cart\common\components\user\models\Token;
 use bl\cms\shop\common\components\user\models\User;
 use bl\emailTemplates\data\Template;
+use bl\legalAgreement\common\entities\Legal;
 use bl\multilang\entities\Language;
 use Yii;
 use yii\base\Component;
@@ -176,7 +177,12 @@ class UserMailer extends Component
     public function sendWelcomeMessage(User $user, Token $token = null)
     {
         $mailVars = [
-            '{token}' => $token->url
+            '{token}' => $token->url,
+            '{legal_link}' => Url::toRoute([
+                '/legal/default/view',
+                'legalId' => Legal::findOne(['key' => 'buyers'])->id,
+                'langId' => Language::getCurrent()->id
+            ], true)
         ];
 
         /**
