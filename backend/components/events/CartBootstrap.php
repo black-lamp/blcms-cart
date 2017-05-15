@@ -3,6 +3,7 @@ namespace bl\cms\cart\backend\components\events;
 
 use bl\cms\cart\backend\controllers\OrderController;
 use bl\cms\cart\backend\events\OrderEvent;
+use bl\cms\sms\SmsMobizoneComponent;
 use bl\emailTemplates\data\Template;
 use bl\multilang\entities\Language;
 use Yii;
@@ -29,7 +30,7 @@ class CartBootstrap implements BootstrapInterface
     }
 
     /**
-     * @param $event
+     * @param OrderEvent $event
      *
      * Records log
      */
@@ -56,7 +57,9 @@ class CartBootstrap implements BootstrapInterface
      */
     public function send($event)
     {
-        $mail = $event->model->orderStatus->mail;
+        $order = $event->model;
+        $mail = $order->orderStatus->mail;
+        $smsTemplate = $order->orderStatus->smsTemplate;
 
         if (!empty($mail)) {
             try {
@@ -66,13 +69,13 @@ class CartBootstrap implements BootstrapInterface
                  */
                 $mailTemplate = Yii::$app->get('emailTemplates')->getTemplate($mail->key, Language::getCurrent()->id);
                 $vars = [
-                    '{order_id}' => $event->model->uid,
-                    '{order_sum}' => $event->model->total_cost,
-                    '{created_at}' => $event->model->creation_time,
-                    '{status}' => $event->model->orderStatus->translation->title,
-                    '{order_invoice}' => $event->model->invoice,
-                    '{order_pay_btn}' => $event->model->invoice
-                        ? Html::tag('p', Html::a(Yii::t('order.mail', 'Pay'), $event->model->invoice, [
+                    '{order_id}' => $order->uid,
+                    '{order_sum}' => $order->total_cost,
+                    '{created_at}' => $order->creation_time,
+                    '{status}' => $order->orderStatus->translation->title,
+                    '{order_invoice}' => $order->invoice,
+                    '{order_pay_btn}' => $order->invoice
+                        ? Html::tag('p', Html::a(Yii::t('order.mail', 'Pay'), $order->invoice, [
                             'target' => '_blank',
                             'style' => [
                                 'background-color' => '#f09020',
@@ -95,13 +98,26 @@ class CartBootstrap implements BootstrapInterface
                 Yii::$app->shopMailer->compose('mail-body',
                     ['bodyContent' => $mailTemplate->getBody()])
                     ->setFrom([\Yii::$app->cart->sender ?? \Yii::$app->shopMailer->transport->getUsername() => \Yii::$app->name ?? Url::to(['/'], true)])
-                    ->setTo($event->model->user->email)
+                    ->setTo($order->user->email)
                     ->setSubject($mailTemplate->getSubject())
                     ->send();
 
             } catch (Exception $ex) {
                 throw new Exception($ex);
             }
+        }
+
+        if(!empty($smsTemplate)) {
+            $vars = [
+                '{order_id}' => $order->uid,
+                '{order_sum}' => $order->total_cost,
+                '{order_invoice}' => Yii::$app->urlShortener->shorten($order->invoice)
+            ];
+
+            /** @var SmsMobizoneComponent $smsComponent */
+            $smsComponent = Yii::$app->sms;
+            $smsComponent->setSmsText(strtr($smsTemplate->translation->subject, $vars));
+            $smsComponent->send();
         }
     }
 
