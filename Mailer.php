@@ -37,7 +37,8 @@ class Mailer extends Component
             ]),
             '{totalCost}' => \Yii::$app->formatter->asCurrency($orderResult['order']->total_cost),
             '{cost}' => \Yii::$app->view->render('@bl/cms/cart/frontend/views/mail/cost', [
-                'cost' => \Yii::$app->formatter->asCurrency($orderResult['order']->cost)
+                'cost' => \Yii::$app->formatter->asCurrency($orderResult['order']->cost),
+                'totalCost' => \Yii::$app->formatter->asCurrency($orderResult['order']->total_cost)
             ]),
         ];
 
