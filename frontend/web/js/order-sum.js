@@ -4,7 +4,12 @@
 $(function() {
 
     function formChangeHandle() {
-        $.get('sum', $('#order-form').serialize(), function(data) {
+        var prefix = '';
+        if(window.currentLang && currentLang === 'uk-ua') {
+            prefix = '/uk-ua'
+        }
+
+        $.get(prefix + '/cart/order/sum', $('#order-form').serialize(), function(data) {
             $('#costContainer').html(data);
         });
     }

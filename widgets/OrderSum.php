@@ -3,6 +3,7 @@ namespace bl\cms\cart\widgets;
 
 use Yii;
 use yii\base\Widget;
+use yii\web\View;
 
 /**
  * @author Gutsulyak Vadim <guts.vadim@gmail.com>
@@ -35,6 +36,7 @@ class OrderSum extends Widget
             $discount = round(($this->cost - $this->totalCost) / $this->cost * 100);
         }
 
+        $this->view->registerJs("var currentLang='" . Yii::$app->language . "';", View::POS_HEAD);
         return $this->render('order-sum', [
             'cost' => $this->cost,
             'totalCost' => $this->totalCost,
