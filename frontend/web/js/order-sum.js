@@ -4,7 +4,7 @@
 $(function() {
 
     function formChangeHandle() {
-        $.get('/cart/order/sum', $('#order-form').serialize(), function(data) {
+        $.get('sum', $('#order-form').serialize(), function(data) {
             $('#costContainer').html(data);
         });
     }
