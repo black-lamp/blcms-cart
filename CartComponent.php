@@ -37,6 +37,10 @@ class CartComponent extends Component
     const EVENT_BEFORE_GET_ORDER = 'before-get-order';
     const EVENT_BEFORE_GET_ORDER_FROM_DB = 'before-get-order-from-db';
 
+    const EVENT_AFTER_CLEAR = 'after-clear';
+    const EVENT_AFTER_ADD_PRODUCT = 'after-add-product';
+    const EVENT_AFTER_REMOVE_PRODUCT = 'after-remove-product';
+
     /**
      * @var bool
      * Enabling sending e-mails
@@ -113,6 +117,7 @@ class CartComponent extends Component
         } else {
             $this->saveProductToSession($productId, $count, $attributesAndValues, $additionalProducts, $combinationId);
         }
+        $this->trigger(self::EVENT_AFTER_ADD_PRODUCT);
     }
 
     /**
@@ -498,6 +503,7 @@ class CartComponent extends Component
                 }
             }
         }
+        $this->trigger(self::EVENT_AFTER_REMOVE_PRODUCT);
     }
 
     /**
@@ -673,6 +679,7 @@ class CartComponent extends Component
             $session = \Yii::$app->session;
             $session->remove(self::SESSION_KEY);
         }
+        $this->trigger(self::EVENT_AFTER_CLEAR);
     }
 
     /**
