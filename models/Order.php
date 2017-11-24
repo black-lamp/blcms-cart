@@ -22,6 +22,7 @@ use yii\db\Expression;
  * @property integer $delivery_id
  * @property integer $uid
  * @property integer $payment_method_id
+ * @property string $user_comment
  * @property integer $creation_time
  * @property integer $update_time
  * @property string $delivery_post_office
@@ -65,6 +66,7 @@ class Order extends ActiveRecord
     public function rules()
     {
         return [
+            [['user_comment'], 'safe'],
             [['user_id'], 'required'],
             [['user_id', 'status', 'address_id', 'uid', 'payment_method_id'], 'integer'],
             [['cost', 'total_cost'], 'double'],
@@ -86,6 +88,7 @@ class Order extends ActiveRecord
             'delivery_post_office' => Yii::t('cart', 'Post office'),
             'uid' => Yii::t('cart', 'Order number'),
             'invoice' => Yii::t('cart', 'Invoice'),
+            'user_comment' => Yii::t('cart', 'User comment'),
         ];
     }
 
