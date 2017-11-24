@@ -4,6 +4,7 @@
  *
  * @var $products \bl\cms\shop\common\entities\Product | \bl\cms\cart\models\OrderProduct
  */
+use bl\cms\shop\common\entities\ShopAttribute;
 use yii\bootstrap\Html;
 
 ?>
@@ -35,7 +36,11 @@ use yii\bootstrap\Html;
                     <?php foreach ($combination->combinationAttributes as $attribute) : ?>
                         <p>
                             <?= $attribute->productAttribute->translation->title; ?>:
-                            <?= $attribute->productAttributeValue->translation->value; ?>
+                            <?php if($attribute->productAttribute->type->id == ShopAttribute::TYPE_COLOR || $attribute->productAttribute->type->id == ShopAttribute::TYPE_TEXTURE): ?>
+                                <?= $attribute->productAttributeValue->translation->colorTexture->title; ?>
+                            <?php else: ?>
+                                <?= $attribute->productAttributeValue->translation->value; ?>
+                            <?php endif; ?>
                         </p>
                     <?php endforeach; ?>
                 <?php endif; ?>
