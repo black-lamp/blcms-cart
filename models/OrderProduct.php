@@ -20,9 +20,14 @@ use yii\db\ActiveRecord;
  * @property integer $combination_id
  * @property integer $order_id
  * @property integer $count
+ * @property float $price
+ * @property float $base_price
+ * @property float $sum
+ * @property float $base_sum
  *
  * @property Order $order
  * @property Product $product
+ * @property Combination $combination
  * @property Price $productPrice
  * @property OrderProductAdditionalProduct $orderProductAdditionalProduct
  */
@@ -44,6 +49,8 @@ class OrderProduct extends ActiveRecord
         return [
             [['product_id', 'order_id', 'count'], 'required'],
             [['product_id', 'order_id', 'combination_id', 'count'], 'integer'],
+            [['price', 'sum', 'base_price', 'base_sum'], 'number'],
+            [['price', 'sum', 'base_price', 'base_sum'], 'safe'],
             [['order_id'], 'exist', 'skipOnError' => true, 'targetClass' => Order::className(), 'targetAttribute' => ['order_id' => 'id']],
             [['product_id'], 'exist', 'skipOnError' => true, 'targetClass' => Product::className(), 'targetAttribute' => ['product_id' => 'id']],
             [['combination_id'], 'exist', 'skipOnError' => true,
@@ -88,18 +95,35 @@ class OrderProduct extends ActiveRecord
         return $this->hasOne(Product::className(), ['id' => 'product_id']);
     }
 
-    public function getPrice()
+    /**
+     * @return Price
+     */
+    public function getPriceObj()
     {
         $product = $this->product;
 
         if (!empty($this->combination_id)) {
-            $price = Combination::findOne($this->combination_id)->price->discountPrice;
+            $price = Combination::findOne($this->combination_id)->price;
         }
         else if (!empty($product->price)) {
-            $price = $product->price->discountPrice;
+            $price = $product->price;
         }
 
-        return $price ?? 0;
+        return $price ?? null;
+    }
+
+    /**
+     * @return float|int|mixed
+     */
+    public function getPrice()
+    {
+        $price = $this->getPriceObj();
+
+        if(!empty($price)) {
+            return $price->discountPrice;
+        }
+
+        return 0;
     }
 
     public function getSmallPhoto() {

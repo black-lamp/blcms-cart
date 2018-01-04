@@ -34,7 +34,7 @@ use yii\db\Expression;
  * @property User $user
  * @property UserAddress $address
  * @property OrderStatus $orderStatus
- * @property OrderProduct[] $OrderProducts
+ * @property OrderProduct[] $orderProducts
  */
 class Order extends ActiveRecord
 {

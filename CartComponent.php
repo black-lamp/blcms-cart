@@ -508,7 +508,7 @@ class CartComponent extends Component
 
     /**
      * Gets registered user's incomplete order
-     * @return array|bool|null|ActiveRecord
+     * @return array|Order|null
      */
     public function getIncompleteOrder()
     {
@@ -517,9 +517,11 @@ class CartComponent extends Component
             $order = Order::find()
                 ->where(['user_id' => $user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])
                 ->one();
-            if (!empty($order)) return $order;
+            if (!empty($order)) {
+                return $order;
+            }
         }
-        return false;
+        return null;
     }
 
     /**
@@ -579,7 +581,16 @@ class CartComponent extends Component
                 $order->total_cost = $this->getTotalCost();
 
                 if ($order->validate()) {
-                    $order->save();
+                    if($order->save()) {
+                        foreach ($order->orderProducts as $orderProduct) {
+                            $price = $orderProduct->getPriceObj();
+                            $orderProduct->price = $price->getDiscountPrice();
+                            $orderProduct->base_price = $price->getBaseDiscountPrice();
+                            $orderProduct->sum = $orderProduct->price * $orderProduct->count;
+                            $orderProduct->base_sum = $orderProduct->base_price * $orderProduct->count;
+                            $orderProduct->save();
+                        }
+                    }
                     return [
                         'user' => \Yii::$app->user,
                         'profile' => $profile,
@@ -644,7 +655,17 @@ class CartComponent extends Component
                 $orderProduct->order_id = $order->id;
                 $orderProduct->count = $sessionProduct['count'];
                 $orderProduct->combination_id = $sessionProduct['combinationId'];
-                if ($orderProduct->validate()) $orderProduct->save();
+
+                if ($orderProduct->validate()) {
+                    $orderProduct->save();
+
+                    $price = $orderProduct->getPriceObj();
+                    $orderProduct->price = $price->getDiscountPrice();
+                    $orderProduct->base_price = $price->getBaseDiscountPrice();
+                    $orderProduct->sum = $orderProduct->price * $orderProduct->count;
+                    $orderProduct->base_sum = $orderProduct->base_price * $orderProduct->count;
+                    $orderProduct->save();
+                }
 
                 //saving additional products
                 if (!empty($sessionProduct['additionalProducts'])) {
