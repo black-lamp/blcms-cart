@@ -33,8 +33,11 @@ use yii\db\Expression;
  *
  * @property User $user
  * @property UserAddress $address
+ * @property DeliveryMethod $deliveryMethod
+ * @property PaymentMethod $paymentMethod
  * @property OrderStatus $orderStatus
  * @property OrderProduct[] $orderProducts
+ * @property int $orderProductsCount
  */
 class Order extends ActiveRecord
 {
@@ -89,6 +92,7 @@ class Order extends ActiveRecord
             'uid' => Yii::t('cart', 'Order number'),
             'invoice' => Yii::t('cart', 'Invoice'),
             'user_comment' => Yii::t('cart', 'User comment'),
+            'orderProductsCount' => Yii::t('cart', 'Product count'),
         ];
     }
 
@@ -130,6 +134,14 @@ class Order extends ActiveRecord
     public function getOrderProducts()
     {
         return $this->hasMany(OrderProduct::className(), ['order_id' => 'id']);
+    }
+
+    /**
+     * @return int
+     */
+    public function getOrderProductsCount()
+    {
+        return $this->hasMany(OrderProduct::className(), ['order_id' => 'id'])->count();
     }
 
     /**

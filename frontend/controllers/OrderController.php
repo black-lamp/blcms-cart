@@ -2,6 +2,7 @@
 namespace bl\cms\cart\frontend\controllers;
 
 use bl\cms\cart\models\Order;
+use bl\cms\cart\models\OrderSearch;
 use bl\cms\cart\widgets\OrderSum;
 use Yii;
 use yii\web\Controller;
@@ -23,9 +24,13 @@ class OrderController extends Controller
     public function actionShowOrderList() {
         if (!\Yii::$app->user->isGuest) {
             $userOrders = \Yii::$app->cart->getAllUserOrders();
+            $filterModel = new OrderSearch();
+            $dataProvider = $filterModel->search(Yii::$app->request->get());
 
             return $this->render('order-list', [
-                'userOrders' => $userOrders
+                'userOrders' => $userOrders,
+                'filterModel' => $filterModel,
+                'dataProvider' => $dataProvider,
             ]);
         }
         else throw new NotFoundHttpException();
