@@ -45,11 +45,11 @@ class OrderSearch extends Order
     public function attributeLabels()
     {
         return [
-            'orderUid' => Yii::t('cart', 'Order #'),
-            'createdFrom' => Yii::t('cart', 'Created from'),
-            'createdTo' => Yii::t('cart', 'Created to'),
-            'sumFrom' => Yii::t('cart', 'Sum from'),
-            'sumTo' => Yii::t('cart', 'Sum to'),
+            'orderUid' => Yii::t('order', 'Order #'),
+            'createdFrom' => Yii::t('order', 'Created from'),
+            'createdTo' => Yii::t('order', 'Created to'),
+            'sumFrom' => Yii::t('order', 'Sum from'),
+            'sumTo' => Yii::t('order', 'Sum to'),
         ];
     }
 
