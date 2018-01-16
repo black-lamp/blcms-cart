@@ -68,7 +68,7 @@ class OrderSearch extends Order
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
-                'pageSize' => 3,
+                'pageSize' => 20,
             ],
             'sort' => [
                 'defaultOrder' => ['creation_time' => SORT_DESC]
