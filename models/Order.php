@@ -25,6 +25,7 @@ use yii\db\Expression;
  * @property string $user_comment
  * @property integer $creation_time
  * @property integer $update_time
+ * @property string $delivery_number
  * @property string $delivery_post_office
  * @property string $confirmation_time
  * @property string $invoice
@@ -73,7 +74,7 @@ class Order extends ActiveRecord
             [['user_id'], 'required'],
             [['user_id', 'status', 'address_id', 'uid', 'payment_method_id'], 'integer'],
             [['cost', 'total_cost'], 'double'],
-            [['delivery_post_office', 'invoice'], 'string', 'max' => 255],
+            [['delivery_post_office', 'delivery_number', 'invoice'], 'string', 'max' => 255],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
             [['address_id'], 'exist', 'skipOnError' => true, 'targetClass' => UserAddress::className(), 'targetAttribute' => ['address_id' => 'id']],
             [['status'], 'exist', 'skipOnError' => true, 'targetClass' => OrderStatus::className(), 'targetAttribute' => ['status' => 'id']],
@@ -91,6 +92,7 @@ class Order extends ActiveRecord
             'delivery_post_office' => Yii::t('cart', 'Post office'),
             'uid' => Yii::t('cart', 'Order number'),
             'invoice' => Yii::t('cart', 'Invoice'),
+            'delivery_number' => Yii::t('cart', 'Delivery number'),
             'user_comment' => Yii::t('cart', 'User comment'),
             'orderProductsCount' => Yii::t('cart', 'Product count'),
         ];
