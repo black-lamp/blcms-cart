@@ -139,7 +139,13 @@ class CartComponent extends Component
                 $combination = $this->getCombination($attributesAndValues, $productId);
                 if (!empty($combination)) {
                     $orderProduct = $this->getOrderProduct($order->id, $productId, $combination->id);
-                } else throw new Exception(\Yii::t('cart', 'Such attributes combination does not exist'));
+                }
+                else {
+                    throw new Exception(\Yii::t('cart', 'Such attributes combination does not exist'));
+                }
+            }
+            else if(!empty($combinationId)) {
+                $orderProduct = $this->getOrderProduct($order->id, $productId, $combinationId);
             }
             else {
                 $orderProduct = $this->getOrderProduct($order->id, $productId, null);
@@ -695,7 +701,8 @@ class CartComponent extends Component
     {
         if (!\Yii::$app->user->isGuest && $this->saveToDataBase === true) {
             $order = Order::find()->where(['user_id' => \Yii::$app->user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])->one();
-            if (!empty($order)) $order->deleteAll();
+            if (!empty($order))
+                $order->delete();
         } else {
             $session = \Yii::$app->session;
             $session->remove(self::SESSION_KEY);
@@ -768,7 +775,8 @@ class CartComponent extends Component
                         if (!empty($combination)) $totalCost += $combination->price->discountPrice * $product['count'];
                     } else {
                         $productFromDb = Product::findOne($product['id']);
-                        if (!empty($productFromDb)) $totalCost += $productFromDb->discountPrice * $product['count'];
+                        if (!empty($productFromDb))
+                            $totalCost += $productFromDb->price->discountPrice * $product['count'];
                     }
 
                     if (!empty($product['additionalProducts'])) {
@@ -776,7 +784,7 @@ class CartComponent extends Component
                             if ((int)$additionalProduct['productId']) {
                                 $product = Product::findOne($additionalProduct['productId']);
                                 if (!empty($product)) {
-                                    $totalCost += $product->discountPrice * $additionalProduct['number'];
+                                    $totalCost += $product->price->discountPrice * $additionalProduct['number'];
                                 }
                             }
                         }
@@ -790,13 +798,12 @@ class CartComponent extends Component
                 ->one();
             if (!empty($order)) {
                 $orderProducts = OrderProduct::find()->where(['order_id' => $order->id])->all();
-
                 if (!empty($orderProducts)) {
                     foreach ($orderProducts as $product) {
                         if (\Yii::$app->getModule('shop')->enableCombinations && !empty($product->combination)) {
                             $totalCost += $product->count * $product->combination->price->discountPrice;
                         } else {
-                            $totalCost += $product->count * $product->price;
+                            $totalCost += $product->count * $product->product->price->discountPrice;
                         }
                         if (!empty($product->orderProductAdditionalProducts)) {
                             foreach ($product->orderProductAdditionalProducts as $orderProductAdditionalProduct) {

@@ -60,4 +60,20 @@ class OrderController extends Controller
 
         throw new NotFoundHttpException();
     }
+
+    public function actionRepeat($id) {
+        $order = Order::findOne($id);
+
+        if(empty($order)) {
+            Yii::$app->session->setFlash('error', Yii::t('order', 'Wrong order id.'));
+            return $this->goBack();
+        }
+
+        Yii::$app->cart->clearCart();
+        foreach ($order->orderProducts as $orderProduct) {
+            Yii::$app->cart->add($orderProduct->product_id, $orderProduct->count, null, [], $orderProduct->combination_id);
+        }
+
+        return $this->redirect(['/cart']);
+    }
 }
