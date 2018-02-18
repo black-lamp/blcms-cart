@@ -27,6 +27,8 @@ use yii\db\ActiveRecord;
  *
  * @property float $priceFloor
  * @property float $calculatedSum
+ * @property string $img
+ * @property string $title
  *
  * @property Order $order
  * @property Product $product
@@ -107,8 +109,7 @@ class OrderProduct extends ActiveRecord
 
         if (!empty($this->combination_id)) {
             $price = Combination::findOne($this->combination_id)->price;
-        }
-        else if (!empty($product->price)) {
+        } else if (!empty($product->price)) {
             $price = $product->price;
         }
 
@@ -122,7 +123,7 @@ class OrderProduct extends ActiveRecord
     {
         $price = $this->getPriceObj();
 
-        if(!empty($price)) {
+        if (!empty($price)) {
             return $price->discountPrice;
         }
 
@@ -134,10 +135,9 @@ class OrderProduct extends ActiveRecord
      */
     public function getPriceFloor()
     {
-        if(!empty($this->combination)) {
+        if (!empty($this->combination)) {
             return $this->combination->price->discountPriceFloor ?: 0;
-        }
-        else {
+        } else {
             return $this->product->price->discountPriceFloor ?: 0;
         }
     }
@@ -150,17 +150,58 @@ class OrderProduct extends ActiveRecord
         return $this->priceFloor * $this->count;
     }
 
-    public function getSmallPhoto() {
+    /**
+     * @return string
+     */
+    public function getImg()
+    {
+        $src = '';
+        if (!empty($this->combination)) {
+            $src = (!empty($this->combination->images)) ?
+                $this->combination->images[0]->productImage->getBig() :
+                ($this->product->image ?
+                    $this->product->image->getBig() : '');
+        }
+        else {
+            if (!empty($this->product->image)) {
+                $src = $this->product->image->getBig() ?: '';
+            }
+        }
+        return $src;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitle()
+    {
+        $title = '';
+        if(!empty($this->product)) {
+            $title .= $this->product->translation->title;
+            if(!empty($this->combination)) {
+                $title .= ', ' . $this->combination->title;
+            }
+        }
+        return $title;
+    }
+
+    public function getSmallPhoto()
+    {
         return $this->getPhoto('small');
     }
-    public function getThumbPhoto() {
+
+    public function getThumbPhoto()
+    {
         return $this->getPhoto('thumb');
     }
-    public function getBigPhoto() {
+
+    public function getBigPhoto()
+    {
         return $this->getPhoto('big');
     }
 
-    private function getPhoto($size) {
+    private function getPhoto($size)
+    {
         $image = ProductImage::find()->where(['product_id' => $this->product_id])->one();
 
         if (!empty($image)) {
@@ -169,14 +210,14 @@ class OrderProduct extends ActiveRecord
             $logo = \Yii::$app->shop_imagable->get('shop-product', $size, $imageName);
 
             return '/images/shop-product/' . FileHelper::getFullName($logo);
-        }
-        else return false;
+        } else return false;
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getOrderProductAdditionalProducts() {
+    public function getOrderProductAdditionalProducts()
+    {
 
         return $this->hasMany(OrderProductAdditionalProduct::className(), ['order_product_id' => 'id']);
     }
@@ -185,7 +226,8 @@ class OrderProduct extends ActiveRecord
      * @param $additionalProductId integer
      * @return array|bool|null|ActiveRecord
      */
-    public function getOrderProductAdditionalProduct($additionalProductId) {
+    public function getOrderProductAdditionalProduct($additionalProductId)
+    {
 
         if (!empty($additionalProductId)) {
             $orderProductAdditionalProduct = OrderProductAdditionalProduct::find()

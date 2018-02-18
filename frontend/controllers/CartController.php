@@ -4,6 +4,7 @@ namespace bl\cms\cart\frontend\controllers;
 use bl\cms\cart\frontend\events\MakeOrderSuccessEvent;
 use bl\cms\cart\frontend\Module;
 use bl\cms\cart\Mailer;
+use bl\cms\cart\models\OrderProductViewModel;
 use bl\cms\seo\StaticPageBehavior;
 use bl\cms\shop\common\entities\ProductAdditionalProduct;
 use bl\cms\shop\frontend\widgets\models\AdditionalProductForm;
@@ -127,6 +128,7 @@ class CartController extends Controller
                 $order = new Order();
 
                 $products = [];
+                $orderProductViewModels = [];
                 foreach ($items as $item) {
                     $product = Product::findOne($item['id']);
                     if (!empty($product)) {
@@ -141,6 +143,11 @@ class CartController extends Controller
                             }
                         }
                         $products[] = $product;
+                        $orderProductViewModels[] = new OrderProductViewModel([
+                            'product_id' => $item['id'],
+                            'combination_id' => $item['combinationId'],
+                            'count' => $item['count'],
+                        ]);
                     }
                 }
                 $view = 'show-for-guest';
@@ -154,7 +161,7 @@ class CartController extends Controller
                         ->where(['user_id' => \Yii::$app->user->id, 'status' => OrderStatus::STATUS_INCOMPLETE])
                         ->one() ?? new Order();
                 $products = OrderProduct::find()->where(['order_id' => $order->id])->all();
-
+                $orderProductViewModels = $products;
                 $view = 'show';
             }
             return $this->render($view, [
@@ -163,6 +170,7 @@ class CartController extends Controller
                 'profile' => $profile,
                 'user' => $user,
                 'address' => $address,
+                'orderProductViewModels' => $orderProductViewModels
             ]);
         }
     }
