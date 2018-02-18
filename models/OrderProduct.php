@@ -25,6 +25,9 @@ use yii\db\ActiveRecord;
  * @property float $sum
  * @property float $base_sum
  *
+ * @property float $priceFloor
+ * @property float $calculatedSum
+ *
  * @property Order $order
  * @property Product $product
  * @property Combination $combination
@@ -124,6 +127,27 @@ class OrderProduct extends ActiveRecord
         }
 
         return 0;
+    }
+
+    /**
+     * @return float
+     */
+    public function getPriceFloor()
+    {
+        if(!empty($this->combination)) {
+            return $this->combination->price->discountPriceFloor ?: 0;
+        }
+        else {
+            return $this->product->price->discountPriceFloor ?: 0;
+        }
+    }
+
+    /**
+     * @return float
+     */
+    public function getCalculatedSum()
+    {
+        return $this->priceFloor * $this->count;
     }
 
     public function getSmallPhoto() {

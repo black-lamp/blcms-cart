@@ -760,7 +760,7 @@ class CartComponent extends Component
      * Gets cost of user's incomplete order without discounts
      * @return mixed
      */
-    public function getCost(): int {
+    public function getCost() {
         $totalCost = 0;
         if (Yii::$app->user->isGuest) {
             //Gets products from session
@@ -772,11 +772,11 @@ class CartComponent extends Component
 
                     if (!empty($product['combinationId'])) {
                         $combination = Combination::findOne($product['combinationId']);
-                        if (!empty($combination)) $totalCost += $combination->price->discountPrice * $product['count'];
+                        if (!empty($combination)) $totalCost += $combination->price->discountPriceFloor * $product['count'];
                     } else {
                         $productFromDb = Product::findOne($product['id']);
                         if (!empty($productFromDb))
-                            $totalCost += $productFromDb->price->discountPrice * $product['count'];
+                            $totalCost += $productFromDb->price->discountPriceFloor * $product['count'];
                     }
 
                     if (!empty($product['additionalProducts'])) {
@@ -784,7 +784,7 @@ class CartComponent extends Component
                             if ((int)$additionalProduct['productId']) {
                                 $product = Product::findOne($additionalProduct['productId']);
                                 if (!empty($product)) {
-                                    $totalCost += $product->price->discountPrice * $additionalProduct['number'];
+                                    $totalCost += $product->price->discountPriceFloor * $additionalProduct['number'];
                                 }
                             }
                         }
@@ -801,13 +801,13 @@ class CartComponent extends Component
                 if (!empty($orderProducts)) {
                     foreach ($orderProducts as $product) {
                         if (\Yii::$app->getModule('shop')->enableCombinations && !empty($product->combination)) {
-                            $totalCost += $product->count * $product->combination->price->discountPrice;
+                            $totalCost += $product->count * $product->combination->price->discountPriceFloor;
                         } else {
-                            $totalCost += $product->count * $product->product->price->discountPrice;
+                            $totalCost += $product->count * $product->product->price->discountPriceFloor;
                         }
                         if (!empty($product->orderProductAdditionalProducts)) {
                             foreach ($product->orderProductAdditionalProducts as $orderProductAdditionalProduct) {
-                                $totalCost += $orderProductAdditionalProduct->additionalProduct->discountPrice *
+                                $totalCost += $orderProductAdditionalProduct->additionalProduct->price->discountPriceFloor *
                                     $orderProductAdditionalProduct->number;
                             }
                         }
@@ -823,7 +823,7 @@ class CartComponent extends Component
      * or from DB if user is authenticated
      * @return mixed
      */
-    public function getTotalCost(): int {
+    public function getTotalCost() {
         $totalCost = $this->getCost();
         $adjustmentTotal = 0;
 
