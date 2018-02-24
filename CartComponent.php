@@ -590,9 +590,9 @@ class CartComponent extends Component
                     if($order->save()) {
                         foreach ($order->orderProducts as $orderProduct) {
                             $price = $orderProduct->getPriceObj();
-                            $orderProduct->price = $price->getDiscountPrice();
+                            $orderProduct->price = $orderProduct->priceFloor;
                             $orderProduct->base_price = $price->getBaseDiscountPrice();
-                            $orderProduct->sum = $orderProduct->price * $orderProduct->count;
+                            $orderProduct->sum = $orderProduct->calculatedSum;
                             $orderProduct->base_sum = $orderProduct->base_price * $orderProduct->count;
                             $orderProduct->save();
                         }
@@ -666,9 +666,9 @@ class CartComponent extends Component
                     $orderProduct->save();
 
                     $price = $orderProduct->getPriceObj();
-                    $orderProduct->price = $price->getDiscountPrice();
+                    $orderProduct->price = $orderProduct->priceFloor;
                     $orderProduct->base_price = $price->getBaseDiscountPrice();
-                    $orderProduct->sum = $orderProduct->price * $orderProduct->count;
+                    $orderProduct->sum = $orderProduct->calculatedSum;
                     $orderProduct->base_sum = $orderProduct->base_price * $orderProduct->count;
                     $orderProduct->save();
                 }
