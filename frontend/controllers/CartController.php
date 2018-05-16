@@ -255,21 +255,38 @@ class CartController extends Controller
      */
     public function actionChangeItemsNumber(int $productId, int $combinationId = NULL)
     {
-        if (Yii::$app->request->isPost && \Yii::$app->request->isAjax) {
+        if (Yii::$app->request->isPost) {
 
-            Yii::$app->response->format = Response::FORMAT_JSON;
+            if(\Yii::$app->request->isAjax){
+                Yii::$app->response->format = Response::FORMAT_JSON;
 
-            if (Yii::$app->user->isGuest) {
-                if (!Yii::$app->cart->changeOrderProductCountInSession($productId, $combinationId))
-                    return ["error" => 1];
-            } else {
-                if (!Yii::$app->cart->changeOrderProductCountInDB($productId, $combinationId))
-                    return ["error" => 1];
+                if (Yii::$app->user->isGuest) {
+                    if (!Yii::$app->cart->changeOrderProductCountInSession($productId, $combinationId))
+                        return ["error" => 1];
+                } else {
+                    if (!Yii::$app->cart->changeOrderProductCountInDB($productId, $combinationId))
+                        return ["error" => 1];
+                }
+                return [
+                    'totalCost' => \Yii::$app->formatter->asCurrency(Module::$cart->getTotalCost())
+                ];
+            }else{
+                if (Yii::$app->user->isGuest) {
+                    if (Yii::$app->cart->changeOrderProductCountInSession($productId, $combinationId)) {
+                        \Yii::$app->getSession()->setFlash('success', Yii::t('cart', 'You have successfully changed count of products.'));
+                    } else {
+                        \Yii::$app->getSession()->setFlash('error', Yii::t('cart', 'Changing count of products error'));
+                    }
+                } else {
+                    if (Yii::$app->cart->changeOrderProductCountInDB($productId, $combinationId)) {
+                        \Yii::$app->getSession()->setFlash('success', Yii::t('cart', 'You have successfully changed count of products.'));
+                    } else {
+                        \Yii::$app->getSession()->setFlash('error', Yii::t('cart', 'Changing count of products error'));
+                    }
+                }
+                return $this->redirect(Yii::$app->request->referrer);
             }
 
-            return [
-                'totalCost' => \Yii::$app->formatter->asCurrency(Module::$cart->getTotalCost())
-            ];
         }
 
         throw new NotFoundHttpException();
